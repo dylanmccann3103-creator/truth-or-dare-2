@@ -831,12 +831,15 @@ input::placeholder { color: #7a6b8a; }
   <div class="w-full">
     <div class="section-label">Gender</div>
     <div class="pill-row" id="setup-gender-row">
-      <div class="pill-select" data-val="male"           onclick="selectPill('gender','male',this)">Male</div>
-      <div class="pill-select" data-val="female"         onclick="selectPill('gender','female',this)">Female</div>
-      <div class="pill-select" data-val="non-binary"     onclick="selectPill('gender','non-binary',this)">Non-binary</div>
-      <div class="pill-select" data-val="other"          onclick="selectPill('gender','other',this)">Other</div>
-      <div class="pill-select" data-val="prefer-not"     onclick="selectPill('gender','prefer-not',this)">Prefer not to say</div>
+      <div class="pill-select" data-val="male"       onclick="selectPill('gender','male',this)">Male</div>
+      <div class="pill-select" data-val="female"     onclick="selectPill('gender','female',this)">Female</div>
+      <div class="pill-select" data-val="non-binary" onclick="selectPill('gender','non-binary',this)">Non-binary</div>
+      <div class="pill-select" data-val="prefer-not" onclick="selectPill('gender','prefer-not',this)">Prefer not to say</div>
     </div>
+    <input type="text" id="setup-gender-custom" placeholder="Or type your own…" maxlength="40"
+      oninput="onCustomGender(this.value)"
+      style="margin-top:8px;font-size:0.88rem;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);width:100%;box-sizing:border-box"/>
+    <p style="font-size:0.75rem;color:#7a6b8a;margin-top:4px">Custom gender lets pack creators target specific identities — base packs use only Male/Female/Non-binary.</p>
   </div>
 
   <div class="w-full">
@@ -1342,12 +1345,23 @@ function selectPill(field, val, el) {
   const row = el.parentElement;
   row.querySelectorAll('.pill-select').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
-  if (field === 'gender')      myGender      = val;
+  if (field === 'gender') {
+    myGender = val;
+    const custom = document.getElementById('setup-gender-custom');
+    if (custom) custom.value = '';
+  }
   if (field === 'orientation') myOrientation = val;
   if (field === 'language') {
     myLanguage = val;
     if (val !== 'nl') loadLangPack(val);
   }
+}
+
+function onCustomGender(val) {
+  const trimmed = val.trim();
+  // Deselect all preset pills when typing a custom value
+  document.querySelectorAll('#setup-gender-row .pill-select').forEach(p => p.classList.remove('active'));
+  myGender = trimmed || null;
 }
 
 // ─── Genitals multi-select ────────────────────────────────────────────────────
