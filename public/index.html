@@ -1310,6 +1310,10 @@ function buildChooseScreen(state) {
   document.getElementById('choose-emoji').textContent = target.emoji;
   document.getElementById('choose-name').textContent  = target.name;
 
+  // Reset disabled — buttons stay disabled across turns if not cleared
+  document.getElementById('choose-truth-btn').disabled = false;
+  document.getElementById('choose-dare-btn').disabled  = false;
+
   const isMe = target.id === myId;
   document.getElementById('choose-truth-btn').style.display = isMe ? 'flex' : 'none';
   document.getElementById('choose-dare-btn').style.display  = isMe ? 'flex' : 'none';
