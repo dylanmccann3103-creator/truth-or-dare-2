@@ -840,13 +840,15 @@ input::placeholder { color: #7a6b8a; }
   </div>
 
   <div class="w-full">
-    <div class="section-label">What do you have? <span style="font-weight:400;color:#7a6b8a">(select all that apply — used to filter cards, never shown to others)</span></div>
-    <div class="pill-row" id="setup-genitals-row">
-      <div class="pill-select" data-val="penis"   onclick="toggleGenital('penis',this)">Penis</div>
-      <div class="pill-select" data-val="vagina"  onclick="toggleGenital('vagina',this)">Vagina</div>
-      <div class="pill-select" data-val="breasts" onclick="toggleGenital('breasts',this)">Breasts</div>
+    <div class="section-label">What are you comfortable with? <span style="font-weight:400;color:#7a6b8a">(select all that apply — private, used to filter cards)</span></div>
+    <div class="pill-row" id="setup-genitals-row" style="flex-wrap:wrap">
+      <div class="pill-select" data-val="penis"   onclick="toggleGenital('penis',this)">🍆 Penis</div>
+      <div class="pill-select" data-val="vagina"  onclick="toggleGenital('vagina',this)">🌸 Vagina</div>
+      <div class="pill-select" data-val="breasts" onclick="toggleGenital('breasts',this)">🫧 Breasts</div>
+      <div class="pill-select" data-val="anus"    onclick="toggleGenital('anus',this)">🍑 Anus</div>
+      <div class="pill-select" data-val="mouth"   onclick="toggleGenital('mouth',this)">👄 Mouth</div>
     </div>
-    <p style="font-size:0.78rem;color:#7a6b8a;margin-top:6px">Select none to skip all anatomy-specific cards.</p>
+    <p style="font-size:0.78rem;color:#7a6b8a;margin-top:6px">Cards requiring body parts you haven't selected won't appear.</p>
   </div>
 
   <div class="w-full">
