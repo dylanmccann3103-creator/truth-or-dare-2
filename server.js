@@ -29,7 +29,7 @@ if (!BASE_URL) {
   console.warn('[warn] BASE_URL not set — QR codes will use local IP (fine for LAN, wrong on Railway)');
 }
 
-const ALL_TAGS = ['general', 'flirty', 'clothing', 'body', 'physical', 'feet', 'mouth', 'oral', 'intimate', 'explicit', 'exposure', 'extreme_exposure'];
+const ALL_TAGS = ['general', 'flirty', 'clothing', 'body', 'physical', 'feet', 'mouth', 'oral', 'intimate', 'explicit', 'exposure', 'extreme_exposure', 'penetration'];
 const EMOJIS   = ['🦊','🐱','🐶','🦁','🐯','🦋','🐝','🦄','🐸','🐙','🦀','🌙','⭐','🍓','🌹'];
 
 // ─── Room Store ───────────────────────────────────────────────────────────────
