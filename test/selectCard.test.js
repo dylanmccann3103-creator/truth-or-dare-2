@@ -9,7 +9,7 @@ const { calcRewards, applyImmunity, POWERUP_COSTS } = require('../lib/gameHelper
 
 function player(overrides = {}) {
   return {
-    id: 'p1', name: 'Test', gender: 'male', bodyType: 'penis',
+    id: 'p1', name: 'Test', gender: 'male', genitals: ['penis'],
     orientation: 'bi', availableForAllCombos: false,
     limits: [], preferences: [],
     ...overrides,
@@ -19,10 +19,10 @@ function player(overrides = {}) {
 function card(overrides = {}) {
   return {
     id: 'c1', type: 'dare', level: 3, difficulty: 2,
-    text: { en: 'Test dare', nl: 'Test dare NL' },
+    text: 'Test dare NL',
     tags: ['physical'],
     genderRequired: null,
-    bodyTypeRelevant: false, bodyTypeRequired: null,
+    performerGenitals: null, targetGenitals: null,
     orientationMatters: false, targetRequired: false,
     ...overrides,
   };
@@ -100,12 +100,34 @@ test('orientation-compatible pair passes when orientationMatters is true', () =>
   assert.ok(result, 'hetero male+female combo should pass orientationMatters');
 });
 
-// ─── Test 8: Body type mismatch blocks when bodyTypeRelevant ──────────────────
-test('body type mismatch blocks card when bodyTypeRelevant is true', () => {
-  const cards = [card({ id: 'c1', bodyTypeRelevant: true, bodyTypeRequired: 'vagina', tags: [], level: 3 })];
-  const performer = player({ bodyType: 'penis' });
+// ─── Test 8: Performer genital mismatch blocks card ───────────────────────────
+test('performer genital mismatch blocks card', () => {
+  const cards = [card({ id: 'c1', performerGenitals: ['vagina'], tags: [], level: 3 })];
+  const performer = player({ genitals: ['penis'] });
   const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
-  assert.equal(result, null, 'Mismatched bodyType should block the card');
+  assert.equal(result, null, 'Performer lacking required genital should block card');
+});
+
+test('performer with matching genital passes filter', () => {
+  const cards = [card({ id: 'c1', performerGenitals: ['vagina'], tags: [], level: 3 })];
+  const performer = player({ genitals: ['vagina', 'breasts'] });
+  const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
+  assert.notEqual(result, null, 'Performer with matching genital should get the card');
+});
+
+test('prefer-not genitals blocks cards with genital requirements', () => {
+  const cards = [card({ id: 'c1', performerGenitals: ['vagina'], tags: [], level: 3 })];
+  const performer = player({ genitals: ['prefer-not'] });
+  const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
+  assert.equal(result, null, 'prefer-not should block genital-required cards');
+});
+
+test('target genital mismatch blocks card', () => {
+  const cards = [card({ id: 'c1', targetGenitals: ['penis'], tags: [], level: 3, targetRequired: true })];
+  const performer = player({ id: 'p1', genitals: ['vagina'] });
+  const target    = player({ id: 'p2', genitals: ['vagina'] });
+  const { card: result } = selectCard(cards, 'dare', performer, target, 3, emptySet);
+  assert.equal(result, null, 'Target lacking required genital should block card');
 });
 
 // ─── Test 9: Type filter — truth request never returns a dare ─────────────────

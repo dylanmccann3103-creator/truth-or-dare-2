@@ -33,7 +33,7 @@ if (!BASE_URL) {
   console.warn('[warn] BASE_URL not set — QR codes will use local IP (fine for LAN, wrong on Railway)');
 }
 
-const ALL_TAGS = ['general', 'flirty', 'clothing', 'body', 'physical', 'feet', 'mouth', 'oral', 'intimate', 'explicit', 'exposure', 'extreme_exposure', 'penetration_vagina', 'penetration_ass'];
+const ALL_TAGS = ['general','flirty','clothing','body','physical','feet','kissing','speaking','oral','intimate','explicit','anal','bondage','toy','public','exposure'];
 const EMOJIS   = ['🦊','🐱','🐶','🦁','🐯','🦋','🐝','🦄','🐸','🐙','🦀','🌙','⭐','🍓','🌹'];
 
 // ─── Room Store ───────────────────────────────────────────────────────────────
@@ -192,7 +192,7 @@ function roomPublicState(room) {
       immunity: p.immunity,
       activePowerups: p.activePowerups || [],
       gender: p.gender,
-      bodyType: p.bodyType,
+      genitals: p.genitals || [],
       orientation: p.orientation,
       availableForAllCombos: p.availableForAllCombos,
       // limits: NEVER sent
@@ -240,8 +240,8 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
-  // Player submits setup (name, clothingItems, prefs, limits, softLimits, gender, bodyType, orientation)
-  socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft, gender, bodyType, orientation, availableForAllCombos }, cb) => {
+  // Player submits setup (name, clothingItems, prefs, limits, softLimits, gender, genitals, orientation, language)
+  socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft, gender, genitals, orientation, availableForAllCombos, language }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
     const emojiIdx = Object.keys(room.players).length % EMOJIS.length;
@@ -264,9 +264,10 @@ io.on('connection', (socket) => {
       immunity: 0,
       activePowerups: [],
       gender: gender || null,
-      bodyType: bodyType || null,
+      genitals: Array.isArray(genitals) ? genitals : [],
       orientation: orientation || 'bi',
       availableForAllCombos: availableForAllCombos || false,
+      language: language || 'nl',
     };
     socket.data.roomCode = code;
     cb({ ok: true });
@@ -902,6 +903,15 @@ app.get('/qr/:code', async (req, res) => {
 });
 
 app.get('/tags', (req, res) => res.json(ALL_TAGS));
+
+// ─── Language packs ────────────────────────────────────────────────────────────
+const fs = require('fs');
+const LANG_DIR = path.join(__dirname, 'data', 'lang');
+app.get('/lang/:lang.json', (req, res) => {
+  const file = path.join(LANG_DIR, `${req.params.lang}.json`);
+  if (!fs.existsSync(file)) return res.status(404).json({});
+  res.sendFile(file);
+});
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 server.listen(PORT, '0.0.0.0', () => {

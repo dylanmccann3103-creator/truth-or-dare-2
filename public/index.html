@@ -803,6 +803,15 @@ input::placeholder { color: #7a6b8a; }
   <p style="text-align:center; color:#7a6b8a; font-size:0.85rem">Your limits are private — never shown to other players.</p>
   <div class="gap-lg"></div>
 
+  <!-- Language -->
+  <div class="w-full">
+    <div class="section-label">Language</div>
+    <div class="pill-row" id="setup-language-row">
+      <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 Nederlands</div>
+      <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 English</div>
+    </div>
+  </div>
+
   <!-- Name -->
   <div class="w-full">
     <div class="section-label">Your Name</div>
@@ -831,12 +840,12 @@ input::placeholder { color: #7a6b8a; }
   </div>
 
   <div class="w-full">
-    <div class="section-label">Body type <span style="font-weight:400;color:#7a6b8a">(used for certain card filtering — private in spirit)</span></div>
-    <div class="pill-row" id="setup-bodytype-row">
-      <div class="pill-select" data-val="penis"      onclick="selectPill('bodyType','penis',this)">Penis</div>
-      <div class="pill-select" data-val="vagina"     onclick="selectPill('bodyType','vagina',this)">Vagina</div>
-      <div class="pill-select" data-val="breasts"    onclick="selectPill('bodyType','breasts',this)">Breasts</div>
-      <div class="pill-select" data-val="prefer-not" onclick="selectPill('bodyType','prefer-not',this)">Prefer not to say</div>
+    <div class="section-label">What do you have? <span style="font-weight:400;color:#7a6b8a">(select all that apply — used to filter cards, never shown to others)</span></div>
+    <div class="pill-row" id="setup-genitals-row">
+      <div class="pill-select" data-val="penis"      onclick="toggleGenital('penis',this)">Penis</div>
+      <div class="pill-select" data-val="vagina"     onclick="toggleGenital('vagina',this)">Vagina</div>
+      <div class="pill-select" data-val="breasts"    onclick="toggleGenital('breasts',this)">Breasts</div>
+      <div class="pill-select" data-val="prefer-not" onclick="toggleGenital('prefer-not',this)">Prefer not to say</div>
     </div>
   </div>
 
@@ -1253,13 +1262,14 @@ input::placeholder { color: #7a6b8a; }
 
 <script>
 // ─── State ────────────────────────────────────────────────────────────────────
-const TAGS = ['general','flirty','clothing','body','physical','feet','mouth','oral','intimate','explicit','exposure','extreme_exposure','penetration_vagina','penetration_ass'];
+const TAGS = ['general','flirty','clothing','body','physical','feet','kissing','speaking','oral','intimate','explicit','anal','bondage','toy','public','exposure'];
 const TAG_LABELS = {
   general: '🎲 General', flirty: '😏 Flirty', clothing: '👗 Clothing',
   body: '💪 Body', physical: '🏃 Physical', feet: '🦶 Feet',
-  mouth: '👄 Mouth', oral: '🗣️ Oral', intimate: '💋 Intimate', explicit: '🔥 Explicit',
-  exposure: '📸 Exposure', extreme_exposure: '🌐 Extreme Exposure',
-  penetration_vagina: '🔞 Penetration (vagina)', penetration_ass: '🔞 Penetration (ass)'
+  kissing: '💋 Kissing', speaking: '🗣️ Speaking', oral: '👅 Oral sex',
+  intimate: '🔥 Intimate', explicit: '🌡️ Explicit',
+  anal: '🍑 Anal', bondage: '⛓️ Bondage', toy: '🎀 Toy',
+  public: '🌍 Public', exposure: '📸 Exposure',
 };
 
 let socket = null;
@@ -1276,9 +1286,11 @@ let myReady = false;
 let myLevelChosen = false;
 // Phase 3 setup fields
 let myGender = null;
-let myBodyType = null;
+let myGenitals = [];
 let myOrientation = 'bi';
 let myAvailableForAllCombos = false;
+let myLanguage = 'nl';
+let LANG_PACK = null;
 
 const CLOTHING_SLOTS = [
   { key: 'head',       label: '🧢 Head',       presets: ['hat', 'cap', 'beanie', 'headband'] },
@@ -1323,14 +1335,40 @@ function connectSocket() {
   socket.on('disconnect', () => toast('Disconnected from server', 'danger'));
 }
 
-// ─── Pill selector (gender / body type / orientation) ─────────────────────────
+// ─── Pill selector (gender / orientation — single select) ─────────────────────
 function selectPill(field, val, el) {
   const row = el.parentElement;
   row.querySelectorAll('.pill-select').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   if (field === 'gender')      myGender      = val;
-  if (field === 'bodyType')    myBodyType    = val;
   if (field === 'orientation') myOrientation = val;
+  if (field === 'language') {
+    myLanguage = val;
+    if (val !== 'nl') loadLangPack(val);
+  }
+}
+
+// ─── Genitals multi-select ────────────────────────────────────────────────────
+function toggleGenital(val, el) {
+  const idx = myGenitals.indexOf(val);
+  if (idx === -1) { myGenitals.push(val); el.classList.add('active'); }
+  else { myGenitals.splice(idx, 1); el.classList.remove('active'); }
+}
+
+// ─── Language pack loader ─────────────────────────────────────────────────────
+async function loadLangPack(lang) {
+  if (lang === 'nl') { LANG_PACK = null; return; }
+  try {
+    const res = await fetch(`/lang/${lang}.json`);
+    LANG_PACK = res.ok ? await res.json() : null;
+  } catch { LANG_PACK = null; }
+}
+
+function cardText(card) {
+  if (!card) return '';
+  const t = card.text;
+  const raw = (t && typeof t === 'object') ? (t[myLanguage] || t.nl || t.en || '') : (t || '');
+  return (LANG_PACK && LANG_PACK[card.id]) ? LANG_PACK[card.id] : raw;
 }
 
 // ─── Screen Navigation ────────────────────────────────────────────────────────
@@ -1646,9 +1684,10 @@ function submitSetup() {
     limits:              [...myLimits],
     limits_soft:         [...mySoftLimits],
     gender:              myGender,
-    bodyType:            myBodyType,
+    genitals:            [...myGenitals],
     orientation:         myOrientation,
     availableForAllCombos: myAvailableForAllCombos,
+    language:            myLanguage,
   }, (res) => {
     if (!res.ok) return toast(res.error || 'Error', 'danger');
     showLobby();
@@ -1932,7 +1971,7 @@ function buildLevelScreen(state) {
     parkedSection.style.display = 'block';
     parkedList.innerHTML = '';
     parked.forEach(d => {
-      const text = d.text && d.text.en ? d.text.en : (d.text || '');
+      const text = cardText(d);
       const btn = document.createElement('button');
       btn.className = 'btn btn-soft btn-sm';
       btn.style.cssText = 'width:100%;max-width:none;text-align:left;margin-bottom:6px;white-space:normal;height:auto;padding:10px 14px;';
@@ -2009,9 +2048,7 @@ function buildCardScreen(state) {
   document.getElementById('card-type-label').style.color =
     turn.choice === 'truth' ? '#60a5fa' : '#f472b6';
 
-  const cardText = turn.card.text;
-  document.getElementById('card-text').textContent =
-    (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
+  document.getElementById('card-text').textContent = cardText(turn.card);
 
   if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
   if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
@@ -2157,10 +2194,7 @@ function buildDisplayScreen(state) {
     cardDiv.style.display    = 'block';
 
     const performer = state.players[turn.performerId];
-    const cardText  = turn.card?.text;
-    const text = (cardText && typeof cardText === 'object')
-      ? (cardText.en || cardText.nl || '')
-      : (cardText || '');
+    const text = cardText(turn.card);
 
     document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
     document.getElementById('display-card-performer-name').textContent  = performer?.name || '';
@@ -2181,9 +2215,8 @@ function buildDisplayScreen(state) {
     const performer = state.players[turn.performerId];
     const target    = state.players[turn.targetId];
     const card      = turn.phase === 'duel' ? turn.card : turn.forfeit?.card;
-    const cardText  = card?.text;
-    const text      = (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
-    const label     = turn.phase === 'duel' ? '⚔️ DUEL' : '⚔️ FORFEIT';
+    const text  = cardText(card);
+    const label = turn.phase === 'duel' ? '⚔️ DUEL' : '⚔️ FORFEIT';
 
     document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
     document.getElementById('display-card-performer-name').textContent  =
@@ -2258,9 +2291,7 @@ function buildDuelScreen(state, isForfeit) {
     document.getElementById('duel-target-emoji').textContent    = target?.emoji    || '🎲';
     document.getElementById('duel-target-name').textContent     = target?.name     || '';
 
-    const cardText = turn.card?.text;
-    const text = (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
-    document.getElementById('duel-card-text').textContent = text;
+    document.getElementById('duel-card-text').textContent = cardText(turn.card);
 
     document.getElementById('duel-forfeit-wrap').style.display = 'none';
 
@@ -2299,9 +2330,7 @@ function buildDuelScreen(state, isForfeit) {
     const forfeitWrap = document.getElementById('duel-forfeit-wrap');
     forfeitWrap.style.display = 'block';
 
-    const forfeitText = forfeit?.card?.text;
-    const fText = (forfeitText && typeof forfeitText === 'object') ? (forfeitText.en || forfeitText.nl || '') : (forfeitText || '');
-    document.getElementById('duel-forfeit-text').textContent = fText;
+    document.getElementById('duel-forfeit-text').textContent = cardText(forfeit?.card);
 
     const doneBtnForfeit = document.getElementById('duel-forfeit-done-btn');
     doneBtnForfeit.style.display = (iAmLoser || isHostOrDisplay) ? 'inline-flex' : 'none';
