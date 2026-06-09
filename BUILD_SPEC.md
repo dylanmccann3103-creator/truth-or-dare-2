@@ -1,191 +1,186 @@
-# Truth or Dare 2.0 — Build Spec voor Claude Code
+# Truth or Dare 2.0 — Build Spec & Handoff
 
-> Handoff-document. Dit is de complete, geprioriteerde bouwopdracht voor v2.
-> Lees ook `CLAUDE.md` (project bible) voor de volledige ontwerpredenen.
-> Status van open beslissingen staat onderaan in **§ Open / nog te bevestigen**.
-
----
-
-## 0. Doel & scope
-
-Een geavanceerde, erotische, **kink-safe** Truth or Dare. Web-based.
-- **Host** start een lokale Node.js server (1 zip downloaden, `start.bat` / `start.sh` runnen).
-- **Spelers** joinen via browser op hun telefoon — geen app-installatie.
-- **18+** age-gate bij laden.
-- Twee views: speler (telefoon) en host (TV/computer).
-
-**v1 staat al** (niet opnieuw bouwen, wel uitbreiden):
-- `server.js` — Express + Socket.io: rooms, player state, card-filtering op limits, QR-code generatie.
-- `public/index.html` — single-page client: age-gate, landing, host/join, player setup, lobby met QR, bottle-spin animatie, truth/dare card screen.
-- `package.json` + `node_modules` — express, socket.io, qrcode.
-
-**v2 = wat hieronder staat bouwen, bovenop v1.**
+> **Status:** Phase 1 ✅ · Phase 2 ✅ · Phase 3 ✅ · **Phase 4 = current target**
+>
+> This document is the living build order. `CLAUDE.md` is the design bible and always wins on conflicts.
+> Open this file when building; `CLAUDE.md` supplies the design reasoning behind each decision.
 
 ---
 
-## 1. Architectuur-principes (niet afwijken zonder overleg)
+## Phase status
 
-1. **Alle game-logica server-side.** Clients zijn dom: ze tonen state en sturen intents (`chooseLevel`, `completeDare`, `useBreakSlot`, `buyPowerup`, `pickTarget`). De server valideert ALLES (limits, gender/orientation, body type, XP-toegang, coin-saldo).
-2. **Eén bron van waarheid:** de server houdt per room een `GameState` object bij; broadcast deltas via Socket.io.
-3. **Geen persistentie nodig.** XP/coins zijn per-sessie. State leeft in memory; server-restart = nieuwe game. (Rollover-gamemode voor coins is optioneel, later.)
-4. **Filtering is een hard block.** Een dare wordt NOOIT getoond als die een limit, gender-regel, orientation of body type schendt. Dit is een veiligheidsgarantie, geen suggestie.
-5. **Single-file client blijft** (`public/index.html`) tenzij het te groot wordt; dan pas opsplitsen. Host-view mag een aparte route/HTML zijn.
-6. **Content-data los van code.** Dares in een apart `data/dares.json` (of `.js`), zodat content uitbreiden geen code-wijziging is.
+| Phase | What | Status |
+|-------|------|--------|
+| 1 | Core engine — 72 cards, `selectCard()` safety, XP/coins, level picker, HUD, Railway deploy | ✅ Done |
+| 2 | Turn flow — auto-advance, targeting, soft limits, break-slots, display host, end-game, restart | ✅ Done |
+| 3 | Duels + power-ups + gender/body setup | ✅ Done |
+| 4 | Host view enhancements + events / game-modes | Future |
 
 ---
 
-## 2. Datamodellen
+## What is already built (read before touching)
 
-### 2.1 Player
-```
-Player {
-  id, name, socketId,
-  clothingItems: [string],        // gebruikt voor "kledingstuk uit" dares
-  gender,                          // identity
-  bodyType: 'penis' | 'vagina' | null,
-  orientation: 'hetero' | 'bi' | 'gay',
-  availableForAllCombos: bool,     // overrided gender/orientation matching als true
-  limits: [limitTag],              // hard blocks
-  consentCombos: [string],         // optionele expliciete combinatie-consents
-  xp: int,
-  coins: int,
-  currentLevel: int,               // gekozen level deze beurt
-  clearedLevels: [int],            // levels met >=3 voltooide dares
-  daresCompletedPerLevel: { level: count },
-  breakSlots: { total: 3, used: int, parkedDares: [dareId] },
-  immunity: float,                 // 0..1, kans op auto-immuniteit
-  activePowerups: [powerupId],
-}
-```
+### Files
+| File | Purpose |
+|------|---------|
+| `server.js` | Express + Socket.io. All game logic. `advanceTurn()`, `selectCard()`, XP/coin attribution. |
+| `lib/selectCard.js` | Pure filtering function. Returns `{ card, recycled, softFlagged }`. Heart of kink-safe guarantee. |
+| `test/selectCard.test.js` | 25 unit tests — all must stay green. `node --test`. |
+| `data/dares.json` | 72 cards (31 truths, 41 dares). Levels 1–9. Schema below. |
+| `public/index.html` | Full single-page client. All screens. |
+| `railway.toml` | Railway deploy config. |
 
-### 2.2 Dare / Truth card
-```
-Card {
-  id,
-  type: 'truth' | 'dare' | 'duel',
-  level: 1..10,
-  text,                            // NL of EN (zie open vraag taal)
-  tags: [limitTag],                // welke limits deze card raakt -> filter
-  genderRequired: [gender] | 'any',
+### Key server events (Phase 1+2)
+`create-room` · `join-room` · `player-setup` · `player-ready` · `set-game-config` · `start-game` · `choose-level` · `pick-truth-dare` · `complete-dare` · `use-break-slot` · `replay-parked-dare` · `respin-card` · `end-game` · `restart-game` · `next-turn` (emergency host-only)
+
+### Card schema (v2)
+```js
+{
+  id, type: 'truth'|'dare',
+  level: 1–10, difficulty: 1–3,
+  text: { en, nl },
+  tags: [...],                    // limit-tag overlap = hard block
+  genderRequired: null | [...],   // null = anyone
   bodyTypeRelevant: bool,
-  bodyTypeRequired: 'penis'|'vagina'|null,
+  bodyTypeRequired: null|'penis'|'vagina',
   orientationMatters: bool,
-  targetRequired: bool,            // heeft deze dare een doelwit nodig?
-  duel: { kind: 'physical'|'funny'|'kinky', players: 'duo'|'multi' } | null,
+  targetRequired: bool,
 }
 ```
 
-### 2.3 GameState (per room)
-```
-GameState {
-  roomCode, hostSocketId,
-  phase: 'lobby'|'playing'|'duel'|'event'|'paused'|'ended',
-  players: [Player],
-  minStartLevel: int,              // host-keuze
-  rouletteMode: 'off'|'exact'|'plus5'|'block',
-  targetingMode: 'self'|'50-50'|'random',
-  economyMode: 'schaars'|'gemiddeld'|'overvloedig',
-  enabledPowerups: [powerupId],    // host-toggle
-  enabledEvents: [eventId],        // host-toggle
-  currentTurn: { playerId, card, target, status },
-  turnOrder: [playerId],
-  activeEvent: eventId | null,
+### Player shape (v2)
+```js
+{
+  id, name, emoji, clothingItems, preferences, softLimits,
+  limits,           // PRIVATE — never broadcast
+  ready, xp, coins, currentLevel, clearedLevels, daresCompletedPerLevel,
+  usedCardIds,      // Set — PRIVATE
+  breakSlots: { total:3, used, parkedDares: [{cardId,level,diff,text,xpPenalty}] },
+  immunity,         // 0..1 float
+  activePowerups,
+  gender,           // currently null stub — Phase 3 makes it real
+  bodyType,         // currently null stub — Phase 3 makes it real
+  orientation: 'bi' // currently default — Phase 3 makes it real
 }
 ```
 
----
-
-## 3. Systemen om te bouwen (geprioriteerd)
-
-### FASE 1 — Kern-progressie (eerst bouwen)
-**1. Levels (1–10).** Host kiest `minStartLevel`. Speler kiest elke beurt eigen level (binnen toegang). Level-ladder = tabel in CLAUDE.md (§1). Een level is "cleared" na ≥3 voltooide dares op dat level.
-
-**2. XP-systeem (per-sessie).**
-- XP per voltooide dare: `level × 10`.
-- XP nodig om volgend level te unlocken: `level × 40`.
-- Duel-winst bonus: `+10` flat.
-- **Beslis-regel (open):** is toegang tot level N = "genoeg XP" OF "vorige level cleared (3 dares)" OF beide? Standaard nu: **beide** (XP-drempel én vorige level cleared). Maak dit een config-flag `levelUnlock: 'xp'|'cleared'|'both'`.
-
-**3. Coins (per-sessie).**
-- Performer van een dare krijgt coins ("pineut zijn beloont je").
-- `economyMode`: schaars (default) / gemiddeld / overvloedig.
-- Schaars: voltooi dare = `level` coins; duel-winst = `5`.
-- gemiddeld/overvloedig = multipliers (voorstel ×2 / ×4) — bevestigen.
-
-**4. Filtering-engine (kritiek, veiligheids-feature).**
-Selecteer een card alleen als ALLE waar zijn:
-- `card.level` == gekozen level (of binnen roulette-regel).
-- Geen overlap tussen `card.tags` en `target.limits` EN `performer.limits`.
-- gender match: `card.genderRequired == 'any'` OF performer/target gender ∈ required (tenzij `availableForAllCombos`).
-- orientation match indien `card.orientationMatters`.
-- body type match indien `card.bodyTypeRelevant`.
-Geen geldige card? → val terug naar lager level of truth.
-
-### FASE 2 — Beurt-flow & targeting
-**5. Turn flow** (zie CLAUDE.md §13):
-1) speler kiest level → 2) systeem kiest card (gefilterd) → 3) target bepaald → 4) uitvoeren/duel → 5) XP+coins → 6) volgende beurt.
-
-**6. Targeting-systeem.** `targetingMode`: self / 50-50 / random. Target mag NOOIT gekozen worden als card diens limits/gender/orientation schendt.
-
-**7. Roulette-mode** voor level-keuze: off / exact / +5% kans op hoger / block (niet hoger dan gekozen).
-
-**8. Break-slots (pauze-slots).** 3 per speler. Geparkeerde dare hoeft niet tijdens spel. Aan het eind: volle puntwaarde afgetrokken. 3 slots vol + weigeren → speler verliest + vooraf-afgesproken straf (host toont).
-
-### FASE 3 — Power-ups & duels
-**9. Power-ups.** Host togglet welke actief zijn. Kosten in coins (tabel CLAUDE.md §4): Skip 8, Immunity stone (2% auto-immuniteit) 12, Force swap 10, Double XP 6, Insight (preview dare-type) 4, Sabotage (-immuniteit ander) 15, Auto-win duel 20, Cooldown reset 7.
-
-**10. Duel-systeem.** Getriggerd door duel-cards. Winnaar krijgt coins, verliezer doet de dare. Types: physical/funny/kinky. Duo of multiplayer (bv. "wie trekt het snelst schoenen uit"). **Resolutie (open):** voorstel = getimede fysieke challenge, host tikt winnaar aan. Auto-win power-up overschrijft.
-
-### FASE 4 — Host-view & events
-**11. Host functionaliteit** op TV/computer (`/host` route): muziek, animaties, dare-presentatie, game-pause, event-knoppen. Twee URLs: `http://HOST_IP:3000/host` (TV) en `http://HOST_IP:3000` (speler).
-
-**12. Events / gamemodes** (host-getriggerd, niet default): Heat Mode (3 rondes extra kinky), Coin Rain, Penalty Night, Lucky One, Dark Round, Audience Vote. Plus de mass-dare / duel-time / mystery box / coin-storm triggers uit §9.
-
-### FASE 5 — Gender/orientation setup & limits
-**13. Player-setup uitbreiden:** gender, body type (penis/vagina), orientation (hetero/bi/gay), limits, optionele consent-combinaties, OF "always available for all combinations".
-
-**14. Limits-tags (hard block).** Voorstel-lijst (CLAUDE.md §11): `fysiek · erotisch · kussen · kleden · voeten · bondage · spanking · exhibition · oraal · aanraking · humiliation · rollenspel · groep · samenwerking · water/ijs · blinddoek`. Lijst nog niet definitief.
+### XP / Coin formulas (locked)
+- XP per dare: `card.level × card.difficulty`
+- Coins per dare: `Math.max(3, card.level × card.difficulty) × economyMultiplier`
+- Economy mult: schaars ×1 · gemiddeld ×2 · overvloedig ×4
+- Level unlock threshold: `(N−1) × 6` XP **AND** previous level cleared (≥3 dares)
 
 ---
 
-## 4. Distributie
-- Zip met `node_modules` inbegrepen.
-- `start.bat` (Windows) + `start.sh` (Mac/Linux) die `node server.js` runnen en de host-URL + QR tonen.
-- Server print host-IP zodat telefoons kunnen joinen op hetzelfde netwerk.
+## Phase 3 — Duels + Power-ups + Gender/body setup
+
+### 3.1 Locked decisions going in
+
+**Duel flow:**
+- New card type: `type: 'duel'`. Always `targetRequired: true`.
+- When duel card drawn: `currentTurn.phase = 'duel'`, broadcast.
+- Both players (performer + target) see the duel screen. Everyone else sees the display screen.
+- Host resolves via `resolve-duel` event: `{ code, winnerId }`.
+- Winner gets coins (full `max(3,level×diff)×economy`). Loser gets nothing.
+- XP **always** goes to the active turn-holder regardless of duel outcome (CLAUDE.md §7.5).
+- `auto-win-duel` power-up: sets `currentTurn.duelAutoWinnerId = performerId` before broadcast; host sees it locked.
+
+**Power-ups:**
+- `buy-powerup` event: validates `player.coins >= cost`, deducts, pushes to `player.activePowerups`.
+- `use-powerup` event: validates powerup is in activePowerups, applies effect, removes it.
+- Power-up effects (all server-side):
+
+| Power-up | Cost | Effect implementation |
+|----------|-----:|-----------------------|
+| skip | 8 | Skip current dare: no XP/coins, call `advanceTurn()` |
+| immunity_stone | 12 | `player.immunity = Math.min(1, player.immunity + 0.02)` |
+| force_swap | 10 | Re-run `pickTarget()` excluding current target; update `currentTurn.targetId` |
+| double_xp | 6 | `currentTurn.doubleXp = true` (checked in `calcRewards`) |
+| insight | 4 | `currentTurn.insightRevealed = true` (broadcasts card.type, not full card text) |
+| sabotage | 15 | `target.immunity = Math.max(0, target.immunity - 0.05)` |
+| auto_win_duel | 20 | `currentTurn.duelAutoWinnerId = performer.id` |
+
+- Power-up shop: slide-up panel accessible from the card screen and level-picker screen (for the active player only).
+- `buy-powerup` only allowed when `room.phase === 'game'` and player has enough coins.
+- `use-powerup` only allowed when the powerup's timing is valid (see timing column).
+- `enabledPowerups` array on room controls which are purchasable (host toggles in lobby).
+
+**Immunity auto-roll:**
+- At the start of each showing phase (`pick-truth-dare` resolves), before broadcasting: `if (Math.random() < performer.immunity) { currentTurn.phase = 'immune'; advanceTurn(); return; }`
+- Toast to all: "[player] was immune this round! 🛡️"
+
+**Gender / body type / orientation in setup:**
+- Add three new fields to the setup form (after clothing, before preferences):
+  - **Gender**: `male / female / non-binary / other / prefer not to say`
+  - **Body type**: `penis / vagina / prefer not to say`
+  - **Orientation**: `hetero / bi / gay / other`
+  - Checkbox: `availableForAllCombos` ("I'm open for any combination")
+- Send these from `player-setup` event: `gender, bodyType, orientation, availableForAllCombos`.
+- Server stores them (replaces the null stubs). This activates the existing filtering steps in `selectCard()` that were already built but neutered by null defaults.
+
+**Duel cards to add (15 new cards):**
+Add to `data/dares.json`. Type `'duel'`, `targetRequired: true`. Spread across levels 1–9.
+- Level 1–2: silly/fun (staring contest, thumb war, paper-scissors-rock best of 3)
+- Level 3–4: flirty competition (who can flirt more convincingly, compliment battle)
+- Level 5–6: physical/touchy (who can hold eye contact longest, who breaks first)
+- Level 7–8: kinky challenge (whoever loses has to do X, intimate dare competition)
+- Level 9: explicit duel
+
+### 3.2 New server events
+
+```
+buy-powerup     { code, powerupId }           → buy from shop
+use-powerup     { code, powerupId, targetId? } → activate (targetId for sabotage/force_swap)
+resolve-duel    { code, winnerId }             → host-only, ends duel phase
+```
+
+### 3.3 New client screens / UI elements
+
+- **`screen-duel`**: shows dare text, both player emojis/names, "duel in progress" state.
+  - Host sees two big "🏆 [name] won" buttons to resolve.
+  - Other players see display view (same card text, waiting for host).
+- **Power-up shop panel** (`#powerup-shop`): slide-up overlay, shows enabled powerups with price/description, buy button, current coin balance.
+  - Triggered by "🛒 Shop" button in HUD and on card screen.
+- **HUD additions**: show active powerups as icons next to break-slot dots.
+
+### 3.4 New tests to add
+
+```
+buy-powerup: insufficient coins → rejected
+buy-powerup: disabled powerup  → rejected
+use-powerup: not in activePowerups → rejected
+double_xp: calcRewards returns 2× XP when doubleXp=true
+immunity: Math.random mock at 0.0 → not immune; at 0.99 → immune
+duel auto-win: duelAutoWinnerId set → winnerId locked to performer
+```
 
 ---
 
-## 5. Tech-stack (vast)
-- Node.js + Express + Socket.io + qrcode.
-- Client in `public/index.html` (single file, geen build-step). Host-view mag `public/host.html`.
-- Content in `data/dares.json` (los van code).
-- UI in het Engels; dare-content NL/EN (taal-keuze nog te bevestigen).
+## Phase 4 — Host-view enhancements & events (future)
+
+- Dedicated host screen enhancements (music controls, game pause, presenter mode)
+- Game-mode events: Heat Mode (3 rounds extra kinky), Coin Rain, Penalty Night, Lucky One, Dark Round
+- Mass-dare / duel-time / mystery-box triggers
 
 ---
 
-## 6. Bouwvolgorde-advies voor Claude Code
-1. Refactor `server.js`: introduceer `GameState` + per-room store.
-2. Verplaats dares naar `data/dares.json` met het Card-schema (§2.2).
-3. Bouw de **filtering-engine** als pure, geteste functie `selectCard(state, performer, target, level)` — dit is het hart en de veiligheidsgarantie. **Unit-test dit grondig.**
-4. Levels + XP + coins (Fase 1).
-5. Turn-flow + targeting + roulette + break-slots (Fase 2).
-6. Power-ups + duels (Fase 3).
-7. Host-view + events (Fase 4).
-8. Setup-uitbreiding + definitieve limits-lijst (Fase 5).
+## Architecture rules (never break)
 
-> **Verplichte verificatiestap:** schrijf unit-tests voor `selectCard()` die bewijzen dat een dare met een tag in iemands limits NOOIT geselecteerd wordt, en dat gender/orientation/bodyType-mismatch altijd blokkeert. Dit is non-negotiable (kink-safe).
+1. All game logic server-side. Clients send intents, display state.
+2. `selectCard()` is the safety guarantee — hard limits never leak.
+3. `limits` array NEVER broadcast to clients (`roomPublicState` enforces this).
+4. `node --test` must stay green before every commit.
+5. Content (dares.json) separate from code.
+6. No build step, no bundler, vanilla JS client.
 
 ---
 
-## 7. Open / nog te bevestigen (vraag Dylan vóór hardcoden)
-1. **Level-definities** — 10-level ladder in CLAUDE.md §1 is voorstel, nog bevestigen.
-2. **Duel-resolutie** — getimede challenge is voorstel, nog bevestigen.
-3. **Limit-tags lijst** — voorstel hierboven, toevoegingen/verwijderingen open.
-4. **XP/Coin-getallen** — voorstellen hierboven, nog niet bevestigd.
-5. **Level-unlock-regel** — XP-drempel, 3-dares-cleared, of beide? (`levelUnlock` flag).
-6. **Taal** van dare-content (NL / EN / beide).
-7. **Coin economy-multipliers** voor gemiddeld/overvloedig.
+## Open decisions (ask Dylan before hardcoding)
 
----
-
-*Bron van waarheid voor ontwerp blijft `CLAUDE.md`. Dit bestand vertaalt dat naar een bouwbare, geprioriteerde opdracht. Wijk niet af van de hard-block filtering zonder expliciete goedkeuring van Dylan.*
+| # | Question | Status |
+|---|----------|--------|
+| 1 | Duel resolution timing — fixed countdown or host-taps-winner? | **Decided: host taps winner** |
+| 2 | Power-up cooldowns — should some powerups have a cooldown per game? | Open |
+| 3 | Duel forfeit — does the loser get a separate penalty dare, or is losing itself the consequence? | Open |
+| 4 | Exact XP/coin numbers after playtest | Open — tune post-playtest |
+| 5 | Final limit-tags list | Open — review with content after build |

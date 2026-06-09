@@ -541,6 +541,102 @@ input::placeholder { color: #7a6b8a; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 2px; }
 
+/* ─── Duel screen ──────────────────────────────────────────────────── */
+#screen-duel {
+  background: radial-gradient(ellipse at center, #1a0520 0%, #0d0d14 70%);
+  justify-content: center;
+  gap: 20px;
+}
+.duel-banner {
+  font-size: 1.4rem; font-weight: 900; letter-spacing: 0.06em;
+  text-align: center;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.duel-players {
+  display: flex; align-items: center; justify-content: center; gap: 24px;
+  width: 100%; max-width: 480px;
+}
+.duel-player { text-align: center; }
+.duel-player .dp-emoji { font-size: 3rem; }
+.duel-player .dp-name  { font-size: 0.9rem; font-weight: 700; margin-top: 4px; }
+.duel-vs { font-size: 1.6rem; font-weight: 900; color: #ef4444; }
+.duel-resolve-btns { display: flex; gap: 12px; width: 100%; max-width: 480px; }
+.btn-winner {
+  flex: 1; padding: 16px 12px;
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: #0d0d14; border: none; border-radius: 12px;
+  font-size: 0.9rem; font-weight: 800; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+}
+.btn-winner:active { transform: scale(0.97); }
+
+/* ─── Power-up shop overlay ────────────────────────────────────────── */
+#powerup-shop-overlay {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+#powerup-shop-overlay.open { display: flex; }
+#powerup-shop {
+  width: 100%; max-width: 540px;
+  max-height: 80vh; overflow-y: auto;
+  background: #13101e;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(60px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.shop-close-btn {
+  float: right; background: none; border: none;
+  color: #7a6b8a; font-size: 1.3rem; cursor: pointer; line-height: 1;
+}
+.shop-powerup-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+.shop-powerup-row:last-child { border-bottom: none; }
+.shop-pu-info { flex: 1; }
+.shop-pu-name  { font-weight: 700; font-size: 0.92rem; }
+.shop-pu-desc  { font-size: 0.78rem; color: #9b89b4; margin-top: 2px; }
+.shop-pu-cost  { font-size: 0.82rem; font-weight: 800; color: var(--gold); white-space: nowrap; }
+.hud-shop-btn {
+  padding: 3px 10px; font-size: 0.78rem; font-weight: 700;
+  background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+  color: #c4b8d8; border-radius: 6px; cursor: pointer;
+  white-space: nowrap;
+}
+.hud-pu-icon {
+  font-size: 0.75rem;
+  background: rgba(124,58,237,0.25); border-radius: 4px;
+  padding: 1px 5px;
+  border: 1px solid rgba(124,58,237,0.4);
+}
+
+/* ─── Setup: pill selectors ────────────────────────────────────────── */
+.pill-row {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.pill-select {
+  padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; border: 2px solid transparent;
+  background: rgba(255,255,255,0.07); color: #c4b8d8;
+  transition: all 0.18s; user-select: none;
+}
+.pill-select.active {
+  background: rgba(124,58,237,0.25); border-color: var(--accent2); color: #fff;
+}
+
 /* ─── Age gate overlay ─────────────────────────────────────────────── */
 #age-gate {
   position: fixed; inset: 0; z-index: 1000;
@@ -564,6 +660,8 @@ input::placeholder { color: #7a6b8a; }
   <div class="hud-item">🪙 <span id="hud-coins">0</span></div>
   <div class="hud-item">Lvl <span id="hud-level">1</span></div>
   <div class="hud-item">🅿️ <div class="hud-slots" id="hud-slots"></div></div>
+  <div class="hud-item" id="hud-powerups" style="gap:3px"></div>
+  <button class="hud-shop-btn" id="hud-shop-btn" onclick="openShop()" style="display:none">🛒 Shop</button>
 </div>
 
 <!-- Age Gate -->
@@ -668,6 +766,42 @@ input::placeholder { color: #7a6b8a; }
     </div>
   </div>
 
+  <!-- Gender / Body type / Orientation -->
+  <div class="w-full">
+    <div class="section-label">Gender</div>
+    <div class="pill-row" id="setup-gender-row">
+      <div class="pill-select" data-val="male"           onclick="selectPill('gender','male',this)">Male</div>
+      <div class="pill-select" data-val="female"         onclick="selectPill('gender','female',this)">Female</div>
+      <div class="pill-select" data-val="non-binary"     onclick="selectPill('gender','non-binary',this)">Non-binary</div>
+      <div class="pill-select" data-val="other"          onclick="selectPill('gender','other',this)">Other</div>
+      <div class="pill-select" data-val="prefer-not"     onclick="selectPill('gender','prefer-not',this)">Prefer not to say</div>
+    </div>
+  </div>
+
+  <div class="w-full">
+    <div class="section-label">Body type <span style="font-weight:400;color:#7a6b8a">(used for certain card filtering — private in spirit)</span></div>
+    <div class="pill-row" id="setup-bodytype-row">
+      <div class="pill-select" data-val="penis"      onclick="selectPill('bodyType','penis',this)">Penis</div>
+      <div class="pill-select" data-val="vagina"     onclick="selectPill('bodyType','vagina',this)">Vagina</div>
+      <div class="pill-select" data-val="prefer-not" onclick="selectPill('bodyType','prefer-not',this)">Prefer not to say</div>
+    </div>
+  </div>
+
+  <div class="w-full">
+    <div class="section-label">Orientation</div>
+    <div class="pill-row" id="setup-orientation-row">
+      <div class="pill-select" data-val="hetero" onclick="selectPill('orientation','hetero',this)">Hetero</div>
+      <div class="pill-select" data-val="bi"     onclick="selectPill('orientation','bi',this)">Bi</div>
+      <div class="pill-select" data-val="gay"    onclick="selectPill('orientation','gay',this)">Gay</div>
+      <div class="pill-select" data-val="other"  onclick="selectPill('orientation','other',this)">Other</div>
+    </div>
+    <div class="gap-sm"></div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;color:#c4b8d8">
+      <input type="checkbox" id="setup-all-combos" style="accent-color:var(--accent2);width:16px;height:16px"/>
+      I'm flexible — any combination works for me
+    </label>
+  </div>
+
   <!-- Preferences -->
   <div class="w-full">
     <div class="section-label">Your Preferences <span style="font-weight:400;color:#7a6b8a">(what you enjoy)</span></div>
@@ -734,6 +868,17 @@ input::placeholder { color: #7a6b8a; }
         <button class="config-btn active" data-key="economyMode" data-val="schaars" onclick="setGameConfig('economyMode','schaars')">Scarce</button>
         <button class="config-btn" data-key="economyMode" data-val="gemiddeld" onclick="setGameConfig('economyMode','gemiddeld')">Medium</button>
         <button class="config-btn" data-key="economyMode" data-val="overvloedig" onclick="setGameConfig('economyMode','overvloedig')">Generous</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Power-ups <span style="font-weight:400">(tap to enable)</span></div>
+      <div class="config-row" id="config-powerups" style="flex-wrap:wrap">
+        <button class="config-btn" data-pu="skip"           onclick="togglePowerup('skip')">⏭ Skip</button>
+        <button class="config-btn" data-pu="immunity_stone" onclick="togglePowerup('immunity_stone')">🛡️ Immunity</button>
+        <button class="config-btn" data-pu="force_swap"     onclick="togglePowerup('force_swap')">🔄 Swap</button>
+        <button class="config-btn" data-pu="double_xp"      onclick="togglePowerup('double_xp')">⚡ 2×XP</button>
+        <button class="config-btn" data-pu="insight"        onclick="togglePowerup('insight')">🔮 Insight</button>
+        <button class="config-btn" data-pu="sabotage"       onclick="togglePowerup('sabotage')">💀 Sabotage</button>
+        <button class="config-btn" data-pu="auto_win_duel"  onclick="togglePowerup('auto_win_duel')">🏆 Auto-Win</button>
       </div>
     </div>
     <div class="gap"></div>
@@ -902,6 +1047,80 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 9b: Duel — Active duel view (performer + target see card;
+     host sees resolve buttons; others see waiting)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-duel" class="screen" style="justify-content:center; gap:20px;">
+  <div class="duel-banner" id="duel-banner">⚔️ Duel!</div>
+
+  <div class="duel-players">
+    <div class="duel-player">
+      <div class="dp-emoji" id="duel-performer-emoji"></div>
+      <div class="dp-name"  id="duel-performer-name"></div>
+    </div>
+    <div class="duel-vs">VS</div>
+    <div class="duel-player">
+      <div class="dp-emoji" id="duel-target-emoji"></div>
+      <div class="dp-name"  id="duel-target-name"></div>
+    </div>
+  </div>
+
+  <div class="card-reveal dare-card w-full" style="max-width:480px;text-align:center">
+    <div class="card-type-label" style="color:#f59e0b">⚔️ DUEL</div>
+    <div class="card-text" id="duel-card-text"></div>
+  </div>
+
+  <!-- Host resolve buttons -->
+  <div id="duel-resolve-wrap" class="duel-resolve-btns" style="display:none">
+    <button class="btn-winner" id="duel-win-performer" onclick="resolveDuelFor('performer')">
+      🏆 <span id="duel-win-performer-name">Performer</span> won
+    </button>
+    <button class="btn-winner" id="duel-win-target" onclick="resolveDuelFor('target')">
+      🏆 <span id="duel-win-target-name">Target</span> won
+    </button>
+  </div>
+
+  <!-- Forfeit sub-view (phase = duel-forfeit) -->
+  <div id="duel-forfeit-wrap" style="display:none;width:100%;max-width:480px;text-align:center">
+    <div class="section-label" style="color:#fcd34d;margin-top:0">⚠️ Forfeit dare for the loser</div>
+    <div class="card-reveal dare-card" style="text-align:center">
+      <div class="card-type-label" style="color:#fcd34d">⚔️ FORFEIT</div>
+      <div class="card-text" id="duel-forfeit-text"></div>
+    </div>
+    <div class="gap-sm"></div>
+    <button class="btn btn-gold" id="duel-forfeit-done-btn" onclick="completeForfeit()" style="display:none">
+      ✓ Done — Forfeit completed
+    </button>
+  </div>
+
+  <p id="duel-waiting-msg" class="text-muted text-center" style="display:none">
+    Waiting for the host to call the winner...
+  </p>
+
+  <!-- Host end-game button -->
+  <div id="duel-end-game-wrap" style="display:none;width:100%;max-width:480px">
+    <button class="btn btn-danger btn-sm" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     Power-up Shop Overlay
+═══════════════════════════════════════════════════════════════════ -->
+<div id="powerup-shop-overlay" onclick="closeShopOnBackdrop(event)">
+  <div id="powerup-shop">
+    <button class="shop-close-btn" onclick="closeShop()">✕</button>
+    <h3 style="margin-bottom:4px">🛒 Power-up Shop</h3>
+    <p class="text-muted" style="font-size:0.8rem">Balance: <span id="shop-balance">0</span> 🪙</p>
+    <div class="gap-sm"></div>
+    <div id="shop-available-list"></div>
+    <div id="shop-owned-section" style="display:none">
+      <div class="section-label" style="margin-top:16px">Your inventory</div>
+      <div id="shop-owned-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
      SCREEN 10: Display — Passive view (non-active players + display host)
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-display" class="screen">
@@ -989,6 +1208,11 @@ let myLimits = [];
 let clothingItems = [];
 let myReady = false;
 let myLevelChosen = false;
+// Phase 3 setup fields
+let myGender = null;
+let myBodyType = null;
+let myOrientation = 'bi';
+let myAvailableForAllCombos = false;
 
 const DEFAULT_SLOTS = [
   { label: 'Head',       placeholder: 'hat, glasses...' },
@@ -1029,7 +1253,18 @@ function connectSocket() {
     roomState = state;
     handleRoomState(state);
   });
+  socket.on('toast', ({ msg }) => toast(msg, 'info'));
   socket.on('disconnect', () => toast('Disconnected from server', 'danger'));
+}
+
+// ─── Pill selector (gender / body type / orientation) ─────────────────────────
+function selectPill(field, val, el) {
+  const row = el.parentElement;
+  row.querySelectorAll('.pill-select').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (field === 'gender')      myGender      = val;
+  if (field === 'bodyType')    myBodyType    = val;
+  if (field === 'orientation') myOrientation = val;
 }
 
 // ─── Screen Navigation ────────────────────────────────────────────────────────
@@ -1066,8 +1301,19 @@ function joinRoom() {
 }
 
 // ─── Game Config ──────────────────────────────────────────────────────────────
+let localEnabledPowerups = [];
+
 function setGameConfig(key, value) {
   socket.emit('set-game-config', { code: myRoom, [key]: value }, (res) => {
+    if (!res || !res.ok) toast('Config error', 'danger');
+  });
+}
+
+function togglePowerup(puId) {
+  const idx = localEnabledPowerups.indexOf(puId);
+  if (idx === -1) localEnabledPowerups.push(puId);
+  else localEnabledPowerups.splice(idx, 1);
+  socket.emit('set-game-config', { code: myRoom, enabledPowerups: [...localEnabledPowerups] }, (res) => {
     if (!res || !res.ok) toast('Config error', 'danger');
   });
 }
@@ -1083,6 +1329,11 @@ function updateConfigUI(state) {
     document.querySelectorAll(`#config-${group} .config-btn`).forEach(btn => {
       btn.classList.toggle('active', btn.dataset.val === configs[btn.dataset.key]);
     });
+  });
+  // Sync local powerup list from state (in case of reconnect)
+  localEnabledPowerups = [...(state.enabledPowerups || [])];
+  document.querySelectorAll('#config-powerups .config-btn').forEach(btn => {
+    btn.classList.toggle('active', localEnabledPowerups.includes(btn.dataset.pu));
   });
 }
 
@@ -1156,13 +1407,19 @@ function submitSetup() {
     .filter(c => c.value.trim())
     .map(c => ({ label: c.label, value: c.value.trim() }));
 
+  myAvailableForAllCombos = document.getElementById('setup-all-combos').checked;
+
   socket.emit('player-setup', {
     code: myRoom,
     name,
     clothing,
-    preferences:  [...myPrefs],
-    limits:       [...myLimits],
-    limits_soft:  [...mySoftLimits],
+    preferences:         [...myPrefs],
+    limits:              [...myLimits],
+    limits_soft:         [...mySoftLimits],
+    gender:              myGender,
+    bodyType:            myBodyType,
+    orientation:         myOrientation,
+    availableForAllCombos: myAvailableForAllCombos,
   }, (res) => {
     if (!res.ok) return toast(res.error || 'Error', 'danger');
     showLobby();
@@ -1302,6 +1559,24 @@ function handleRoomState(state) {
       } else {
         buildDisplayScreen(state);
         showScreen('screen-display');
+      }
+
+    } else if (turn.phase === 'duel') {
+      if (isDisplayHost) {
+        buildDisplayScreen(state);
+        showScreen('screen-display');
+      } else {
+        buildDuelScreen(state, false);
+        showScreen('screen-duel');
+      }
+
+    } else if (turn.phase === 'duel-forfeit') {
+      if (isDisplayHost) {
+        buildDisplayScreen(state);
+        showScreen('screen-display');
+      } else {
+        buildDuelScreen(state, true);
+        showScreen('screen-duel');
       }
 
     } else if (turn.phase === 'loss') {
@@ -1657,7 +1932,308 @@ function buildDisplayScreen(state) {
     document.getElementById('display-card-reveal').className =
       `card-reveal ${turn.choice || 'dare'}-card`;
     document.getElementById('display-card-text').textContent = text;
+
+  } else if (turn.phase === 'duel' || turn.phase === 'duel-forfeit') {
+    // Display host sees a built-in duel screen in the display area
+    waitingDiv.style.display = 'none';
+    cardDiv.style.display    = 'block';
+
+    const performer = state.players[turn.performerId];
+    const target    = state.players[turn.targetId];
+    const card      = turn.phase === 'duel' ? turn.card : turn.forfeit?.card;
+    const cardText  = card?.text;
+    const text      = (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
+    const label     = turn.phase === 'duel' ? '⚔️ DUEL' : '⚔️ FORFEIT';
+
+    document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
+    document.getElementById('display-card-performer-name').textContent  =
+      turn.phase === 'duel'
+        ? `${performer?.name || ''} vs ${target?.name || ''}`
+        : `Forfeit → ${state.players[turn.forfeit?.playerId]?.name || ''}`;
+    document.getElementById('display-card-type-label').textContent  = label;
+    document.getElementById('display-card-type-label').style.color  = '#f59e0b';
+    document.getElementById('display-card-reveal').className = 'card-reveal dare-card';
+    document.getElementById('display-card-text').textContent = text;
+
+    // Host resolve buttons (only for display host during active duel)
+    const hostControlsEl = document.getElementById('display-host-controls');
+    if ((amHost || isDisplayHost) && turn.phase === 'duel') {
+      const existingDuelBtns = document.getElementById('display-duel-btns');
+      if (!existingDuelBtns) {
+        const duelBtnsDiv = document.createElement('div');
+        duelBtnsDiv.id = 'display-duel-btns';
+        duelBtnsDiv.className = 'duel-resolve-btns';
+        duelBtnsDiv.style.marginBottom = '8px';
+        const pBtn = document.createElement('button');
+        pBtn.className = 'btn-winner';
+        pBtn.textContent = `🏆 ${performer?.name || 'Performer'} won`;
+        pBtn.onclick = () => resolveDuelWinner(turn.performerId);
+        const tBtn = document.createElement('button');
+        tBtn.className = 'btn-winner';
+        tBtn.textContent = `🏆 ${target?.name || 'Target'} won`;
+        tBtn.onclick = () => resolveDuelWinner(turn.targetId);
+        duelBtnsDiv.appendChild(pBtn);
+        duelBtnsDiv.appendChild(tBtn);
+        hostControlsEl.insertBefore(duelBtnsDiv, hostControlsEl.firstChild);
+      }
+    } else {
+      const existingDuelBtns = document.getElementById('display-duel-btns');
+      if (existingDuelBtns) existingDuelBtns.remove();
+    }
+
+    // Forfeit done button for display host
+    if ((amHost || isDisplayHost) && turn.phase === 'duel-forfeit') {
+      const existingForfeitBtn = document.getElementById('display-forfeit-btn');
+      if (!existingForfeitBtn) {
+        const fb = document.createElement('button');
+        fb.id = 'display-forfeit-btn';
+        fb.className = 'btn btn-gold btn-sm';
+        fb.style.marginBottom = '8px';
+        fb.textContent = '✓ Forfeit completed';
+        fb.onclick = completeForfeit;
+        hostControlsEl.insertBefore(fb, hostControlsEl.firstChild);
+      }
+    } else {
+      const existingForfeitBtn = document.getElementById('display-forfeit-btn');
+      if (existingForfeitBtn) existingForfeitBtn.remove();
+    }
   }
+}
+
+// ─── Duel Screen ──────────────────────────────────────────────────────────────
+function buildDuelScreen(state, isForfeit) {
+  const turn      = state.currentTurn;
+  const performer = state.players[turn.performerId];
+  const target    = state.players[turn.targetId];
+  const isHostOrDisplay = amHost || state.displayHostId === myId;
+  const iAmPerformer = turn.performerId === myId;
+  const iAmTarget    = turn.targetId    === myId;
+
+  if (!isForfeit) {
+    // Active duel phase
+    document.getElementById('duel-banner').textContent = '⚔️ Duel in Progress!';
+
+    document.getElementById('duel-performer-emoji').textContent = performer?.emoji || '🎲';
+    document.getElementById('duel-performer-name').textContent  = performer?.name  || '';
+    document.getElementById('duel-target-emoji').textContent    = target?.emoji    || '🎲';
+    document.getElementById('duel-target-name').textContent     = target?.name     || '';
+
+    const cardText = turn.card?.text;
+    const text = (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
+    document.getElementById('duel-card-text').textContent = text;
+
+    document.getElementById('duel-forfeit-wrap').style.display = 'none';
+
+    // Auto-win notice
+    if (turn.duelAutoWinnerId === myId) {
+      toast('🏆 Auto-win powerup active — you win this duel!', 'success');
+    }
+
+    if (isHostOrDisplay) {
+      const resolveWrap = document.getElementById('duel-resolve-wrap');
+      resolveWrap.style.display = 'flex';
+      document.getElementById('duel-win-performer-name').textContent = performer?.name || 'Performer';
+      document.getElementById('duel-win-target-name').textContent    = target?.name    || 'Target';
+      document.getElementById('duel-waiting-msg').style.display = 'none';
+    } else {
+      document.getElementById('duel-resolve-wrap').style.display = 'none';
+      document.getElementById('duel-waiting-msg').style.display =
+        (iAmPerformer || iAmTarget) ? 'none' : 'block';
+    }
+
+  } else {
+    // Forfeit phase
+    const forfeit = turn.forfeit;
+    const loser   = state.players[forfeit?.playerId];
+    const iAmLoser = myId === forfeit?.playerId;
+
+    document.getElementById('duel-banner').textContent = `⚔️ Forfeit dare for ${loser?.name || 'the loser'}`;
+    document.getElementById('duel-performer-emoji').textContent = performer?.emoji || '🎲';
+    document.getElementById('duel-performer-name').textContent  = performer?.name  || '';
+    document.getElementById('duel-target-emoji').textContent    = target?.emoji    || '🎲';
+    document.getElementById('duel-target-name').textContent     = target?.name     || '';
+
+    document.getElementById('duel-card-text').textContent = '';
+    document.getElementById('duel-resolve-wrap').style.display = 'none';
+
+    const forfeitWrap = document.getElementById('duel-forfeit-wrap');
+    forfeitWrap.style.display = 'block';
+
+    const forfeitText = forfeit?.card?.text;
+    const fText = (forfeitText && typeof forfeitText === 'object') ? (forfeitText.en || forfeitText.nl || '') : (forfeitText || '');
+    document.getElementById('duel-forfeit-text').textContent = fText;
+
+    const doneBtnForfeit = document.getElementById('duel-forfeit-done-btn');
+    doneBtnForfeit.style.display = (iAmLoser || isHostOrDisplay) ? 'inline-flex' : 'none';
+    doneBtnForfeit.disabled = false;
+
+    document.getElementById('duel-waiting-msg').style.display =
+      (!iAmLoser && !isHostOrDisplay) ? 'block' : 'none';
+  }
+
+  document.getElementById('duel-end-game-wrap').style.display = amHost ? 'block' : 'none';
+}
+
+function resolveDuelFor(who) {
+  const turn = roomState?.currentTurn;
+  if (!turn) return;
+  const winnerId = who === 'performer' ? turn.performerId : turn.targetId;
+  resolveDuelWinner(winnerId);
+}
+
+function resolveDuelWinner(winnerId) {
+  socket.emit('resolve-duel', { code: myRoom, winnerId }, (res) => {
+    if (!res || !res.ok) toast(res?.error || 'Error resolving duel', 'danger');
+  });
+}
+
+function completeForfeit() {
+  const btn = document.getElementById('duel-forfeit-done-btn');
+  if (btn) btn.disabled = true;
+  const displayBtn = document.getElementById('display-forfeit-btn');
+  if (displayBtn) displayBtn.disabled = true;
+  socket.emit('complete-forfeit', { code: myRoom }, (res) => {
+    if (!res || !res.ok) {
+      if (btn) btn.disabled = false;
+      if (displayBtn) displayBtn.disabled = false;
+    }
+  });
+}
+
+// ─── Power-up Shop ────────────────────────────────────────────────────────────
+const POWERUP_META = {
+  skip:          { name: 'Skip',          icon: '⏭', desc: 'Skip current dare — no XP or coins', cost: 8  },
+  immunity_stone:{ name: 'Immunity Stone',icon: '🛡️', desc: '+2% chance to be immune each round',  cost: 12 },
+  force_swap:    { name: 'Force Swap',    icon: '🔄', desc: 'Swap your current target for another', cost: 10 },
+  double_xp:     { name: 'Double XP',    icon: '⚡', desc: 'Double XP for your current dare',      cost: 6  },
+  insight:       { name: 'Insight',       icon: '🔮', desc: 'Preview your next card type',          cost: 4  },
+  sabotage:      { name: 'Sabotage',      icon: '💀', desc: "Reduce another player's immunity by 5%",cost: 15 },
+  auto_win_duel: { name: 'Auto-Win Duel', icon: '🏆', desc: 'Automatically win your next duel',     cost: 20 },
+};
+
+const POWERUP_COSTS_CLIENT = { skip:8, immunity_stone:12, force_swap:10, double_xp:6, insight:4, sabotage:15, auto_win_duel:20 };
+
+function openShop() {
+  const state = roomState;
+  if (!state) return;
+  const me = state.players[myId];
+  if (!me) return;
+
+  document.getElementById('shop-balance').textContent = me.coins || 0;
+
+  // Available powerups
+  const availList = document.getElementById('shop-available-list');
+  availList.innerHTML = '';
+  (state.enabledPowerups || []).forEach(puId => {
+    const meta = POWERUP_META[puId];
+    if (!meta) return;
+    const cost = POWERUP_COSTS_CLIENT[puId] || meta.cost;
+    const canAfford = (me.coins || 0) >= cost;
+    const row = document.createElement('div');
+    row.className = 'shop-powerup-row';
+    row.innerHTML = `
+      <div style="font-size:1.4rem">${meta.icon}</div>
+      <div class="shop-pu-info">
+        <div class="shop-pu-name">${meta.name}</div>
+        <div class="shop-pu-desc">${meta.desc}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="shop-pu-cost">🪙 ${cost}</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:4px;max-width:none"
+          ${canAfford ? '' : 'disabled'} onclick="buyPowerup('${puId}')">Buy</button>
+      </div>`;
+    availList.appendChild(row);
+  });
+
+  if ((state.enabledPowerups || []).length === 0) {
+    availList.innerHTML = '<p class="text-muted" style="font-size:0.85rem">No power-ups enabled for this game.</p>';
+  }
+
+  // Owned powerups
+  const owned = me.activePowerups || [];
+  const ownedSection = document.getElementById('shop-owned-section');
+  const ownedList = document.getElementById('shop-owned-list');
+  ownedList.innerHTML = '';
+  if (owned.length > 0) {
+    ownedSection.style.display = 'block';
+    const counts = {};
+    owned.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+    Object.entries(counts).forEach(([puId, count]) => {
+      const meta = POWERUP_META[puId];
+      if (!meta) return;
+      const row = document.createElement('div');
+      row.className = 'shop-powerup-row';
+      row.innerHTML = `
+        <div style="font-size:1.4rem">${meta.icon}</div>
+        <div class="shop-pu-info">
+          <div class="shop-pu-name">${meta.name} ${count > 1 ? `×${count}` : ''}</div>
+          <div class="shop-pu-desc">${meta.desc}</div>
+        </div>
+        <div>
+          <button class="btn btn-secondary btn-sm" style="max-width:none"
+            onclick="usePowerup('${puId}')">Use</button>
+        </div>`;
+      ownedList.appendChild(row);
+    });
+  } else {
+    ownedSection.style.display = 'none';
+  }
+
+  document.getElementById('powerup-shop-overlay').classList.add('open');
+}
+
+function closeShop() {
+  document.getElementById('powerup-shop-overlay').classList.remove('open');
+}
+
+function closeShopOnBackdrop(e) {
+  if (e.target === document.getElementById('powerup-shop-overlay')) closeShop();
+}
+
+function buyPowerup(puId) {
+  socket.emit('buy-powerup', { code: myRoom, powerupId: puId }, (res) => {
+    if (!res || !res.ok) { toast(res?.error || 'Cannot buy', 'danger'); return; }
+    toast(`Bought ${POWERUP_META[puId]?.name || puId}!`, 'success');
+    openShop(); // refresh shop
+  });
+}
+
+function usePowerup(puId) {
+  const state = roomState;
+  if (!state) return;
+  const turn = state.currentTurn;
+
+  // Powerups that need a target selector
+  if (puId === 'sabotage') {
+    const others = state.turnOrder.filter(id => id !== myId && state.players[id]);
+    if (others.length === 0) { toast('No valid target', 'danger'); return; }
+    const names = others.map(id => `${state.players[id].emoji} ${state.players[id].name}`).join('\n');
+    const chosen = others.length === 1 ? others[0] : (() => {
+      // Simple prompt for target selection
+      const idx = others.findIndex((id, i) => confirm(`Sabotage ${state.players[id].emoji} ${state.players[id].name}?`));
+      return idx >= 0 ? others[idx] : null;
+    })();
+    if (!chosen) return;
+    socket.emit('use-powerup', { code: myRoom, powerupId: puId, targetId: chosen }, (res) => {
+      if (!res || !res.ok) toast(res?.error || 'Cannot use', 'danger');
+      else { toast(`Sabotaged ${state.players[chosen]?.name}! 💀`, 'success'); closeShop(); }
+    });
+    return;
+  }
+
+  socket.emit('use-powerup', { code: myRoom, powerupId: puId }, (res) => {
+    if (!res || !res.ok) { toast(res?.error || 'Cannot use right now', 'danger'); return; }
+    closeShop();
+    if (puId === 'insight' && res.insightType) {
+      toast(`🔮 Insight: next card is a ${res.insightType.toUpperCase()}`, 'info');
+    } else if (puId === 'double_xp') {
+      toast('⚡ Double XP active for this dare!', 'success');
+    } else if (puId === 'immunity_stone') {
+      toast('🛡️ Immunity boosted +2%', 'success');
+    } else if (puId === 'auto_win_duel') {
+      toast('🏆 Auto-win duel activated!', 'success');
+    }
+  });
 }
 
 // ─── End Screen ───────────────────────────────────────────────────────────────
@@ -1706,7 +2282,7 @@ function updateHud(player) {
   document.getElementById('hud-coins').textContent  = player.coins || 0;
   document.getElementById('hud-level').textContent  = player.currentLevel || 1;
 
-  const nextThreshold = (player.currentLevel || 1) * 6; // unlock next = currentLevel * 6
+  const nextThreshold = (player.currentLevel || 1) * 6;
   const pct = Math.min(100, Math.round(((player.xp || 0) / nextThreshold) * 100));
   document.getElementById('hud-xp-fill').style.width = pct + '%';
 
@@ -1720,6 +2296,27 @@ function updateHud(player) {
     dot.className = 'slot-dot' + (i < used ? ' used' : '');
     slotsEl.appendChild(dot);
   }
+
+  // Active powerup icons
+  const puEl = document.getElementById('hud-powerups');
+  puEl.innerHTML = '';
+  const owned = player.activePowerups || [];
+  const counts = {};
+  owned.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+  Object.entries(counts).forEach(([id, count]) => {
+    const meta = POWERUP_META[id];
+    if (!meta) return;
+    const span = document.createElement('span');
+    span.className = 'hud-pu-icon';
+    span.textContent = meta.icon + (count > 1 ? `×${count}` : '');
+    span.title = meta.name;
+    puEl.appendChild(span);
+  });
+
+  // Show shop button only if powerups are enabled
+  const shopBtn = document.getElementById('hud-shop-btn');
+  const hasPowerups = (roomState?.enabledPowerups || []).length > 0;
+  shopBtn.style.display = hasPowerups ? 'inline-block' : 'none';
 }
 
 // ─── Level-up animation ───────────────────────────────────────────────────────

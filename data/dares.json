@@ -286,6 +286,66 @@
 
     { "id": "d041", "type": "dare", "level": 8, "difficulty": 3,
       "text": { "en": "Let the group give you a dare within your stated preferences. If they go too far — call it.", "nl": "Laat de groep je een dare geven binnen jouw voorkeuren. Als ze te ver gaan — zeg het." },
-      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false }
+      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "duel001", "type": "duel", "level": 1, "difficulty": 1,
+      "text": { "en": "Staring contest — first to blink loses. Go!", "nl": "Starwedstrijd — wie het eerst knippert verliest. Ga!" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel002", "type": "duel", "level": 1, "difficulty": 1,
+      "text": { "en": "Thumb war, best of 3. May the best thumb win.", "nl": "Duimworstelwedstrijd, best of 3. Laat de beste duim winnen." },
+      "tags": ["general", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel003", "type": "duel", "level": 2, "difficulty": 1,
+      "text": { "en": "Rock-paper-scissors, best of 5. Loser must do a silly forfeit chosen by the group.", "nl": "Steen-schaar-papier, best of 5. De verliezer doet een grappige straf gekozen door de groep." },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel004", "type": "duel", "level": 2, "difficulty": 1,
+      "text": { "en": "Most creative compliment battle — each give the other your best compliment. Group votes for the most convincing.", "nl": "Creatieve complimentenwedstrijd — geef elkaar jullie beste compliment. De groep stemt voor de meest overtuigende." },
+      "tags": ["general", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel005", "type": "duel", "level": 3, "difficulty": 2,
+      "text": { "en": "Pick-up line battle — each delivers their best line. Group votes for who they'd actually fall for.", "nl": "Versieringszinnen-duel — geef elkaar jullie beste openingszin. De groep stemt wie ze echt zou versieren." },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel006", "type": "duel", "level": 3, "difficulty": 2,
+      "text": { "en": "Flirt-off: 30 seconds each to convince the group you're the better flirt. Group votes.", "nl": "Flirt-duel: 30 seconden elk om de groep te overtuigen dat jij de betere flirter bent. De groep stemt." },
+      "tags": ["flirty", "oral"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel007", "type": "duel", "level": 4, "difficulty": 2,
+      "text": { "en": "Eye-contact challenge — hold each other's gaze without looking away. Last one to break wins.", "nl": "Oogcontact-uitdaging — houd elkaars blik vast zonder weg te kijken. Wie het langst volhoudt wint." },
+      "tags": ["flirty", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel008", "type": "duel", "level": 4, "difficulty": 2,
+      "text": { "en": "Straight-face challenge — try to make the other laugh while keeping a straight face yourself. First to crack loses.", "nl": "Strak-gezicht-uitdaging — probeer de ander aan het lachen te maken terwijl je zelf een strak gezicht houdt. Wie het eerst lacht verliest." },
+      "tags": ["flirty", "general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel009", "type": "duel", "level": 5, "difficulty": 2,
+      "text": { "en": "Slow dance together for 30 seconds. Whoever pulls the other closer first wins.", "nl": "Dans 30 seconden langzaam samen. Wie de ander het eerst dichter naar zich toe trekt wint." },
+      "tags": ["physical", "flirty", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel010", "type": "duel", "level": 5, "difficulty": 2,
+      "text": { "en": "Back-to-back, link arms and try to stand up together. First to give up or let go loses.", "nl": "Rug-aan-rug, haken in elkaars armen en samen opstaan. Wie het eerst opgeeft of loslaat verliest." },
+      "tags": ["physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel011", "type": "duel", "level": 6, "difficulty": 2,
+      "text": { "en": "Sit face to face, hold hands, and maintain eye contact in silence. First to speak or look away loses.", "nl": "Zit tegenover elkaar, pak elkaars handen vast en houd oogcontact in stilte. Wie het eerst spreekt of wegkijkt verliest." },
+      "tags": ["intimate", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel012", "type": "duel", "level": 6, "difficulty": 2,
+      "text": { "en": "Arm wrestling — or thumb wrestling if preferred. The loser receives a forfeit dare from the group.", "nl": "Arm drukken — of duimworstelwedstrijd als dat de voorkeur heeft. De verliezer krijgt een straf van de groep." },
+      "tags": ["physical", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel013", "type": "duel", "level": 7, "difficulty": 3,
+      "text": { "en": "Whisper the most seductive thing you can think of into the other's ear. Group votes for who made the other blush most.", "nl": "Fluister het meest verleidelijke dat je kunt bedenken in het oor van de ander. De groep stemt wie de ander het meest deed blozen." },
+      "tags": ["intimate", "flirty", "oral"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "duel014", "type": "duel", "level": 8, "difficulty": 3,
+      "text": { "en": "Endurance challenge: hold the most seductive pose you can, facing each other. First to break posture or look away loses — and owes the winner one dare (within limits).", "nl": "Uithoudings-uitdaging: houd de meest verleidelijke pose vast, tegenover elkaar. Wie het eerst zijn/haar houding verbreekt of wegkijkt verliest — en is de winnaar één dare verschuldigd (binnen limits)." },
+      "tags": ["intimate", "explicit"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": true, "targetRequired": true },
+
+    { "id": "duel015", "type": "duel", "level": 9, "difficulty": 3,
+      "text": { "en": "Face-to-face breath challenge: stand as close as possible without touching. Whoever moves or makes contact first loses — winner earns one intimate command (within hard limits and full consent).", "nl": "Adem-uitdaging: sta zo dicht mogelijk bij elkaar zonder aan te raken. Wie het eerst beweegt of aanraakt verliest — de winnaar verdient één intiem commando (binnen harde limits en volledige toestemming)." },
+      "tags": ["intimate", "explicit"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": true, "targetRequired": true }
   ]
 }

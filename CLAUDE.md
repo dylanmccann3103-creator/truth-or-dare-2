@@ -150,11 +150,12 @@ haal je het level dus precies in 3 dares; krijg je drie 1-pointers, dan heb je p
 - Duel-winst: `+10` XP flat (voorlopig).
 
 **Coins** (performer wordt beloond — "pineut zijn loont"):
-- Per dare: `max(3, card.level + card.difficulty)` — de vloer van 3 zorgt dat early-game
-  power-ups (goedkoopste = Insight 4) binnen ~2 dares bereikbaar zijn.
-- `economyMode`: **schaars** (default, bovenstaande formule) · **gemiddeld** ×2 · **overvloedig** ×4.
+- Per dare: `max(3, card.level × card.difficulty × economyMult)` — coins volgen dus de XP-waarde
+  (`level × difficulty`), geschaald met de economy, met een **vloer van 3**. Die vloer zorgt dat
+  early-game power-ups (goedkoopste = Insight 4) binnen ~2 dares bereikbaar blijven.
+- `economyMult`: **schaars** ×1 (default) · **gemiddeld** ×2 · **overvloedig** ×4.
 - De host kan vóór de game starten kiezen voor een ruimere economy (meer coins per game). ✅
-- Duel-winst: `5` coins (×economyMode).
+- Duel-winst: `5` coins (×economyMult), tenzij de duel-card een eigen waarde draagt.
 
 > Getallen hierboven (XP-formule, coin-vloer, multipliers) zijn een coherent startpunt maar
 > **moeten getuned worden via playtest**. Wijzig ze hier in CLAUDE.md, niet ad hoc in code.
@@ -175,10 +176,52 @@ haal je het level dus precies in 3 dares; krijg je drie 1-pointers, dan heb je p
 `general · flirty · clothing · body · physical · feet · mouth · oral · intimate · explicit`
 (uitbreidbaar; finale lijst wordt samen met de content-review bevestigd ná de build.)
 
-### §7.5 Turn-flow
-1. speler kiest **truth of dare** + **level** → 2. systeem kiest gefilterde card van dat **type** en
-level → 3. target bepaald (`targetingMode`: self / 50-50 / random) → 4. uitvoeren of duel →
-5. XP + coins → 6. volgende beurt.
+### §7.5 Turn-flow & rollen
+**Host-rol = keuze (host-mode).** Bij het aanmaken kiest de host:
+- **`display`** (default, aanbevolen voor TV/groot scherm): de host is **geen speler** — zit niet in
+  `turnOrder`, doet geen dares, verdient geen XP/coins. Het host-scherm is het centrale display: het
+  toont de actieve card, de spin/state, en notificaties.
+- **`player`**: de host doet óók mee als speler (handig zonder los TV-scherm, bv. iedereen op
+  telefoon). Dan doorloopt de host setup en zit hij wél in `turnOrder`.
+
+In beide modi krijgen spelers op hun telefoon een melding zoals *"Je bent gedared/geduëld door
+{speler}."*
+
+**Wat het centrale display (de "TV-view") toont:** de actieve truth/dare-card, de **timer** (bij
+duels en getimede dares), en **wie gekozen is** voor een duel / 2-speler-dare.
+
+**Geen los TV/iPad-scherm? → de TV-view verschijnt op álle telefoons behalve die van de actieve
+speler.** De rest van de groep ziet zo de gedeelde presentatie op hun eigen toestel; de actieve
+speler ziet in plaats daarvan zijn eigen **actie-view**: dezelfde card-tekst (hij moet 'm immers
+lezen/uitvoeren) **plus** zijn knoppen (done, park, respin, soft-limit-keuze). Verschil = controls
+vs. presentatie; beide tonen de card. De TV-view is dus een **rol/rendering**, niet per se een apart
+apparaat:
+- `display`-host aanwezig → TV-view op het hostscherm.
+- geen display-host (phones-only) → TV-view op elke niet-actieve telefoon; actieve speler krijgt de
+  actie-view.
+
+**Wie verdient wat (canon):**
+> **Kern-regel:** **XP** gaat altijd naar de **actieve speler** (turn-holder). **Coins** gaan naar
+> wie de dare daadwerkelijk **uitvoert** (of een duel **wint**). Coins per ontvanger =
+> `max(3, card.level × card.difficulty × economyMult)` — elke ontvanger krijgt het volle bedrag.
+
+- Per beurt kiest het systeem één **actieve speler** (uit `turnOrder`). Die verdient **alle XP** van
+  die beurt (`card.level × card.difficulty`, ×Double-XP indien actief).
+- **Solo dare** (actieve speler doet 'm zelf): actieve speler krijgt **XP + coins**.
+- **Duel:** de **winnaar** krijgt de coins; de **XP blijft altijd bij de actieve speler**, óók als
+  die het duel verliest. (XP = beloning voor "aan de beurt zijn", niet voor winnen.)
+- **Dubbel / 2-speler-card** (bv. "kus speler B"): **beide** uitvoerders krijgen coins (elk het volle
+  bedrag); de actieve speler krijgt daarbovenop de XP.
+- **Actieve speler daret/duëlt iemand anders** (bv. met een geparkeerde of gekochte dare): **A krijgt
+  de XP, B (die uitvoert) de coins.**
+- Voorbeeld: spelers A B C D E. Beurt → A actief (verdient alle XP). Card is een duo-card → systeem
+  kiest D; D krijgt coins, geen XP. A klaar → volgende beurt → B actief, enz.
+
+**Flow:** 1. systeem kiest actieve speler → 2. speler kiest **truth/dare + level** → 3. systeem kiest
+gefilterde card van dat type/level → 4. tweede persoon bepaald indien card dat vraagt
+(`targetingMode`: self / 50-50 / random) → 5. uitvoeren of duel → 6. XP (actieve speler) + coins
+(actief + evt. tweede persoon) → 7. **auto-advance** naar volgende speler (geen handmatige
+"next"/spin-tap; de spin is enkel host-scherm-flavor, server-gedreven, één bron).
 
 ### §7.6 Card-schema & selectie — beslissingen (canon: BUILD_SPEC §2)
 - **`type` is een harde filter.** `selectCard(allCards, type, performer, target, chosenLevel, …)`
@@ -195,6 +238,40 @@ level → 3. target bepaald (`targetingMode`: self / 50-50 / random) → 4. uitv
   lichte voorkeur in de selectie (houdt het spel leuk), maar sluiten niets uit.
 - **`host`-veld NIET hernoemen.** Code houdt `room.host` (v1). `hostSocketId` in BUILD_SPEC §2.3 is
   enkel een doc-alias — kosmetische rename loont de 4 call-sites breekrisico niet.
+- **`targetRequired` wordt afgedwongen.** Heeft een card `targetRequired: true` en is er geen geldige
+  tweede persoon (bv. disconnect, of de enige kandidaat schendt limits/gender/orientation)? → die
+  card valt af in `selectCard`; val terug via de normale keten. Nooit een target-card tonen zonder
+  geldige target.
+
+### §7.6b Soft limits (zachte grenzen)
+Limits zijn er in twee niveaus:
+- **Hard limit** = nooit. `selectCard` blokkeert deze altijd (veiligheidsgarantie, §5).
+- **Soft limit** = "liever niet, maar bespreekbaar". Blokkeert **niet**, maar de geselecteerde card
+  wordt **soft-flagged** teruggegeven. De client toont dan de keuze: *doe 'm* of *respin een level
+  hoger* (op level 9 = difficulty hoger i.p.v. level hoger, want 10 is het plafond).
+- Schema: `player.limits` (hard) + `player.softLimits` (soft). `selectCard` retourneert
+  `{ card, recycled, softFlagged }`.
+- **Geen geldige card voor het gekozen level + deze pairing?** → prompt de actieve speler:
+  *"Geen veilige kaart op dit level met jullie limits."* met de opties: (a) limits aanpassen,
+  (b) lager level accepteren. Niet stilzwijgend een veel lagere card opdringen.
+
+### §7.7 Break-slots, roulette-10 & restart
+- **Break-slots (3 per speler, alleen voor DARES).** Parken kan enkel als `phase === 'showing'` én
+  `choice === 'dare'`. Parken kost een slot en bewaart de dare.
+  - Een geparkeerde dare mag op **elke eigen beurt** alsnog gespeeld worden → slot komt vrij, speler
+    krijgt de XP+coins van die dare.
+  - **Verlies-conditie:** wil een speler de huidige dare weigeren maar zijn alle 3 slots al vol
+    (niets vrij om te parken)? → speler **verliest**; de host toont de vooraf-afgesproken straf.
+  - **Einde game:** nog-geparkeerde dares → **volle XP-waarde afgetrokken** (`level × difficulty`).
+- **Roulette & level 10.** Roulette `plus1` capt op het **vrijgespeelde** max-level van de speler en
+  **kruist nooit vanzelf level 10 binnen**. Zou een bump op 10 uitkomen, dan: respin met level 10
+  genegeerd voor die ronde. Level 10 betreedt men **alleen via een bewuste keuze**, en dat vuurt de
+  **Extreme-waarschuwing** af. Per-speler instelling: *waarschuw bij elke level-10 card* of
+  *éénmalig bevestigen* (daarna geen waarschuwing meer deze sessie).
+- **Restart (`restart-game`, host-only).** Reset de room naar `lobby`. Spelers **behouden hun setup**
+  (naam, limits/softLimits, kleding, preferences) maar progressie reset: `xp=0`, `coins=0`,
+  `currentLevel=1`, `clearedLevels=[]`, `daresCompletedPerLevel={}`, `usedCardIds` leeg,
+  `breakSlots` leeg. Geen page-reload-only; dit is een server-event.
 
 ---
 
@@ -221,9 +298,14 @@ Nog open:
 
 **Reeds beslist** (niet meer vragen): `levelUnlock = 'both'` · dare-content tweetalig (NL+EN,
 `text:{nl,en}`) · economy `gemiddeld ×2 / overvloedig ×4` · XP = `level×difficulty`, unlock = `N×6`
-(§7.2) · coins = `max(3, level+difficulty)` · difficulty 1–3 · `genderRequired` = array|null ·
+(§7.2) · coins = `max(3, level×difficulty×economy)` · difficulty 1–3 · `genderRequired` = array|null ·
 `selectCard` filtert op `type` · `usedCardIds` per speler + recycle-met-note · preferences = zachte
-weging · `host`-veld niet hernoemen · level 10 = "Extreme" met waarschuwing · **level 7 = `intimate`
-(6–7)** (§7.1, §7.6).
+weging · `host`-veld niet hernoemen · level 10 = "Extreme" met waarschuwing · level 7 = `intimate`
+(6–7) · **host-mode = keuze (`display` default / `player`)** · **XP → actieve speler; coins → wie
+uitvoert/wint, vol bedrag elk (solo/duel/dubbel/redirect, §7.5)** · **duel-XP blijft altijd bij de
+actieve speler, óók bij verlies** · **auto-advance na voltooien** · **targetRequired afgedwongen** · **soft limits
+(hard/soft + respin)** · **break-slots: dares-only, herspeelbaar, verlies bij 0 vrije slots** ·
+**roulette capt onder 10; 10 enkel via bewuste keuze + waarschuwing** · **`restart-game` reset naar
+lobby, setup blijft, progressie reset** (§7.5–§7.7).
 
 Tref je een nog-open beslissing? → vraag het, verzin niks zelf.

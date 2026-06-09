@@ -14,6 +14,7 @@ const path = require('path');
 
 const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
+const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
 
 const app = express();
 const server = http.createServer(app);
@@ -76,12 +77,6 @@ function getRoom(code) { return rooms[code]; }
 
 // ─── Progression helpers ──────────────────────────────────────────────────────
 
-function coinsByEconomy(baseCoins, mode) {
-  if (mode === 'gemiddeld')   return baseCoins * 2;
-  if (mode === 'overvloedig') return baseCoins * 4;
-  return baseCoins; // schaars
-}
-
 function canAccessLevel(player, level) {
   if (level <= 1) return true;
   const prev = level - 1;
@@ -98,9 +93,10 @@ function maxUnlockedLevel(player) {
 
 // ─── Game helpers ─────────────────────────────────────────────────────────────
 
-function pickTarget(room, performerId) {
-  const others = room.turnOrder.filter(id => id !== performerId && room.players[id]);
-  if (others.length === 0) return performerId;
+function pickTarget(room, performerId, excludeId = null) {
+  let others = room.turnOrder.filter(id => id !== performerId && room.players[id]);
+  if (excludeId) others = others.filter(id => id !== excludeId);
+  if (others.length === 0) return (excludeId ? null : performerId);
 
   const mode = room.targetingMode;
   if (mode === 'self') return performerId;
@@ -111,18 +107,6 @@ function pickTarget(room, performerId) {
     : others[Math.floor(Math.random() * others.length)];
 }
 
-function calcRewards(card, attribution, economyMode) {
-  const xpEarned    = card.level * (card.difficulty || 1);
-  const baseCoins   = Math.max(3, card.level * (card.difficulty || 1));
-  const coinsEarned = coinsByEconomy(baseCoins, economyMode);
-
-  let coinRecipients = [];
-  if (attribution && attribution.type === 'solo') {
-    coinRecipients = [{ id: attribution.performerId, coins: coinsEarned }];
-  }
-  return { xpEarned, coinRecipients };
-}
-
 function advanceTurn(room) {
   room.currentTurnIndex++;
   room.currentTurn = {
@@ -131,6 +115,11 @@ function advanceTurn(room) {
     phase: 'spinning',
     recycled: false, softFlagged: false, rouletteUpgrade: false,
     attribution: null,
+    doubleXp: false,
+    insightRevealed: false,
+    insightType: null,
+    duelAutoWinnerId: null,
+    forfeit: null,
   };
   io.to(room.code).emit('room-state', roomPublicState(room));
 
@@ -151,6 +140,11 @@ function advanceTurn(room) {
       phase: 'choosing',
       recycled: false, softFlagged: false, rouletteUpgrade: false,
       attribution: null,
+      doubleXp: false,
+      insightRevealed: false,
+      insightType: null,
+      duelAutoWinnerId: null,
+      forfeit: null,
     };
     io.to(room.code).emit('room-state', roomPublicState(room));
   }, 800);
@@ -188,6 +182,11 @@ function roomPublicState(room) {
         })),
       },
       immunity: p.immunity,
+      activePowerups: p.activePowerups || [],
+      gender: p.gender,
+      bodyType: p.bodyType,
+      orientation: p.orientation,
+      availableForAllCombos: p.availableForAllCombos,
       // limits: NEVER sent
     };
   }
@@ -204,6 +203,7 @@ function roomPublicState(room) {
     rouletteMode: room.rouletteMode,
     economyMode: room.economyMode,
     minStartLevel: room.minStartLevel,
+    enabledPowerups: room.enabledPowerups || [],
   };
 }
 
@@ -232,8 +232,8 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
-  // Player submits setup (name, clothingItems, prefs, limits, softLimits)
-  socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft }, cb) => {
+  // Player submits setup (name, clothingItems, prefs, limits, softLimits, gender, bodyType, orientation)
+  socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft, gender, bodyType, orientation, availableForAllCombos }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
     const emojiIdx = Object.keys(room.players).length % EMOJIS.length;
@@ -255,10 +255,10 @@ io.on('connection', (socket) => {
       breakSlots: { total: 3, used: 0, parkedDares: [] },
       immunity: 0,
       activePowerups: [],
-      gender: null,
-      bodyType: null,
-      orientation: 'bi',
-      availableForAllCombos: false,
+      gender: gender || null,
+      bodyType: bodyType || null,
+      orientation: orientation || 'bi',
+      availableForAllCombos: availableForAllCombos || false,
     };
     socket.data.roomCode = code;
     cb({ ok: true });
@@ -275,7 +275,7 @@ io.on('connection', (socket) => {
   });
 
   // Host updates game config (lobby phase only)
-  socket.on('set-game-config', ({ code, targetingMode, rouletteMode, economyMode }, cb) => {
+  socket.on('set-game-config', ({ code, targetingMode, rouletteMode, economyMode, enabledPowerups }, cb) => {
     const room = getRoom(code);
     if (!room) return cb && cb({ ok: false, error: 'Room not found' });
     if (room.host !== socket.id) return cb && cb({ ok: false, error: 'Only the host can configure' });
@@ -284,10 +284,14 @@ io.on('connection', (socket) => {
     const validTargeting = ['self', '50-50', 'random'];
     const validRoulette  = ['off', 'plus1', 'block'];
     const validEconomy   = ['schaars', 'gemiddeld', 'overvloedig'];
+    const validPowerups  = Object.keys(POWERUP_COSTS);
 
     if (targetingMode && validTargeting.includes(targetingMode)) room.targetingMode = targetingMode;
     if (rouletteMode  && validRoulette.includes(rouletteMode))   room.rouletteMode  = rouletteMode;
     if (economyMode   && validEconomy.includes(economyMode))     room.economyMode   = economyMode;
+    if (Array.isArray(enabledPowerups)) {
+      room.enabledPowerups = enabledPowerups.filter(p => validPowerups.includes(p));
+    }
 
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -328,7 +332,7 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
-  // Performer picks Truth or Dare — card selection with roulette + soft-limit
+  // Performer picks Truth or Dare — card selection with roulette + soft-limit + duel roll
   socket.on('pick-truth-dare', ({ code, choice }, cb) => {
     const room = getRoom(code);
     if (!room || !room.currentTurn) return cb && cb({ ok: false });
@@ -336,9 +340,14 @@ io.on('connection', (socket) => {
     if (room.currentTurn.phase !== 'choosing') return cb && cb({ ok: false, error: 'Wrong phase' });
 
     const performer = room.players[socket.id];
-    const target = room.currentTurn.targetId !== socket.id
-      ? room.players[room.currentTurn.targetId]
-      : null;
+    const targetId  = room.currentTurn.targetId;
+    const target = (targetId && targetId !== socket.id) ? room.players[targetId] : null;
+
+    // Immunity auto-roll: before card selection
+    if (applyImmunity(performer)) {
+      io.to(code).emit('toast', { msg: `🛡️ ${performer.name} is immune this round!` });
+      return advanceTurn(room);
+    }
 
     let effectiveLevel = performer.currentLevel || 1;
     let rouletteUpgrade = false;
@@ -352,18 +361,36 @@ io.on('connection', (socket) => {
       }
     }
 
-    // Pass 'block' to selectCard when in block mode, otherwise 'off'
     const scMode = room.rouletteMode === 'block' ? 'block' : 'off';
+
+    // Duel roll: 25% chance when choice is 'dare' and a different target exists
+    if (choice === 'dare' && target && Math.random() < 0.25) {
+      const duelResult = selectCard(
+        ALL_CARDS, 'duel', performer, target, effectiveLevel,
+        performer.usedCardIds, { rouletteMode: scMode }
+      );
+      if (duelResult.card) {
+        performer.usedCardIds.add(duelResult.card.id);
+        room.currentTurn.choice          = 'dare';
+        room.currentTurn.card            = duelResult.card;
+        room.currentTurn.phase           = 'duel';
+        room.currentTurn.recycled        = duelResult.recycled;
+        room.currentTurn.softFlagged     = false;
+        room.currentTurn.rouletteUpgrade = rouletteUpgrade;
+        room.currentTurn.attribution     = { type: 'duel', performerId: socket.id, targetId };
+        room.currentTurn.duelAutoWinnerId = null;
+        cb && cb({ ok: true, isDuel: true });
+        io.to(code).emit('room-state', roomPublicState(room));
+        return;
+      }
+    }
 
     const { card, recycled, softFlagged } = selectCard(
       ALL_CARDS, choice, performer, target, effectiveLevel,
-      performer.usedCardIds,
-      { rouletteMode: scMode }
+      performer.usedCardIds, { rouletteMode: scMode }
     );
 
     if (card) performer.usedCardIds.add(card.id);
-
-    const attribution = { type: 'solo', performerId: socket.id };
 
     room.currentTurn.choice          = choice;
     room.currentTurn.card            = card;
@@ -371,7 +398,7 @@ io.on('connection', (socket) => {
     room.currentTurn.recycled        = recycled;
     room.currentTurn.softFlagged     = softFlagged;
     room.currentTurn.rouletteUpgrade = rouletteUpgrade;
-    room.currentTurn.attribution     = attribution;
+    room.currentTurn.attribution     = { type: 'solo', performerId: socket.id };
 
     cb && cb({ ok: true, recycled, softFlagged, rouletteUpgrade });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -384,11 +411,12 @@ io.on('connection', (socket) => {
     const performer = room.players[socket.id];
     if (!performer) return cb && cb({ ok: false });
     if (room.currentTurn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+    if (room.currentTurn?.phase !== 'showing') return cb && cb({ ok: false, error: 'Wrong phase' });
     const card = room.currentTurn?.card;
     if (!card) return cb && cb({ ok: false });
 
     const { xpEarned, coinRecipients } = calcRewards(
-      card, room.currentTurn.attribution, room.economyMode
+      card, room.currentTurn.attribution, room.economyMode, room.currentTurn.doubleXp || false
     );
 
     performer.xp += xpEarned;
@@ -562,6 +590,210 @@ io.on('connection', (socket) => {
 
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  // ─── Duel resolution (host-only) ─────────────────────────────────────────────
+  socket.on('resolve-duel', ({ code, winnerId }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (room.host !== socket.id && room.displayHostId !== socket.id) {
+      return cb && cb({ ok: false, error: 'Host only' });
+    }
+    if (room.phase !== 'game') return cb && cb({ ok: false, error: 'Not in game' });
+    if (room.currentTurn?.phase !== 'duel') return cb && cb({ ok: false, error: 'Not in duel phase' });
+
+    const turn = room.currentTurn;
+    const actualWinnerId = turn.duelAutoWinnerId || winnerId;
+    const performerId    = turn.attribution?.performerId || turn.performerId;
+    const targetId       = turn.attribution?.targetId    || turn.targetId;
+    const loserId        = actualWinnerId === performerId ? targetId : performerId;
+
+    const performer = room.players[performerId];
+    const winner    = room.players[actualWinnerId];
+
+    // XP always goes to performer (turn-holder), coins to winner
+    const { xpEarned, coinRecipients } = calcRewards(
+      turn.card,
+      { type: 'duel', winnerId: actualWinnerId },
+      room.economyMode,
+      turn.doubleXp || false
+    );
+
+    if (performer) performer.xp += xpEarned;
+    for (const { id, coins } of coinRecipients) {
+      if (room.players[id]) room.players[id].coins += coins;
+    }
+
+    // Track level clearing for performer
+    if (performer) {
+      const lvl = turn.card.level;
+      performer.daresCompletedPerLevel[lvl] = (performer.daresCompletedPerLevel[lvl] || 0) + 1;
+      if (performer.daresCompletedPerLevel[lvl] >= 3 && !performer.clearedLevels.includes(lvl)) {
+        performer.clearedLevels.push(lvl);
+      }
+    }
+
+    const winnerName = winner?.name || 'Someone';
+    io.to(code).emit('toast', { msg: `🏆 ${winnerName} won the duel!` });
+
+    // Pick a small forfeit dare for the loser
+    const loser = room.players[loserId];
+    let forfeitCard = null;
+    if (loser) {
+      const forfeitLevel = Math.max(1, Math.min(3, Math.ceil(turn.card.level / 3)));
+      const fr = selectCard(ALL_CARDS, 'dare', loser, null, forfeitLevel, loser.usedCardIds, { rouletteMode: 'off' });
+      forfeitCard = fr.card;
+    }
+
+    if (forfeitCard && loser) {
+      turn.phase  = 'duel-forfeit';
+      turn.forfeit = { playerId: loserId, card: forfeitCard };
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+    } else {
+      turn.phase = 'showing'; // brief resolved state before advance
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      setTimeout(() => advanceTurn(room), 1500);
+    }
+  });
+
+  // Loser (or host) confirms forfeit dare is done — advance turn
+  socket.on('complete-forfeit', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room || room.phase !== 'game') return cb && cb({ ok: false });
+    if (room.currentTurn?.phase !== 'duel-forfeit') return cb && cb({ ok: false, error: 'Not in forfeit phase' });
+
+    const forfeit = room.currentTurn.forfeit;
+    if (!forfeit) return cb && cb({ ok: false });
+
+    const isLoser   = socket.id === forfeit.playerId;
+    const isHost    = socket.id === room.host || socket.id === room.displayHostId;
+    if (!isLoser && !isHost) return cb && cb({ ok: false, error: 'Not authorized' });
+
+    cb && cb({ ok: true });
+    setTimeout(() => advanceTurn(room), 1500);
+  });
+
+  // ─── Power-up shop ────────────────────────────────────────────────────────────
+  socket.on('buy-powerup', ({ code, powerupId }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (room.phase !== 'game') return cb && cb({ ok: false, error: 'Game not in progress' });
+
+    const player = room.players[socket.id];
+    if (!player) return cb && cb({ ok: false });
+
+    const cost = POWERUP_COSTS[powerupId];
+    if (!cost) return cb && cb({ ok: false, error: 'Unknown powerup' });
+    if (!(room.enabledPowerups || []).includes(powerupId)) {
+      return cb && cb({ ok: false, error: 'Powerup not enabled' });
+    }
+    if (player.coins < cost) return cb && cb({ ok: false, error: 'Not enough coins' });
+
+    player.coins -= cost;
+    player.activePowerups.push(powerupId);
+    cb && cb({ ok: true, coins: player.coins });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('use-powerup', ({ code, powerupId, targetId: puTargetId }, cb) => {
+    const room = getRoom(code);
+    if (!room || room.phase !== 'game') return cb && cb({ ok: false });
+
+    const player = room.players[socket.id];
+    if (!player) return cb && cb({ ok: false });
+
+    const idx = player.activePowerups.indexOf(powerupId);
+    if (idx === -1) return cb && cb({ ok: false, error: 'Powerup not in inventory' });
+
+    const turn = room.currentTurn;
+
+    // Per-powerup validation and effect
+    if (powerupId === 'skip') {
+      if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+      if (turn?.phase !== 'showing') return cb && cb({ ok: false, error: 'Can only skip on card screen' });
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      advanceTurn(room);
+      return;
+    }
+
+    if (powerupId === 'immunity_stone') {
+      player.immunity = Math.min(1, player.immunity + 0.02);
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true, immunity: player.immunity });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'force_swap') {
+      if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+      if (!turn?.targetId) return cb && cb({ ok: false, error: 'No current target' });
+      const newTarget = pickTarget(room, socket.id, turn.targetId);
+      if (!newTarget || newTarget === turn.targetId) return cb && cb({ ok: false, error: 'No alternative target available' });
+      turn.targetId = newTarget;
+      if (turn.attribution) turn.attribution.targetId = newTarget;
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'double_xp') {
+      if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+      turn.doubleXp = true;
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'insight') {
+      if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+      if (turn?.phase !== 'choosing') return cb && cb({ ok: false, error: 'Insight only works during choosing phase' });
+      // Trial draw to reveal dare type
+      const trialTarget = (turn.targetId && turn.targetId !== socket.id) ? room.players[turn.targetId] : null;
+      const trialDuel = (trialTarget && Math.random() < 0.25)
+        ? selectCard(ALL_CARDS, 'duel', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' })
+        : { card: null };
+      if (trialDuel.card) {
+        turn.insightType = 'duel';
+      } else {
+        const trialDare = selectCard(ALL_CARDS, 'dare', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' });
+        turn.insightType = trialDare.card ? 'dare' : 'truth';
+      }
+      turn.insightRevealed = true;
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true, insightType: turn.insightType });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'sabotage') {
+      const target = room.players[puTargetId];
+      if (!target) return cb && cb({ ok: false, error: 'Target not found' });
+      if (puTargetId === socket.id) return cb && cb({ ok: false, error: 'Cannot sabotage yourself' });
+      target.immunity = Math.max(0, target.immunity - 0.05);
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'auto_win_duel') {
+      if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+      if (turn?.phase !== 'duel' && turn?.phase !== 'choosing') {
+        return cb && cb({ ok: false, error: 'Auto-win only usable before or during a duel' });
+      }
+      turn.duelAutoWinnerId = socket.id;
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    cb && cb({ ok: false, error: 'Unhandled powerup' });
   });
 
   // Emergency host-only turn advance (stuck state recovery)

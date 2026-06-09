@@ -3,6 +3,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { selectCard } = require('../lib/selectCard');
+const { calcRewards, applyImmunity, POWERUP_COSTS } = require('../lib/gameHelpers');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -203,4 +204,88 @@ test('end-game XP penalty equals sum of level × difficulty across parked dares'
   });
   const total = parkedDares.reduce((sum, d) => sum + d.xpPenalty, 0);
   assert.equal(total, 6 + 1 + 15, 'Total penalty should be sum of all individual penalties');
+});
+
+// ─── Phase 3 tests ────────────────────────────────────────────────────────────
+
+// Helper: pure buy-powerup validation (mirrors server logic)
+function validateBuyPowerup(player, powerupId, enabledPowerups) {
+  const cost = POWERUP_COSTS[powerupId];
+  if (!cost) return { ok: false, error: 'Unknown powerup' };
+  if (!enabledPowerups.includes(powerupId)) return { ok: false, error: 'Powerup not enabled' };
+  if (player.coins < cost) return { ok: false, error: 'Not enough coins' };
+  return { ok: true };
+}
+
+// Helper: pure duel auto-win override (mirrors server logic)
+function resolveWinnerId(turn, passedWinnerId) {
+  return turn.duelAutoWinnerId || passedWinnerId;
+}
+
+// ─── Test 18: buy-powerup insufficient coins → rejected ───────────────────────
+test('buy-powerup: insufficient coins returns error', () => {
+  const p = { coins: 5 };
+  const res = validateBuyPowerup(p, 'skip', ['skip']);
+  assert.equal(res.ok, false, 'Should reject when player cannot afford powerup');
+  assert.ok(res.error.includes('coins'), 'Error should mention coins');
+});
+
+test('buy-powerup: disabled powerup returns error', () => {
+  const p = { coins: 100 };
+  const res = validateBuyPowerup(p, 'skip', []); // skip not in enabledPowerups
+  assert.equal(res.ok, false, 'Should reject disabled powerup');
+});
+
+test('buy-powerup: sufficient coins and enabled powerup succeeds', () => {
+  const p = { coins: 10 };
+  const res = validateBuyPowerup(p, 'skip', ['skip']); // skip costs 8
+  assert.equal(res.ok, true, 'Should accept valid purchase');
+});
+
+// ─── Test 19: double_xp flag doubles XP from calcRewards ─────────────────────
+test('double_xp flag returns 2× XP amount', () => {
+  const testCard = { level: 3, difficulty: 2 };
+  const attribution = { type: 'solo', performerId: 'p1' };
+  const { xpEarned: normal } = calcRewards(testCard, attribution, 'schaars', false);
+  const { xpEarned: doubled } = calcRewards(testCard, attribution, 'schaars', true);
+  assert.equal(normal, 6, 'Normal XP should be level(3) × difficulty(2) = 6');
+  assert.equal(doubled, 12, 'Doubled XP should be 12');
+  assert.equal(doubled, normal * 2, 'Doubled XP should be exactly 2× normal');
+});
+
+// ─── Test 20: immunity at 100% — performer always immune ──────────────────────
+test('immunity at 100%: performer is always immune (Math.random mocked to 0.0)', () => {
+  const origRandom = Math.random;
+  Math.random = () => 0.0; // always below threshold
+  try {
+    const immune = applyImmunity({ immunity: 1.0 });
+    assert.equal(immune, true, 'immunity=1.0 with random=0.0 should always be immune');
+  } finally {
+    Math.random = origRandom;
+  }
+});
+
+// ─── Test 21: immunity at 0% — performer never immune ────────────────────────
+test('immunity at 0%: performer is never immune', () => {
+  const origRandom = Math.random;
+  Math.random = () => 0.99;
+  try {
+    const immune = applyImmunity({ immunity: 0 });
+    assert.equal(immune, false, 'immunity=0 should never trigger');
+  } finally {
+    Math.random = origRandom;
+  }
+});
+
+// ─── Test 22: duel auto-win overrides passed winnerId ────────────────────────
+test('duelAutoWinnerId overrides any passed winnerId in resolve-duel', () => {
+  const turn = { duelAutoWinnerId: 'performer_id' };
+  const resolved = resolveWinnerId(turn, 'other_player_id');
+  assert.equal(resolved, 'performer_id', 'duelAutoWinnerId should override passedWinnerId');
+});
+
+test('resolve-duel uses passedWinnerId when duelAutoWinnerId is null', () => {
+  const turn = { duelAutoWinnerId: null };
+  const resolved = resolveWinnerId(turn, 'other_player_id');
+  assert.equal(resolved, 'other_player_id', 'Should use passedWinnerId when no auto-win is set');
 });
