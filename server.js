@@ -886,7 +886,17 @@ io.on('connection', (socket) => {
 // ─── HTTP Routes ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true }));
 app.get('/cards',  (req, res) => res.json(ALL_CARDS));
-app.get('/editor', (req, res) => res.sendFile(path.join(__dirname, 'public', 'editor.html')));
+
+// Serve HTML files with no-cache so deploys are picked up immediately
+function sendNoCache(file) {
+  return (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.sendFile(path.join(__dirname, 'public', file));
+  };
+}
+app.get('/',        sendNoCache('index.html'));
+app.get('/editor',  sendNoCache('editor.html'));
+app.get('/host',    sendNoCache('host.html'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
