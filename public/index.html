@@ -481,6 +481,61 @@ input::placeholder { color: #7a6b8a; }
 }
 .slot-dot.used { background: #ef4444; }
 
+/* ─── Level-up rainbow overlay ────────────────────────────────────── */
+#levelup-overlay {
+  position: fixed; inset: 0; z-index: 950;
+  display: none;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+#levelup-bar {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg,
+    #ff0040, #ff6600, #ffcc00, #00dd44, #0099ff, #7700ff, #ff00cc
+  );
+  opacity: 0.88;
+  clip-path: inset(0 100% 0 0);
+}
+#levelup-bar.animating {
+  animation: rainbowReveal 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes rainbowReveal {
+  0%   { clip-path: inset(0 100% 0 0%); }
+  30%  { clip-path: inset(0 0%   0 0%); }
+  70%  { clip-path: inset(0 0%   0 0%); }
+  100% { clip-path: inset(0 0%   0 100%); }
+}
+#levelup-text {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 0 24px;
+  animation: levelTextPop 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes levelTextPop {
+  0%   { opacity: 0; transform: scale(0.6) translateY(20px); }
+  28%  { opacity: 0; transform: scale(0.6) translateY(20px); }
+  42%  { opacity: 1; transform: scale(1.08) translateY(-4px); }
+  55%  { opacity: 1; transform: scale(1) translateY(0); }
+  70%  { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-16px); }
+}
+.levelup-title {
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
+  font-weight: 900;
+  color: #0d0d14;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 6px rgba(255,255,255,0.4);
+}
+.levelup-msg {
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  font-weight: 800;
+  color: #0d0d14;
+  margin-top: 10px;
+  text-shadow: 0 2px 6px rgba(255,255,255,0.4);
+}
+
 /* ─── Scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -901,6 +956,15 @@ input::placeholder { color: #7a6b8a; }
   <div class="gap"></div>
 </div>
 
+<!-- Level-up rainbow overlay -->
+<div id="levelup-overlay">
+  <div id="levelup-bar"></div>
+  <div id="levelup-text">
+    <div class="levelup-title" id="levelup-title"></div>
+    <div class="levelup-msg"   id="levelup-msg"></div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -1186,15 +1250,8 @@ function handleRoomState(state) {
   roomState = state;
 
   if (state.phase === 'lobby') {
-    // Only re-render lobby if we're currently showing it
-    const isInLobby = document.getElementById('screen-lobby').classList.contains('active') ||
-                      document.getElementById('screen-host').classList.contains('active') ||
-                      document.getElementById('screen-setup').classList.contains('active');
-    if (isInLobby || !document.querySelector('.screen.active')) {
-      renderLobby(state);
-    } else {
-      renderLobby(state);
-    }
+    myPrevClearedLevels = null; // reset so level-up fires fresh next game
+    renderLobby(state);
     return;
   }
 
@@ -1212,7 +1269,7 @@ function handleRoomState(state) {
     const isDisplayHost = state.displayHostId === myId;
     const isActive      = turn.performerId === myId;
     const me = state.players[myId];
-    if (me) updateHud(me);
+    if (me) { updateHud(me); checkLevelUp(me); }
 
     // Display host always sees the display screen during game
     if (isDisplayHost) {
@@ -1392,7 +1449,7 @@ function buildLevelScreen(state) {
 function canAccessLevelClient(player, level) {
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = level * 6;
+  const xpThreshold = (level - 1) * 6; // level 2 = 6 XP, level 3 = 12 XP, etc.
   return player.xp >= xpThreshold && (player.clearedLevels || []).includes(prev);
 }
 
@@ -1649,7 +1706,7 @@ function updateHud(player) {
   document.getElementById('hud-coins').textContent  = player.coins || 0;
   document.getElementById('hud-level').textContent  = player.currentLevel || 1;
 
-  const nextThreshold = ((player.currentLevel || 1) + 1) * 6;
+  const nextThreshold = (player.currentLevel || 1) * 6; // unlock next = currentLevel * 6
   const pct = Math.min(100, Math.round(((player.xp || 0) / nextThreshold) * 100));
   document.getElementById('hud-xp-fill').style.width = pct + '%';
 
@@ -1663,6 +1720,57 @@ function updateHud(player) {
     dot.className = 'slot-dot' + (i < used ? ' used' : '');
     slotsEl.appendChild(dot);
   }
+}
+
+// ─── Level-up animation ───────────────────────────────────────────────────────
+const LEVELUP_TEXTS = {
+  2:  { msg: "Ooh, things are warming up... 🔥"                        },
+  3:  { msg: "Getting a bit touchy, are we? 👀"                        },
+  4:  { msg: "First kisses incoming... pucker up! 😘"                  },
+  5:  { msg: "Spicy stuff ahead — hope you can handle it 🌶️"          },
+  6:  { msg: "Hands are starting to wander... 🤭"                      },
+  7:  { msg: "Now we're getting JUICY. You ready? 😏"                  },
+  8:  { msg: "Seriously naughty territory — no turning back 😈"        },
+  9:  { msg: "Almost ZERO limits left... 🔥🔥"                        },
+  10: { msg: "FULL EXTREME MODE. You actually went there. 💀🔞"        },
+};
+
+let myPrevClearedLevels = null;
+let levelupTimer = null;
+
+function checkLevelUp(me) {
+  if (!me) return;
+  const cleared = me.clearedLevels || [];
+  if (myPrevClearedLevels === null) {
+    myPrevClearedLevels = [...cleared];
+    return;
+  }
+  const newLevels = cleared.filter(l => !myPrevClearedLevels.includes(l));
+  if (newLevels.length > 0) {
+    const highest = Math.max(...newLevels);
+    showLevelUpAnimation(highest + 1); // the level that just became accessible
+    myPrevClearedLevels = [...cleared];
+  }
+}
+
+function showLevelUpAnimation(newLevel) {
+  const entry = LEVELUP_TEXTS[newLevel] || { msg: `Level ${newLevel} unlocked! 🔓` };
+  document.getElementById('levelup-title').textContent = `⬆ Level ${newLevel} Unlocked`;
+  document.getElementById('levelup-msg').textContent   = entry.msg;
+
+  const overlay = document.getElementById('levelup-overlay');
+  const bar     = document.getElementById('levelup-bar');
+
+  clearTimeout(levelupTimer);
+  overlay.style.display = 'flex';
+  bar.classList.remove('animating');
+  void bar.offsetWidth; // force reflow so animation restarts cleanly
+  bar.classList.add('animating');
+
+  levelupTimer = setTimeout(() => {
+    overlay.style.display = 'none';
+    bar.classList.remove('animating');
+  }, 2900);
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────

@@ -85,7 +85,7 @@ function coinsByEconomy(baseCoins, mode) {
 function canAccessLevel(player, level) {
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = level * 6;
+  const xpThreshold = (level - 1) * 6; // level 2 = 6 XP, level 3 = 12 XP, etc.
   return player.xp >= xpThreshold && player.clearedLevels.includes(prev);
 }
 
