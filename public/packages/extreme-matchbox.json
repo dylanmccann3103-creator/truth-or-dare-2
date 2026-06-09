@@ -1,7 +1,7 @@
 [
   { "id": "ext_001", "type": "dare", "level": 8, "difficulty": 1,
     "text": { "en": "Finger your own arsehole in front of your partner.", "nl": "Vinger je eigen kont voor het oog van je partner." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_002", "type": "dare", "level": 8, "difficulty": 2,
     "text": { "en": "Take a sexy photo of yourself and send it to someone who isn't your partner.", "nl": "Maak een sexy foto van jezelf en stuur het naar iemand die niet je partner is." },
@@ -21,7 +21,7 @@
 
   { "id": "ext_006", "type": "dare", "level": 8, "difficulty": 2,
     "text": { "en": "Insert an object that isn't a sex toy into your arsehole or vagina at least 5 times.", "nl": "Stop een object dat geen seksspeeltje is minstens 5 keer in je kont of vagina." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_vagina", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_007", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Allow your partner to take a photo of you in nothing more than underwear and send it to a person of their choice.", "nl": "Laat je partner een foto van je nemen in enkel je ondergoed en het sturen naar een persoon naar keuze." },
@@ -33,7 +33,7 @@
 
   { "id": "ext_009", "type": "dare", "level": 8, "difficulty": 2,
     "text": { "en": "Allow your partner to insert 2 fingers into your arsehole at least 5 times.", "nl": "Laat je partner minstens 5 keer 2 vingers in je kont steken." },
-    "tags": ["explicit", "intimate", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "intimate", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_010", "type": "dare", "level": 10, "difficulty": 3,
     "text": { "en": "Upload a 15-second or longer video of yourself masturbating to a porn site and leave it there until the end of the game.", "nl": "Upload een video van minstens 15 seconden waarop je masturbeert op een pornosite — laat hem staan tot het einde van het spel." },
@@ -57,19 +57,19 @@
 
   { "id": "ext_015", "type": "dare", "level": 10, "difficulty": 3,
     "text": { "en": "Perform anal sex with your partner.", "nl": "Heb anale seks met je partner." },
-    "tags": ["explicit", "intimate", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "intimate", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_016", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Insert anal beads to the second ball, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen tot aan het tweede balletje, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_017", "type": "dare", "level": 9, "difficulty": 1,
     "text": { "en": "Insert anal beads halfway, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen halverwege, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_018", "type": "dare", "level": 9, "difficulty": 3,
     "text": { "en": "Insert the anal beads all the way, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen er helemaal in, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_019", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Receive 10 hard whips from your partner.", "nl": "Ontvang 10 harde zweepslagen van je partner." },
@@ -77,7 +77,7 @@
 
   { "id": "ext_020", "type": "dare", "level": 9, "difficulty": 3,
     "text": { "en": "Allow your partner to insert their toe into your arsehole as far as possible.", "nl": "Laat je partner zijn/haar teen zo ver mogelijk in je kont steken." },
-    "tags": ["explicit", "feet", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "feet", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_021", "type": "dare", "level": 7, "difficulty": 1,
     "text": { "en": "Send a text to the last person you messaged who isn't your partner saying: 'I'm so horny for you'.", "nl": "Stuur een berichtje naar de laatste persoon in je chat (niet je partner) met: 'Ik ben zo geil op je'." },
@@ -89,7 +89,7 @@
 
   { "id": "ext_023", "type": "dare", "level": 9, "difficulty": 3,
     "text": { "en": "Allow your partner to insert 3 fingers into your arsehole at least 5 times.", "nl": "Laat je partner minstens 5 keer 3 vingers in je kont steken." },
-    "tags": ["explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_024", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Allow your partner to drip hot candle wax on your body (be careful not to burn yourself).", "nl": "Laat je partner hete kaarsenwas op je lijf druppelen (let op: niet verbranden)." },
@@ -105,7 +105,7 @@
 
   { "id": "ext_027", "type": "dare", "level": 10, "difficulty": 3,
     "text": { "en": "Allow your partner to give you a handjob or finger you on a cam-sharing website for 5 minutes.", "nl": "Laat je partner je een handjob geven of je vingeren op een adult cam-website gedurende 5 minuten." },
-    "tags": ["extreme_exposure", "explicit", "penetration"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["extreme_exposure", "explicit", "penetration_vagina", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_028", "type": "dare", "level": 8, "difficulty": 1,
     "text": { "en": "Give your partner a foot job.", "nl": "Geef je partner een voetjob." },
