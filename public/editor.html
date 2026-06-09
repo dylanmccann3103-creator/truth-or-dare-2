@@ -238,18 +238,32 @@ datalist option { background: var(--surface2); color: var(--text); }
           <div class="spill" data-v="male"       onclick="toggleGender('male',this)">Male</div>
           <div class="spill" data-v="female"     onclick="toggleGender('female',this)">Female</div>
           <div class="spill" data-v="non-binary" onclick="toggleGender('non-binary',this)">Non-binary</div>
-          <div class="spill" data-v="other"      onclick="toggleGender('other',this)">Other</div>
+        </div>
+        <input class="finp" id="ed-gender-custom" placeholder="Custom gender (e.g. gender fluid)… press Enter to add"
+          style="margin-top:6px;font-size:0.82rem" onkeydown="addCustomGender(event)">
+        <div id="ed-gender-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Performer Genitals <span style="font-weight:400;text-transform:none">— none = anyone; OR logic (any one match)</span></div>
+        <div class="pill-row" id="ed-performer-genitals" style="flex-wrap:wrap">
+          <div class="spill" data-v="penis"   onclick="toggleGenitalPill('performer','penis',this)">🍆 Penis</div>
+          <div class="spill" data-v="vagina"  onclick="toggleGenitalPill('performer','vagina',this)">🌸 Vagina</div>
+          <div class="spill" data-v="breasts" onclick="toggleGenitalPill('performer','breasts',this)">🫧 Breasts</div>
+          <div class="spill" data-v="anus"    onclick="toggleGenitalPill('performer','anus',this)">🍑 Anus</div>
+          <div class="spill" data-v="mouth"   onclick="toggleGenitalPill('performer','mouth',this)">👄 Mouth</div>
         </div>
       </div>
 
       <div class="fld">
-        <div class="flbl">Body Type Required</div>
-        <select class="fsel" id="ed-body">
-          <option value="">None (anyone)</option>
-          <option value="penis">Penis</option>
-          <option value="vagina">Vagina</option>
-          <option value="breasts">Breasts</option>
-        </select>
+        <div class="flbl">Target Genitals <span style="font-weight:400;text-transform:none">— none = anyone; OR logic</span></div>
+        <div class="pill-row" id="ed-target-genitals" style="flex-wrap:wrap">
+          <div class="spill" data-v="penis"   onclick="toggleGenitalPill('target','penis',this)">🍆 Penis</div>
+          <div class="spill" data-v="vagina"  onclick="toggleGenitalPill('target','vagina',this)">🌸 Vagina</div>
+          <div class="spill" data-v="breasts" onclick="toggleGenitalPill('target','breasts',this)">🫧 Breasts</div>
+          <div class="spill" data-v="anus"    onclick="toggleGenitalPill('target','anus',this)">🍑 Anus</div>
+          <div class="spill" data-v="mouth"   onclick="toggleGenitalPill('target','mouth',this)">👄 Mouth</div>
+        </div>
       </div>
 
       <div class="fld" style="gap:9px">
@@ -574,9 +588,50 @@ function buildLevelPills() {
   }
 }
 
+let edPerformerGenitals = [];
+let edTargetGenitals    = [];
+
+function toggleGenitalPill(side, val, el) {
+  if (editing?.card?._builtin) return;
+  const arr = side === 'performer' ? edPerformerGenitals : edTargetGenitals;
+  const i = arr.indexOf(val);
+  if (i === -1) arr.push(val); else arr.splice(i, 1);
+  el.classList.toggle('on', arr.includes(val));
+}
+
+function addCustomGender(e) {
+  if (e.key !== 'Enter') return;
+  const val = e.target.value.trim();
+  if (!val || edGenders.includes(val)) { e.target.value = ''; return; }
+  edGenders.push(val);
+  e.target.value = '';
+  renderGenderChips();
+}
+
+function removeCustomGender(val) {
+  edGenders = edGenders.filter(g => g !== val);
+  renderGenderChips();
+  // Also un-highlight preset pill if it was removed
+  document.getElementById('ed-gender').querySelectorAll('.spill').forEach(p => {
+    p.classList.toggle('on', edGenders.includes(p.dataset.v));
+  });
+}
+
+function renderGenderChips() {
+  const presets = ['male','female','non-binary'];
+  const customs = edGenders.filter(g => !presets.includes(g));
+  const chips = document.getElementById('ed-gender-chips');
+  chips.innerHTML = customs.map(g => `
+    <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,0.25);border:1px solid var(--accent2);border-radius:12px;padding:3px 10px;font-size:0.78rem;color:#fff">
+      ${h(g)} <span onclick="removeCustomGender('${h(g)}')" style="cursor:pointer;opacity:0.7">✕</span>
+    </span>`).join('');
+}
+
 function openEditor(card, pkgId) {
-  editing   = { card, pkgId };
-  edGenders = Array.isArray(card.genderRequired) ? [...card.genderRequired] : [];
+  editing              = { card, pkgId };
+  edGenders            = Array.isArray(card.genderRequired) ? [...card.genderRequired] : [];
+  edPerformerGenitals  = Array.isArray(card.performerGenitals) ? [...card.performerGenitals] : [];
+  edTargetGenitals     = Array.isArray(card.targetGenitals)    ? [...card.targetGenitals]    : [];
   const ro  = !!card._builtin;
 
   document.getElementById('ed-title').textContent = ro ? '🔒 View Card (Built-in)' : (card.id.startsWith('custom_') && !pkgs.find(p=>p.id===pkgId)?.cards?.some(c=>c.id===card.id) ? 'New Card' : 'Edit Card');
@@ -594,8 +649,11 @@ function openEditor(card, pkgId) {
   setPill('ed-level', String(card.level || 1));
   setPill('ed-diff',  String(card.difficulty || 2));
 
-  document.getElementById('ed-en').value = card.text?.en || '';
-  document.getElementById('ed-nl').value = card.text?.nl || '';
+  // Support both old {en,nl} object and new plain string (Dutch default)
+  const textEn = card.text?.en ?? (typeof card.text === 'string' ? card.text : '');
+  const textNl = card.text?.nl ?? (typeof card.text === 'string' ? card.text : '');
+  document.getElementById('ed-en').value = textEn;
+  document.getElementById('ed-nl').value = textNl;
 
   renderTags(card.tags || [], ro);
 
@@ -603,14 +661,26 @@ function openEditor(card, pkgId) {
     p.classList.toggle('on', edGenders.includes(p.dataset.v));
     p.style.pointerEvents = ro ? 'none' : '';
   });
+  const customInput = document.getElementById('ed-gender-custom');
+  customInput.value = '';
+  customInput.disabled = ro;
+  renderGenderChips();
 
-  document.getElementById('ed-body').value   = card.bodyTypeRequired   || '';
+  document.getElementById('ed-performer-genitals').querySelectorAll('.spill').forEach(p => {
+    p.classList.toggle('on', edPerformerGenitals.includes(p.dataset.v));
+    p.style.pointerEvents = ro ? 'none' : '';
+  });
+  document.getElementById('ed-target-genitals').querySelectorAll('.spill').forEach(p => {
+    p.classList.toggle('on', edTargetGenitals.includes(p.dataset.v));
+    p.style.pointerEvents = ro ? 'none' : '';
+  });
+
   document.getElementById('ed-orient').checked = !!card.orientationMatters;
   document.getElementById('ed-target').checked = !!card.targetRequired;
   document.getElementById('ed-avail').checked  = !!card.availableForAllCombos;
 
   // Disable all inputs for built-in cards
-  ['ed-en','ed-nl','ed-body'].forEach(id => document.getElementById(id).disabled = ro);
+  ['ed-en','ed-nl'].forEach(id => document.getElementById(id).disabled = ro);
   ['ed-orient','ed-target','ed-avail'].forEach(id => document.getElementById(id).disabled = ro);
   if (ro) {
     ['ed-type','ed-level','ed-diff'].forEach(id =>
@@ -695,17 +765,19 @@ function saveCard() {
   if (!pkg) { toast('Package not found', 'danger'); return; }
 
   const en = document.getElementById('ed-en').value.trim();
-  if (!en) { toast('English text is required', 'danger'); return; }
+  const nl = document.getElementById('ed-nl').value.trim();
+  if (!en && !nl) { toast('At least one language text is required', 'danger'); return; }
 
   const card = {
-    id:               editing.card.id,
-    type:             getPill('ed-type') || 'dare',
-    level:            parseInt(getPill('ed-level')) || 1,
-    difficulty:       parseInt(getPill('ed-diff'))  || 2,
-    text:             { en, nl: document.getElementById('ed-nl').value.trim() },
-    tags:             currentTags(),
-    genderRequired:   edGenders.length ? [...edGenders] : null,
-    bodyTypeRequired: document.getElementById('ed-body').value || null,
+    id:                   editing.card.id,
+    type:                 getPill('ed-type') || 'dare',
+    level:                parseInt(getPill('ed-level')) || 1,
+    difficulty:           parseInt(getPill('ed-diff'))  || 2,
+    text:                 { en: en || nl, nl: nl || en },
+    tags:                 currentTags(),
+    genderRequired:       edGenders.length ? [...edGenders] : null,
+    performerGenitals:    edPerformerGenitals.length ? [...edPerformerGenitals] : null,
+    targetGenitals:       edTargetGenitals.length    ? [...edTargetGenitals]    : null,
     orientationMatters:   document.getElementById('ed-orient').checked,
     targetRequired:       document.getElementById('ed-target').checked,
     availableForAllCombos:document.getElementById('ed-avail').checked,
@@ -743,7 +815,7 @@ function newCard() {
     id: 'custom_' + Date.now(),
     type: 'dare', level: 1, difficulty: 2,
     text: { en: '', nl: '' }, tags: [],
-    genderRequired: null, bodyTypeRequired: null,
+    genderRequired: null, performerGenitals: null, targetGenitals: null,
     orientationMatters: false, targetRequired: false, availableForAllCombos: false,
     _pkgId: pkg.id, _pkgName: pkg.name, _builtin: false,
   };
@@ -769,8 +841,9 @@ function doCopyCard() {
   const copy  = {
     id: newId, type: src.type, level: src.level, difficulty: src.difficulty,
     text: { ...src.text }, tags: [...(src.tags||[])],
-    genderRequired:       src.genderRequired ? [...src.genderRequired] : null,
-    bodyTypeRequired:     src.bodyTypeRequired || null,
+    genderRequired:       src.genderRequired       ? [...src.genderRequired]      : null,
+    performerGenitals:    src.performerGenitals    ? [...src.performerGenitals]   : null,
+    targetGenitals:       src.targetGenitals       ? [...src.targetGenitals]      : null,
     orientationMatters:   !!src.orientationMatters,
     targetRequired:       !!src.targetRequired,
     availableForAllCombos:!!src.availableForAllCombos,
