@@ -136,6 +136,7 @@ datalist option { background: var(--surface2); color: var(--text); }
     <div class="sidebar-actions">
       <button class="btn btn-p btn-sm" onclick="newPackage()">+ New</button>
       <button class="btn btn-s btn-sm" onclick="importPackage()">↑ Import</button>
+      <button class="btn btn-s btn-sm" onclick="openLibrary()">📚 Library</button>
     </div>
     <div class="pkg-list" id="pkg-list"></div>
   </div>
@@ -163,6 +164,7 @@ datalist option { background: var(--surface2); color: var(--text); }
         <option>general</option><option>flirty</option><option>clothing</option>
         <option>body</option><option>physical</option><option>feet</option>
         <option>mouth</option><option>oral</option><option>intimate</option><option>explicit</option>
+        <option>exposure</option><option>extreme_exposure</option>
       </select>
       <div style="flex:1"></div>
       <button class="btn btn-p btn-sm" onclick="newCard()">+ New Card</button>
@@ -293,11 +295,24 @@ datalist option { background: var(--surface2); color: var(--text); }
   </div>
 </div>
 
+<!-- Library Modal -->
+<div class="overlay" id="library-modal" onclick="if(event.target===this)closeModal('library-modal')">
+  <div class="modal">
+    <h3>📚 Package Library</h3>
+    <p style="font-size:0.82rem;color:#7a6b8a;margin-bottom:12px">Pre-built packages you can add to your editor.</p>
+    <div id="library-list" style="display:flex;flex-direction:column;gap:10px;min-height:60px"></div>
+    <div class="mfooter" style="margin-top:16px">
+      <button class="btn btn-s" onclick="closeModal('library-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="import-file" accept=".json,.zip" style="display:none" onchange="handleImport(event)">
 <datalist id="tag-opts">
   <option>general</option><option>flirty</option><option>clothing</option>
   <option>body</option><option>physical</option><option>feet</option>
   <option>mouth</option><option>oral</option><option>intimate</option><option>explicit</option>
+  <option>exposure</option><option>extreme_exposure</option>
 </datalist>
 <div id="toast"></div>
 
@@ -418,6 +433,37 @@ function exportPkg(id, e) {
 function importPackage() {
   document.getElementById('import-file').value = '';
   document.getElementById('import-file').click();
+}
+
+async function openLibrary() {
+  const list = document.getElementById('library-list');
+  list.innerHTML = '<div style="color:#7a6b8a;font-size:0.85rem">Loading…</div>';
+  document.getElementById('library-modal').style.display = 'flex';
+  try {
+    const entries = await fetch('/packages/index.json').then(r => r.json());
+    if (!entries.length) { list.innerHTML = '<div style="color:#7a6b8a;font-size:0.85rem">No packages available.</div>'; return; }
+    list.innerHTML = entries.map((e, i) => `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:600;font-size:0.9rem">${e.name}</div>
+        <div style="font-size:0.78rem;color:#7a6b8a">${e.description}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px">
+          <span style="font-size:0.75rem;color:#a78bfa">${e.cardCount} cards · ${(e.tags||[]).join(', ')}</span>
+          <button class="btn btn-p btn-sm" onclick="importFromLibrary('${e.file}','${e.name}',${i})">+ Add</button>
+        </div>
+      </div>`).join('');
+  } catch(err) { list.innerHTML = `<div style="color:#f87171;font-size:0.85rem">Failed to load library: ${err.message}</div>`; }
+}
+
+async function importFromLibrary(file, name, idx) {
+  try {
+    const cards = await fetch(file).then(r => r.json());
+    if (!Array.isArray(cards)) throw new Error('unexpected format');
+    const valid = cards.filter(validate);
+    pkgs.push({ id: 'pkg_' + Date.now(), name, active: true, builtin: false, cards: valid });
+    savePkgs(); renderSidebar(); renderBrowser();
+    closeModal('library-modal');
+    toast(`Added "${name}" — ${valid.length} cards`);
+  } catch(err) { toast('Import failed: ' + err.message, 'danger'); }
 }
 
 async function handleImport(e) {
