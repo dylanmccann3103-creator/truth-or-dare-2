@@ -89,6 +89,9 @@ header h1 { font-size: 1.05rem; background: linear-gradient(135deg,#9333ea,#c026
 .cbrow { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .cbrow input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
 .cbrow label { font-size: 0.85rem; cursor: pointer; }
+.tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 0.6rem; font-weight: 700; cursor: help; position: relative; margin-left: 4px; flex-shrink: 0; }
+.tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1a1528; color: var(--text); border: 1px solid var(--border); padding: 7px 10px; border-radius: 8px; font-size: 0.73rem; font-weight: 400; white-space: normal; width: 220px; text-align: left; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 200; }
+.tip:hover::after { opacity: 1; }
 .ed-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
 
 /* ── Buttons ── */
@@ -250,9 +253,9 @@ datalist option { background: var(--surface2); color: var(--text); }
       </div>
 
       <div class="fld" style="gap:9px">
-        <label class="cbrow"><input type="checkbox" id="ed-orient"> <label for="ed-orient">Orientation matters</label></label>
-        <label class="cbrow"><input type="checkbox" id="ed-target"> <label for="ed-target">Target required</label></label>
-        <label class="cbrow"><input type="checkbox" id="ed-avail">  <label for="ed-avail">Available for all combos</label></label>
+        <label class="cbrow"><input type="checkbox" id="ed-orient"> <label for="ed-orient">Orientation matters</label><span class="tip" data-tip="Only show this dare to compatible orientation pairings — e.g. hide a hetero dare when both players are gay."></span></label>
+        <label class="cbrow"><input type="checkbox" id="ed-target"> <label for="ed-target">Target required</label><span class="tip" data-tip="This dare involves a second player. It won't be shown unless a valid target is available in the game."></span></label>
+        <label class="cbrow"><input type="checkbox" id="ed-avail">  <label for="ed-avail">Available for all combos</label><span class="tip" data-tip="Override gender restrictions — this dare works for any player regardless of their gender setting."></span></label>
       </div>
 
     </div><!-- ed-body -->
@@ -441,7 +444,7 @@ function importPackage() {
 async function openLibrary() {
   const list = document.getElementById('library-list');
   list.innerHTML = '<div style="color:#7a6b8a;font-size:0.85rem">Loading…</div>';
-  document.getElementById('library-modal').style.display = 'flex';
+  openModal('library-modal');
   try {
     const entries = await fetch('/packages/index.json').then(r => r.json());
     if (!entries.length) { list.innerHTML = '<div style="color:#7a6b8a;font-size:0.85rem">No packages available.</div>'; return; }

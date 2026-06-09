@@ -723,6 +723,9 @@ input::placeholder { color: #7a6b8a; }
   <button class="btn btn-primary" onclick="showScreen('screen-host')">🎉 Host a Game</button>
   <div class="gap-sm"></div>
   <button class="btn btn-secondary" onclick="showScreen('screen-join')">📱 Join a Game</button>
+  <div class="gap-sm"></div>
+  <a href="/editor" target="_blank" style="font-size:0.82rem;color:#9b89b4;text-decoration:underline">🃏 Card Editor</a>
+  <div id="landing-packages" style="width:100%;max-width:400px;margin-top:20px"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
@@ -1298,6 +1301,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('age-gate').style.display = 'none';
   }
   initSetupScreen();
+  renderLandingPackages();
   connectSocket();
   const params = new URLSearchParams(location.search);
   const roomParam = params.get('room');
@@ -1333,6 +1337,7 @@ function selectPill(field, val, el) {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if (id === 'screen-landing') renderLandingPackages();
 }
 
 // ─── Room Actions ─────────────────────────────────────────────────────────────
@@ -1343,14 +1348,25 @@ const EQUIPMENT_ITEMS = [
   { id: 'equip_wax_candle', label: 'Wax Candle',     emoji: '🕯️', desc: 'Hot wax dares' },
 ];
 let equipmentAvailable = new Set();
+let activeEquipmentItems = [];
 
-function initEquipmentScreen() {
-  equipmentAvailable = new Set(EQUIPMENT_ITEMS.map(e => e.id)); // default: all available
+function getRelevantEquipmentItems() {
+  try {
+    const pkgs = JSON.parse(localStorage.getItem('tod2_packages') || '[]');
+    const active = pkgs.filter(p => p.active);
+    const allTags = new Set(active.flatMap(p => (p.cards || []).flatMap(c => c.tags || [])));
+    return EQUIPMENT_ITEMS.filter(item => allTags.has(item.id));
+  } catch(e) { return []; }
+}
+
+function initEquipmentScreen(items) {
+  activeEquipmentItems = items;
+  equipmentAvailable = new Set(items.map(e => e.id)); // default: all available
   renderEquipmentScreen();
 }
 
 function renderEquipmentScreen() {
-  document.getElementById('equipment-list').innerHTML = EQUIPMENT_ITEMS.map(item => {
+  document.getElementById('equipment-list').innerHTML = activeEquipmentItems.map(item => {
     const on = equipmentAvailable.has(item.id);
     return `<div onclick="toggleEquipment('${item.id}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:2px solid ${on ? 'var(--accent)' : 'var(--border)'};border-radius:14px;cursor:pointer;transition:border-color .15s">
       <span style="font-size:1.6rem">${item.emoji}</span>
@@ -1372,7 +1388,7 @@ function toggleEquipment(id) {
 }
 
 function confirmEquipment() {
-  const limits = EQUIPMENT_ITEMS.map(e => e.id).filter(id => !equipmentAvailable.has(id));
+  const limits = activeEquipmentItems.map(e => e.id).filter(id => !equipmentAvailable.has(id));
   socket.emit('set-equipment', { code: myRoom, limits }, (res) => {
     if (res && !res.ok) return toast(res.error || 'Error', 'danger');
     if (myHostMode === 'display') showLobby();
@@ -1386,9 +1402,51 @@ function createRoom(hostMode) {
     if (!res.ok) return toast(res.error, 'danger');
     myRoom = res.code;
     amHost = true;
-    initEquipmentScreen();
-    showScreen('screen-equipment');
+    const relevant = getRelevantEquipmentItems();
+    if (relevant.length === 0) {
+      socket.emit('set-equipment', { code: myRoom, limits: [] }, () => {
+        if (myHostMode === 'display') showLobby();
+        else showScreen('screen-setup');
+      });
+    } else {
+      initEquipmentScreen(relevant);
+      showScreen('screen-equipment');
+    }
   });
+}
+
+// ─── Landing Package Picker ────────────────────────────────────────────────────
+function renderLandingPackages() {
+  const el = document.getElementById('landing-packages');
+  if (!el) return;
+  try {
+    const pkgs = JSON.parse(localStorage.getItem('tod2_packages') || '[]');
+    const custom = pkgs.filter(p => !p.builtin);
+    if (!custom.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a6b8a;text-align:center;margin-bottom:10px">Card Packages</div>
+      ${custom.map(p => `
+        <div onclick="toggleLandingPackage('${p.id}')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid ${p.active ? 'var(--accent)' : 'rgba(255,255,255,0.08)'};border-radius:12px;cursor:pointer;margin-bottom:8px;transition:border-color .15s">
+          <div style="flex:1;text-align:left">
+            <div style="font-size:0.88rem;font-weight:600">${p.name}</div>
+            <div style="font-size:0.72rem;color:#7a6b8a">${(p.cards||[]).length} cards</div>
+          </div>
+          <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;background:${p.active ? 'var(--accent)' : 'rgba(255,255,255,0.08)'};color:${p.active ? 'white' : '#7a6b8a'};flex-shrink:0">
+            ${p.active ? '✓' : '✗'}
+          </div>
+        </div>
+      `).join('')}
+    `;
+  } catch(e) { el.innerHTML = ''; }
+}
+
+function toggleLandingPackage(id) {
+  try {
+    const pkgs = JSON.parse(localStorage.getItem('tod2_packages') || '[]');
+    const p = pkgs.find(q => q.id === id);
+    if (p) { p.active = !p.active; localStorage.setItem('tod2_packages', JSON.stringify(pkgs)); }
+    renderLandingPackages();
+  } catch(e) {}
 }
 
 function joinRoom() {
