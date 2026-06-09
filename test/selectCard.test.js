@@ -115,11 +115,11 @@ test('performer with matching genital passes filter', () => {
   assert.notEqual(result, null, 'Performer with matching genital should get the card');
 });
 
-test('prefer-not genitals blocks cards with genital requirements', () => {
+test('empty genitals blocks cards with genital requirements', () => {
   const cards = [card({ id: 'c1', performerGenitals: ['vagina'], tags: [], level: 3 })];
-  const performer = player({ genitals: ['prefer-not'] });
+  const performer = player({ genitals: [] });
   const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
-  assert.equal(result, null, 'prefer-not should block genital-required cards');
+  assert.equal(result, null, 'No genitals selected should block genital-required cards');
 });
 
 test('target genital mismatch blocks card', () => {
