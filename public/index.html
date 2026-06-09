@@ -1468,10 +1468,13 @@ function buildCardScreen(state) {
   actionWrap.style.display = isPerformer ? 'block' : 'none';
 
   if (isPerformer) {
-    // Done button (dares only)
-    document.getElementById('card-done-btn').disabled = false;
-    document.getElementById('card-done-btn').style.display =
-      turn.choice === 'dare' ? 'flex' : 'none';
+    // Done button — always visible (truths and dares both need it to advance the turn)
+    const doneBtn = document.getElementById('card-done-btn');
+    doneBtn.disabled = false;
+    doneBtn.style.display = 'flex';
+    doneBtn.textContent = turn.choice === 'truth'
+      ? '✓ Done — I answered it'
+      : '✓ Done — I completed it';
 
     // Respin (only for dares when softFlagged)
     const respinWrap = document.getElementById('card-respin-wrap');
