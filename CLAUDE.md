@@ -130,7 +130,7 @@ setup opgegeven en worden uitsluitend backend afgehandeld.
 | 10 | **Extreme (met waarschuwing)** | meest intens — alleen wat álle limits/consents toelaten; toon een expliciete waarschuwing vóór het tonen van de card |
 
 **Tag → level mapping (content-migratie):**
-`general→1 · flirty→2 · body/physical→3 · mouth/clothing→4 · feet/oral→5 · intimate→6–7 ·
+`general→1 · flirty→2 · body/physical→3 · kissing/clothing→4 · feet/speaking→5 · intimate→6–7 ·
 explicit→8–9 · extreme→10 (met waarschuwing)`.
 
 > ✅ **Level 7 = `intimate` (intimate vult 6 én 7).** Geen gat meer in de ladder; selectCard
@@ -173,7 +173,7 @@ haal je het level dus precies in 3 dares; krijg je drie 1-pointers, dan heb je p
 | Cooldown reset | 7 | reset cooldown |
 
 ### §7.4 Limit-tags (hard block) — *English v1-lijst, werkend; definitieve review na build*
-`general · flirty · clothing · body · physical · feet · mouth · oral · intimate · explicit · anal · bondage · toy · public · exposure`
+`general · flirty · clothing · body · physical · feet · kissing · speaking · oral · intimate · explicit · anal · bondage · toy · public · exposure`
 
 Tag-omschrijvingen (voor speler-setup UI én selectCard-filtering):
 | Tag | Blokkeert |
@@ -184,8 +184,9 @@ Tag-omschrijvingen (voor speler-setup UI én selectCard-filtering):
 | `body` | lichaamsgericht (aanraking, massage) |
 | `physical` | fysieke uitdagingen |
 | `feet` | voeten-gerelateerd |
-| `mouth` | mond/kus-gericht |
-| `oral` | orale seks |
+| `kissing` | kussen (wang, mond, lichaam — niet-seksueel) |
+| `speaking` | iets hardop zeggen: fluisteren, complimenten, fantasie beschrijven |
+| `oral` | orale seks (pijpen, beffen) |
 | `intimate` | intieme aanraking (niet-seksueel) |
 | `explicit` | seksuele handelingen |
 | `anal` | anale stimulatie (plug, vinger, tong) |

@@ -247,8 +247,8 @@
         "nl": "Beschrijf de beste kus die je ooit hebt gehad."
       },
       "tags": [
-        "mouth",
-        "intimate"
+        "intimate",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -266,8 +266,8 @@
         "nl": "Heb je ooit iemand gekust waar je spijt van had?"
       },
       "tags": [
-        "mouth",
-        "flirty"
+        "flirty",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -286,7 +286,7 @@
       },
       "tags": [
         "flirty",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -304,7 +304,7 @@
         "nl": "Wat is het meest bizarre dat je ooit in je mond hebt gestopt?"
       },
       "tags": [
-        "mouth"
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -376,8 +376,8 @@
         "nl": "Heb je ooit iets vies in iemands oor gefluisterd op een openbare plek?"
       },
       "tags": [
-        "oral",
-        "flirty"
+        "flirty",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -470,8 +470,8 @@
         "nl": "Wat is het vuilste dat je ooit tegen iemand hebt gezegd?"
       },
       "tags": [
-        "oral",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -489,8 +489,8 @@
         "nl": "Beschrijf, zonder namen te noemen, de beste nacht van je leven."
       },
       "tags": [
-        "oral",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -658,7 +658,7 @@
       },
       "tags": [
         "general",
-        "oral"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -860,7 +860,7 @@
         "nl": "Lees het meest recente ongelezen bericht op je telefoon hardop voor."
       },
       "tags": [
-        "oral"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -932,8 +932,8 @@
         "nl": "Kus de achterkant van de hand van de speler tegenover je."
       },
       "tags": [
-        "mouth",
-        "flirty"
+        "flirty",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -951,7 +951,7 @@
         "nl": "Laat de groep een mysterieus voorwerp in je mond stoppen (niets gevaarlijks) — raad wat het is."
       },
       "tags": [
-        "mouth"
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -970,7 +970,7 @@
       },
       "tags": [
         "flirty",
-        "mouth"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1064,9 +1064,9 @@
         "nl": "Fluister de meest romantische zin die je kunt bedenken in iemands oor."
       },
       "tags": [
-        "oral",
         "intimate",
-        "flirty"
+        "flirty",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1084,8 +1084,8 @@
         "nl": "Beschrijf in detail hoe je een romantische avond zou organiseren — hou niets achter."
       },
       "tags": [
-        "oral",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1200,8 +1200,8 @@
       },
       "tags": [
         "intimate",
-        "mouth",
-        "flirty"
+        "flirty",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1240,7 +1240,7 @@
       "tags": [
         "intimate",
         "flirty",
-        "mouth"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1258,9 +1258,8 @@
         "nl": "Houd een stukje eten tussen je lippen en laat de speler links van je het pakken met hun tanden."
       },
       "tags": [
-        "mouth",
-        "oral",
-        "intimate"
+        "intimate",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1278,9 +1277,9 @@
         "nl": "Fluister drie oprechte complimenten over iemands uiterlijk in hun oor."
       },
       "tags": [
-        "mouth",
         "flirty",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1299,8 +1298,8 @@
       },
       "tags": [
         "explicit",
-        "oral",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1450,7 +1449,7 @@
       },
       "tags": [
         "flirty",
-        "oral"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1584,7 +1583,7 @@
       "tags": [
         "intimate",
         "flirty",
-        "oral"
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1910,7 +1909,7 @@
       "tags": [
         "intimate",
         "toy",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -1950,7 +1949,7 @@
       "tags": [
         "intimate",
         "body",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -2028,8 +2027,8 @@
       },
       "tags": [
         "intimate",
-        "oral",
-        "explicit"
+        "explicit",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -2507,7 +2506,8 @@
       "tags": [
         "explicit",
         "extreme",
-        "intimate"
+        "intimate",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -2588,8 +2588,7 @@
       "tags": [
         "oral",
         "explicit",
-        "extreme",
-        "mouth"
+        "extreme"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -2608,8 +2607,7 @@
       },
       "tags": [
         "oral",
-        "explicit",
-        "mouth"
+        "explicit"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -2667,7 +2665,7 @@
       },
       "tags": [
         "intimate",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": [
         "male"
@@ -2772,9 +2770,9 @@
         "nl": "Zoek haar terwijl jullie geparkeerd staan uitgebreid 3 minuten. Bonuspunten als er een echte kans is dat iemand langs loopt."
       },
       "tags": [
-        "mouth",
         "intimate",
-        "public"
+        "public",
+        "kissing"
       ],
       "genderRequired": [
         "male"
@@ -2971,7 +2969,7 @@
       "tags": [
         "intimate",
         "explicit",
-        "oral"
+        "kissing"
       ],
       "genderRequired": [
         "male"
@@ -3147,7 +3145,7 @@
       "tags": [
         "intimate",
         "explicit",
-        "oral"
+        "kissing"
       ],
       "genderRequired": [
         "male"
@@ -3344,7 +3342,7 @@
       "tags": [
         "intimate",
         "flirty",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": [
         "female"
@@ -3365,8 +3363,8 @@
       },
       "tags": [
         "flirty",
-        "mouth",
-        "intimate"
+        "intimate",
+        "kissing"
       ],
       "genderRequired": [
         "female"
@@ -3410,7 +3408,8 @@
       "tags": [
         "flirty",
         "intimate",
-        "exposure"
+        "exposure",
+        "speaking"
       ],
       "genderRequired": [
         "female"
@@ -3475,8 +3474,8 @@
       },
       "tags": [
         "intimate",
-        "mouth",
-        "body"
+        "body",
+        "kissing"
       ],
       "genderRequired": [
         "female"
@@ -3518,8 +3517,7 @@
       },
       "tags": [
         "oral",
-        "explicit",
-        "mouth"
+        "explicit"
       ],
       "genderRequired": [
         "female"
@@ -3603,9 +3601,8 @@
         "nl": "Blinddoek jezelf terwijl hij chocolade, honing of slagroom op een lichaamsdeel aanbrengt. Gebruik alleen je mond en tong om het te vinden en eraf te likken — geen handen, niet kijken."
       },
       "tags": [
-        "oral",
         "explicit",
-        "mouth"
+        "kissing"
       ],
       "genderRequired": [
         "female"
@@ -3849,8 +3846,7 @@
       "tags": [
         "oral",
         "explicit",
-        "extreme",
-        "mouth"
+        "extreme"
       ],
       "genderRequired": [
         "female"
@@ -3870,9 +3866,9 @@
         "nl": "Elke partner houdt een ijsblokje in hun mond. Smelt het door het tussen elkaar door te geven — geen handen toegestaan. Wie het laat vallen, moet een kledingstuk uitdoen."
       },
       "tags": [
-        "mouth",
         "intimate",
-        "clothing"
+        "clothing",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -3950,8 +3946,8 @@
       },
       "tags": [
         "intimate",
-        "mouth",
-        "body"
+        "body",
+        "kissing"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -4149,8 +4145,7 @@
       "tags": [
         "oral",
         "explicit",
-        "extreme",
-        "mouth"
+        "extreme"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
@@ -4170,7 +4165,8 @@
       "tags": [
         "flirty",
         "intimate",
-        "exposure"
+        "exposure",
+        "speaking"
       ],
       "genderRequired": null,
       "bodyTypeRelevant": false,
