@@ -580,6 +580,33 @@ input::placeholder { color: #7a6b8a; }
 }
 .btn-winner:active { transform: scale(0.97); }
 
+/* ─── Target picker overlay ─────────────────────────────────────────── */
+#target-picker-overlay {
+  position: fixed; inset: 0; z-index: 810;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+#target-picker-overlay.open { display: flex; }
+#target-picker {
+  width: 100%; max-width: 540px;
+  background: #13101e;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  animation: slideUp 0.3s ease;
+}
+#target-picker h3 { margin: 0 0 16px; font-size: 1rem; color: #c4b8d8; }
+.target-pick-btn {
+  display: block; width: 100%;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: 12px; padding: 14px; margin-bottom: 10px;
+  color: #e2d9f0; font-size: 1rem; cursor: pointer; text-align: left;
+}
+.target-pick-btn:active { background: rgba(255,255,255,0.12); }
+
 /* ─── Power-up shop overlay ────────────────────────────────────────── */
 #powerup-shop-overlay {
   position: fixed; inset: 0; z-index: 800;
@@ -1183,6 +1210,16 @@ input::placeholder { color: #7a6b8a; }
   <div class="gap"></div>
 </div>
 
+<!-- Target picker overlay (sabotage / force_swap) -->
+<div id="target-picker-overlay" onclick="closeTargetPicker(event)">
+  <div id="target-picker">
+    <button class="shop-close-btn" onclick="closeTargetPicker()">✕</button>
+    <h3 id="target-picker-title">Choose a target</h3>
+    <div id="target-picker-list"></div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:4px" onclick="closeTargetPicker()">Cancel</button>
+  </div>
+</div>
+
 <!-- Level-up rainbow overlay -->
 <div id="levelup-overlay">
   <div id="levelup-bar"></div>
@@ -1584,6 +1621,7 @@ function handleRoomState(state) {
 
   if (state.phase === 'lobby') {
     myPrevClearedLevels = null; // reset so level-up fires fresh next game
+    myLevelChosen = false;      // reset so first turn of new game shows level picker
     renderLobby(state);
     return;
   }
@@ -1800,7 +1838,7 @@ function buildLevelScreen(state) {
 function canAccessLevelClient(player, level) {
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = (level - 1) * 6; // level 2 = 6 XP, level 3 = 12 XP, etc.
+  const xpThreshold = 3 * level * (level - 1); // cumulative max-XP across prior levels
   return player.xp >= xpThreshold && (player.clearedLevels || []).includes(prev);
 }
 
@@ -2280,20 +2318,14 @@ function usePowerup(puId) {
   const turn = state.currentTurn;
 
   // Powerups that need a target selector
-  if (puId === 'sabotage') {
+  if (puId === 'sabotage' || puId === 'force_swap') {
     const others = state.turnOrder.filter(id => id !== myId && state.players[id]);
     if (others.length === 0) { toast('No valid target', 'danger'); return; }
-    const names = others.map(id => `${state.players[id].emoji} ${state.players[id].name}`).join('\n');
-    const chosen = others.length === 1 ? others[0] : (() => {
-      // Simple prompt for target selection
-      const idx = others.findIndex((id, i) => confirm(`Sabotage ${state.players[id].emoji} ${state.players[id].name}?`));
-      return idx >= 0 ? others[idx] : null;
-    })();
-    if (!chosen) return;
-    socket.emit('use-powerup', { code: myRoom, powerupId: puId, targetId: chosen }, (res) => {
-      if (!res || !res.ok) toast(res?.error || 'Cannot use', 'danger');
-      else { toast(`Sabotaged ${state.players[chosen]?.name}! 💀`, 'success'); closeShop(); }
-    });
+    if (others.length === 1) {
+      sendTargetedPowerup(puId, others[0], state);
+    } else {
+      showTargetPicker(puId, others, state);
+    }
     return;
   }
 
@@ -2309,6 +2341,37 @@ function usePowerup(puId) {
     } else if (puId === 'auto_win_duel') {
       toast('🏆 Auto-win duel activated!', 'success');
     }
+  });
+}
+
+// ─── Target Picker (sabotage / force_swap) ───────────────────────────────────
+function showTargetPicker(puId, targetIds, state) {
+  const title = puId === 'sabotage' ? '💀 Sabotage — pick a target' : '🔀 Force Swap — pick a new target';
+  document.getElementById('target-picker-title').textContent = title;
+  const list = document.getElementById('target-picker-list');
+  list.innerHTML = '';
+  for (const id of targetIds) {
+    const p = state.players[id];
+    const btn = document.createElement('button');
+    btn.className = 'target-pick-btn';
+    btn.textContent = `${p.emoji} ${p.name}`;
+    btn.onclick = () => { closeTargetPicker(); sendTargetedPowerup(puId, id, state); };
+    list.appendChild(btn);
+  }
+  document.getElementById('target-picker-overlay').classList.add('open');
+}
+
+function closeTargetPicker(e) {
+  if (e && e.target !== document.getElementById('target-picker-overlay')) return;
+  document.getElementById('target-picker-overlay').classList.remove('open');
+}
+
+function sendTargetedPowerup(puId, targetId, state) {
+  socket.emit('use-powerup', { code: myRoom, powerupId: puId, targetId }, (res) => {
+    if (!res || !res.ok) { toast(res?.error || 'Cannot use', 'danger'); return; }
+    closeShop();
+    if (puId === 'sabotage') toast(`Sabotaged ${state.players[targetId]?.name}! 💀`, 'success');
+    else if (puId === 'force_swap') toast('🔀 Target swapped!', 'success');
   });
 }
 

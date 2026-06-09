@@ -80,7 +80,7 @@ function getRoom(code) { return rooms[code]; }
 function canAccessLevel(player, level) {
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = (level - 1) * 6; // level 2 = 6 XP, level 3 = 12 XP, etc.
+  const xpThreshold = 3 * level * (level - 1); // cumulative max-XP across prior levels
   return player.xp >= xpThreshold && player.clearedLevels.includes(prev);
 }
 
@@ -320,6 +320,7 @@ io.on('connection', (socket) => {
     const player = room.players[socket.id];
     if (!player) return cb && cb({ ok: false, error: 'Player not found' });
     if (room.currentTurn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
+    if (room.currentTurn?.phase !== 'choosing') return cb && cb({ ok: false, error: 'Wrong phase' });
 
     const lvl = parseInt(level, 10);
     if (!lvl || lvl < 1 || lvl > 10) return cb && cb({ ok: false, error: 'Invalid level' });
@@ -438,7 +439,10 @@ io.on('connection', (socket) => {
     cb && cb({ ok: true, xpEarned, coinsEarned });
 
     // Auto-advance after brief reward pause
-    setTimeout(() => advanceTurn(room), 1500);
+    setTimeout(() => {
+      if (!rooms[room.code] || room.phase !== 'game') return;
+      advanceTurn(room);
+    }, 1500);
   });
 
   // Park a dare — consumes a break slot, no XP awarded
@@ -557,6 +561,7 @@ io.on('connection', (socket) => {
     for (const player of Object.values(room.players)) {
       const penalty = player.breakSlots.parkedDares.reduce((sum, d) => sum + d.xpPenalty, 0);
       player.xp = Math.max(0, player.xp - penalty);
+      player.breakSlots.parkedDares = [];
     }
 
     room.phase = 'ended';
@@ -603,6 +608,10 @@ io.on('connection', (socket) => {
     if (room.currentTurn?.phase !== 'duel') return cb && cb({ ok: false, error: 'Not in duel phase' });
 
     const turn = room.currentTurn;
+    // Prevent a participant from resolving their own duel
+    if (socket.id === turn.performerId || socket.id === turn.targetId) {
+      return cb && cb({ ok: false, error: 'Duel participants cannot resolve the duel' });
+    }
     const actualWinnerId = turn.duelAutoWinnerId || winnerId;
     const performerId    = turn.attribution?.performerId || turn.performerId;
     const targetId       = turn.attribution?.targetId    || turn.targetId;
@@ -642,7 +651,10 @@ io.on('connection', (socket) => {
     if (loser) {
       const forfeitLevel = Math.max(1, Math.min(3, Math.ceil(turn.card.level / 3)));
       const fr = selectCard(ALL_CARDS, 'dare', loser, null, forfeitLevel, loser.usedCardIds, { rouletteMode: 'off' });
-      forfeitCard = fr.card;
+      if (fr.card && fr.card.type === 'dare') {
+        forfeitCard = fr.card;
+        loser.usedCardIds.add(forfeitCard.id);
+      }
     }
 
     if (forfeitCard && loser) {
@@ -654,7 +666,10 @@ io.on('connection', (socket) => {
       turn.phase = 'showing'; // brief resolved state before advance
       cb && cb({ ok: true });
       io.to(code).emit('room-state', roomPublicState(room));
-      setTimeout(() => advanceTurn(room), 1500);
+      setTimeout(() => {
+        if (!rooms[room.code] || room.phase !== 'game') return;
+        advanceTurn(room);
+      }, 1500);
     }
   });
 
@@ -672,7 +687,10 @@ io.on('connection', (socket) => {
     if (!isLoser && !isHost) return cb && cb({ ok: false, error: 'Not authorized' });
 
     cb && cb({ ok: true });
-    setTimeout(() => advanceTurn(room), 1500);
+    setTimeout(() => {
+      if (!rooms[room.code] || room.phase !== 'game') return;
+      advanceTurn(room);
+    }, 1500);
   });
 
   // ─── Power-up shop ────────────────────────────────────────────────────────────
@@ -783,8 +801,8 @@ io.on('connection', (socket) => {
 
     if (powerupId === 'auto_win_duel') {
       if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
-      if (turn?.phase !== 'duel' && turn?.phase !== 'choosing') {
-        return cb && cb({ ok: false, error: 'Auto-win only usable before or during a duel' });
+      if (turn?.phase !== 'duel') {
+        return cb && cb({ ok: false, error: 'Auto-win only usable during a duel' });
       }
       turn.duelAutoWinnerId = socket.id;
       player.activePowerups.splice(idx, 1);
@@ -819,7 +837,7 @@ io.on('connection', (socket) => {
       room.turnOrder = room.turnOrder.filter(id => id !== socket.id);
     }
 
-    if (Object.keys(room.players).length === 0 && room.displayHostId !== socket.id) {
+    if (Object.keys(room.players).length === 0) {
       delete rooms[code];
       console.log(`[room] ${code} closed (empty)`);
       return;
