@@ -1,0 +1,291 @@
+{
+  "cards": [
+    { "id": "t001", "type": "truth", "level": 1, "difficulty": 1,
+      "text": { "en": "What's your most embarrassing moment ever?", "nl": "Wat is je meest embarrassante moment ooit?" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t002", "type": "truth", "level": 1, "difficulty": 2,
+      "text": { "en": "What's a secret you've never told anyone in this room?", "nl": "Wat is een geheim dat je nog nooit aan iemand in deze kamer hebt verteld?" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t003", "type": "truth", "level": 1, "difficulty": 1,
+      "text": { "en": "What's the most childish thing you still do?", "nl": "Wat is het meest kinderachtige dat je nog steeds doet?" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t004", "type": "truth", "level": 1, "difficulty": 1,
+      "text": { "en": "What's the weirdest dream you've ever had?", "nl": "Wat is de meest bizarre droom die je ooit hebt gehad?" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t005", "type": "truth", "level": 1, "difficulty": 1,
+      "text": { "en": "What's the most awkward situation you've ever been in?", "nl": "Wat is de meest ongemakkelijke situatie die je ooit hebt meegemaakt?" },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t006", "type": "truth", "level": 2, "difficulty": 2,
+      "text": { "en": "Have you ever lied to get out of a date?", "nl": "Heb je ooit gelogen om onder een date uit te komen?" },
+      "tags": ["general", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t007", "type": "truth", "level": 2, "difficulty": 2,
+      "text": { "en": "Who in this room do you find most attractive?", "nl": "Wie in deze kamer vind je het meest aantrekkelijk?" },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t008", "type": "truth", "level": 2, "difficulty": 1,
+      "text": { "en": "Have you ever had a crush on someone in this room?", "nl": "Heb je ooit een crush gehad op iemand in deze kamer?" },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t009", "type": "truth", "level": 2, "difficulty": 1,
+      "text": { "en": "What's the cheesiest pick-up line you've ever used?", "nl": "Wat is de cheesiest openingszin die je ooit hebt gebruikt?" },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t010", "type": "truth", "level": 2, "difficulty": 2,
+      "text": { "en": "What's the most daring thing you've done to impress someone?", "nl": "Wat is het meest gedurfde dat je ooit hebt gedaan om indruk te maken?" },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t011", "type": "truth", "level": 3, "difficulty": 1,
+      "text": { "en": "What body part of yours are you most proud of?", "nl": "Op welk lichaamsdeel van jezelf ben je het meest trots?" },
+      "tags": ["body"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t012", "type": "truth", "level": 3, "difficulty": 2,
+      "text": { "en": "What body part do you find most attractive on a partner?", "nl": "Welk lichaamsdeel vind je het aantrekkelijkst bij een partner?" },
+      "tags": ["body", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t013", "type": "truth", "level": 4, "difficulty": 2,
+      "text": { "en": "Have you ever skinny dipped?", "nl": "Heb je ooit naakt gezwommen?" },
+      "tags": ["body", "clothing"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t014", "type": "truth", "level": 4, "difficulty": 2,
+      "text": { "en": "Describe the best kiss you've ever had.", "nl": "Beschrijf de beste kus die je ooit hebt gehad." },
+      "tags": ["mouth", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t015", "type": "truth", "level": 4, "difficulty": 2,
+      "text": { "en": "Have you ever kissed someone you regretted?", "nl": "Heb je ooit iemand gekust waar je spijt van had?" },
+      "tags": ["mouth", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t016", "type": "truth", "level": 4, "difficulty": 2,
+      "text": { "en": "Describe your ideal first kiss.", "nl": "Beschrijf je ideale eerste kus." },
+      "tags": ["flirty", "mouth"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t017", "type": "truth", "level": 4, "difficulty": 2,
+      "text": { "en": "What's the weirdest thing you've ever put in your mouth?", "nl": "Wat is het meest bizarre dat je ooit in je mond hebt gestopt?" },
+      "tags": ["mouth"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t018", "type": "truth", "level": 5, "difficulty": 1,
+      "text": { "en": "When was the last time someone touched your feet, and did you like it?", "nl": "Wanneer heeft iemand voor het laatst je voeten aangeraakt, en vond je het fijn?" },
+      "tags": ["feet"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t019", "type": "truth", "level": 5, "difficulty": 1,
+      "text": { "en": "Do you have a foot-related memory — good or bad?", "nl": "Heb je een bijzondere voeten-herinnering — goed of slecht?" },
+      "tags": ["feet"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t020", "type": "truth", "level": 5, "difficulty": 1,
+      "text": { "en": "Would you let someone paint your toenails right now?", "nl": "Zou je iemand nu je teennagels laten lakken?" },
+      "tags": ["feet"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t021", "type": "truth", "level": 5, "difficulty": 2,
+      "text": { "en": "Have you ever whispered something naughty in someone's ear in public?", "nl": "Heb je ooit iets vies in iemands oor gefluisterd op een openbare plek?" },
+      "tags": ["oral", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t022", "type": "truth", "level": 6, "difficulty": 2,
+      "text": { "en": "What's your biggest turn-on?", "nl": "Wat is jouw grootste turn-on?" },
+      "tags": ["flirty", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t023", "type": "truth", "level": 6, "difficulty": 2,
+      "text": { "en": "What's your biggest turn-off?", "nl": "Wat is jouw grootste turn-off?" },
+      "tags": ["intimate", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t024", "type": "truth", "level": 6, "difficulty": 2,
+      "text": { "en": "What's something you've always wanted to try but haven't?", "nl": "Wat is iets dat je altijd al hebt willen proberen maar nog niet hebt gedaan?" },
+      "tags": ["intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t025", "type": "truth", "level": 6, "difficulty": 3,
+      "text": { "en": "How many people in this room have you thought about romantically?", "nl": "Over hoeveel mensen in deze kamer heb je al romantisch nagedacht?" },
+      "tags": ["intimate", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t026", "type": "truth", "level": 6, "difficulty": 3,
+      "text": { "en": "What's the dirtiest thing you've ever said to someone?", "nl": "Wat is het vuilste dat je ooit tegen iemand hebt gezegd?" },
+      "tags": ["oral", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t027", "type": "truth", "level": 6, "difficulty": 3,
+      "text": { "en": "Describe, without names, the best night of your life.", "nl": "Beschrijf, zonder namen te noemen, de beste nacht van je leven." },
+      "tags": ["oral", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t028", "type": "truth", "level": 6, "difficulty": 2,
+      "text": { "en": "What's the most adventurous place you've been undressed?", "nl": "Op welke meest avontuurlijke plek ben je ooit uitgekleed geweest?" },
+      "tags": ["body", "clothing", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t029", "type": "truth", "level": 8, "difficulty": 3,
+      "text": { "en": "What's the boldest thing you've ever done in a bedroom?", "nl": "Wat is het stoerste dat je ooit in een slaapkamer hebt gedaan?" },
+      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t030", "type": "truth", "level": 8, "difficulty": 3,
+      "text": { "en": "What's your most outrageous fantasy?", "nl": "Wat is je meest gewaagde fantasie?" },
+      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "t031", "type": "truth", "level": 8, "difficulty": 3,
+      "text": { "en": "What's something you'd only do in the dark?", "nl": "Wat is iets dat je alleen in het donker zou doen?" },
+      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d001", "type": "dare", "level": 1, "difficulty": 1,
+      "text": { "en": "Do your best impression of someone in this room. Everyone votes on who it is.", "nl": "Doe je beste imitatie van iemand in de kamer. Iedereen stemt op wie het is." },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d002", "type": "dare", "level": 1, "difficulty": 1,
+      "text": { "en": "Speak in an accent of the group's choosing for the next 3 rounds.", "nl": "Spreek de volgende 3 ronden in een accent naar keuze van de groep." },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d003", "type": "dare", "level": 1, "difficulty": 1,
+      "text": { "en": "Let the group give you a nickname for the rest of the game.", "nl": "Laat de groep je een bijnaam geven voor de rest van het spel." },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d004", "type": "dare", "level": 1, "difficulty": 1,
+      "text": { "en": "Say something nice — and genuine — about every player in the room.", "nl": "Zeg iets aardigs en oprechts over elke speler in de kamer." },
+      "tags": ["general"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d005", "type": "dare", "level": 1, "difficulty": 1,
+      "text": { "en": "Narrate everything you see the player to your right doing, in the most dramatic voice possible, for 1 minute.", "nl": "Beschrijf alles wat de speler rechts van je doet in de meest dramatische stem, gedurende 1 minuut." },
+      "tags": ["general", "oral"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d006", "type": "dare", "level": 2, "difficulty": 1,
+      "text": { "en": "Wink at every player one by one, as seductively as you can.", "nl": "Knipoog naar elke speler één voor één, zo verleidelijk als je kunt." },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d007", "type": "dare", "level": 2, "difficulty": 2,
+      "text": { "en": "Send a flirty text to the last person in your contacts.", "nl": "Stuur een flirterig berichtje naar de laatste persoon in je contacten." },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d008", "type": "dare", "level": 2, "difficulty": 1,
+      "text": { "en": "Do your best 'come hither' look at the player across from you.", "nl": "Doe je beste verleidelijke blik naar de speler tegenover je." },
+      "tags": ["flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d009", "type": "dare", "level": 2, "difficulty": 1,
+      "text": { "en": "Do 15 jumping jacks right now.", "nl": "Doe nu 15 jumping jacks." },
+      "tags": ["general", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d010", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Do a plank for 30 seconds.", "nl": "Houd een plank 30 seconden vol." },
+      "tags": ["physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d011", "type": "dare", "level": 3, "difficulty": 2,
+      "text": { "en": "Arm-wrestle the strongest-looking player in the room.", "nl": "Doe een arm drukken met de sterkst uitziende speler in de kamer." },
+      "tags": ["physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d012", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Hold eye contact with the player across from you for 1 minute without laughing.", "nl": "Houd oogcontact met de speler tegenover je gedurende 1 minuut zonder te lachen." },
+      "tags": ["physical", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d013", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Let someone draw anything they want on your arm with a pen.", "nl": "Laat iemand met een pen alles wat ze willen op je arm tekenen." },
+      "tags": ["body"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d014", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Flex and hold a pose like a statue for 30 seconds.", "nl": "Span je spieren en hou een standbeeldpose 30 seconden vast." },
+      "tags": ["body", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d015", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Show the group your most awkward dance move.", "nl": "Laat de groep je meest awkward dansmove zien." },
+      "tags": ["body", "physical"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d016", "type": "dare", "level": 3, "difficulty": 1,
+      "text": { "en": "Read the most recent unread text on your phone out loud.", "nl": "Lees het meest recente ongelezen bericht op je telefoon hardop voor." },
+      "tags": ["oral"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d017", "type": "dare", "level": 4, "difficulty": 2,
+      "text": { "en": "Remove one article of clothing of your choice.", "nl": "Trek één kledingstuk naar keuze uit." },
+      "tags": ["clothing"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d018", "type": "dare", "level": 4, "difficulty": 2,
+      "text": { "en": "Swap one item of clothing with the player to your right for 2 rounds.", "nl": "Wissel een kledingstuk met de speler rechts van je voor 2 ronden." },
+      "tags": ["clothing"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d019", "type": "dare", "level": 4, "difficulty": 3,
+      "text": { "en": "Let the group vote on which item of clothing you remove.", "nl": "Laat de groep stemmen welk kledingstuk jij uittrekt." },
+      "tags": ["clothing"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d020", "type": "dare", "level": 4, "difficulty": 2,
+      "text": { "en": "Kiss the back of the hand of the player across from you.", "nl": "Kus de achterkant van de hand van de speler tegenover je." },
+      "tags": ["mouth", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d021", "type": "dare", "level": 4, "difficulty": 2,
+      "text": { "en": "Let the group put a mystery item in your mouth (nothing unsafe) — guess what it is.", "nl": "Laat de groep een mysterieus voorwerp in je mond stoppen (niets gevaarlijks) — raad wat het is." },
+      "tags": ["mouth"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d022", "type": "dare", "level": 4, "difficulty": 1,
+      "text": { "en": "Whisper a compliment to the player on your left.", "nl": "Fluister een compliment in het oor van de speler links van je." },
+      "tags": ["flirty", "mouth"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d023", "type": "dare", "level": 5, "difficulty": 1,
+      "text": { "en": "Remove your shoes and hand them to someone else for 2 rounds.", "nl": "Trek je schoenen uit en geef ze 2 ronden aan iemand anders." },
+      "tags": ["clothing", "feet"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d024", "type": "dare", "level": 5, "difficulty": 1,
+      "text": { "en": "Take off your socks and leave them off for the rest of the game.", "nl": "Trek je sokken uit en laat ze uit voor de rest van het spel." },
+      "tags": ["clothing", "feet"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d025", "type": "dare", "level": 5, "difficulty": 2,
+      "text": { "en": "Let someone write a word on the sole of your foot with their finger — guess the word.", "nl": "Laat iemand met hun vinger een woord schrijven op de zool van je voet — raad het woord." },
+      "tags": ["feet", "body"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d026", "type": "dare", "level": 5, "difficulty": 1,
+      "text": { "en": "Take off your right sock and use your toes to pick up a small object.", "nl": "Trek je rechtersok uit en pak met je tenen een klein voorwerp op." },
+      "tags": ["feet", "clothing"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d027", "type": "dare", "level": 5, "difficulty": 2,
+      "text": { "en": "Whisper the most romantic sentence you can think of into someone's ear.", "nl": "Fluister de meest romantische zin die je kunt bedenken in iemands oor." },
+      "tags": ["oral", "intimate", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d028", "type": "dare", "level": 5, "difficulty": 2,
+      "text": { "en": "Describe, in detail, how you would set up a romantic evening — don't hold back.", "nl": "Beschrijf in detail hoe je een romantische avond zou organiseren — hou niets achter." },
+      "tags": ["oral", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d029", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Let the player to your left tickle your feet for 10 seconds. No pulling away.", "nl": "Laat de speler links van je 10 seconden je voeten kietelen. Niet wegtrekken." },
+      "tags": ["feet", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d030", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Give the player to your right a 30-second foot rub.", "nl": "Geef de speler rechts van je 30 seconden voetmassage." },
+      "tags": ["feet", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d031", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Give the player to your right a 30-second shoulder massage.", "nl": "Geef de speler rechts van je 30 seconden schoudermassage." },
+      "tags": ["physical", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d032", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Let the player to your left trace a shape on your back — guess what it is.", "nl": "Laat de speler links van je een vorm op je rug tekenen — raad wat het is." },
+      "tags": ["body", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d033", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Sit in the lap of the player of your choice for the next round.", "nl": "Ga de volgende ronde op de schoot zitten van de speler naar keuze." },
+      "tags": ["intimate", "body", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d034", "type": "dare", "level": 6, "difficulty": 3,
+      "text": { "en": "Let the player to your left choose a spot on your arm to kiss.", "nl": "Laat de speler links van je een plek op je arm kiezen om te kussen." },
+      "tags": ["intimate", "mouth", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d035", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Give a slow, dramatic hair stroke to the player across from you.", "nl": "Geef de speler tegenover je een langzame, dramatische haarstreling." },
+      "tags": ["intimate", "body"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d036", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Stare into the eyes of the player to your right and tell them one thing you genuinely find attractive about them.", "nl": "Kijk de speler rechts van je diep in de ogen en vertel hen één ding dat je oprecht aantrekkelijk aan hen vindt." },
+      "tags": ["intimate", "flirty", "mouth"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d037", "type": "dare", "level": 6, "difficulty": 3,
+      "text": { "en": "Hold a piece of food between your lips and let the player to your left take it with their teeth.", "nl": "Houd een stukje eten tussen je lippen en laat de speler links van je het pakken met hun tanden." },
+      "tags": ["mouth", "oral", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d038", "type": "dare", "level": 6, "difficulty": 2,
+      "text": { "en": "Whisper three honest compliments about someone's appearance into their ear.", "nl": "Fluister drie oprechte complimenten over iemands uiterlijk in hun oor." },
+      "tags": ["mouth", "flirty", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+
+    { "id": "d039", "type": "dare", "level": 8, "difficulty": 2,
+      "text": { "en": "Describe, in as much detail as you're comfortable with, your ideal romantic scenario.", "nl": "Beschrijf zo gedetailleerd als je wilt je ideale romantische scenario." },
+      "tags": ["explicit", "oral", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d040", "type": "dare", "level": 8, "difficulty": 2,
+      "text": { "en": "Do the most seductive walk you can across the room and back.", "nl": "Doe de meest verleidelijke wandeling die je kunt door de kamer en terug." },
+      "tags": ["explicit", "body", "flirty"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+
+    { "id": "d041", "type": "dare", "level": 8, "difficulty": 3,
+      "text": { "en": "Let the group give you a dare within your stated preferences. If they go too far — call it.", "nl": "Laat de groep je een dare geven binnen jouw voorkeuren. Als ze te ver gaan — zeg het." },
+      "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false }
+  ]
+}

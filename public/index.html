@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Truth or Dare 2.0 🔥</title>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<style>
+/* ─── Reset & Base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #0d0d14;
+  color: #f0eaf8;
+  min-height: 100dvh;
+}
+
+/* ─── Variables ────────────────────────────────────────────────────── */
+:root {
+  --accent: #c026d3;
+  --accent2: #7c3aed;
+  --gold: #f59e0b;
+  --danger: #ef4444;
+  --truth-color: #3b82f6;
+  --dare-color: #ec4899;
+  --glass: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.12);
+  --radius: 16px;
+}
+
+/* ─── Screens ──────────────────────────────────────────────────────── */
+.screen {
+  position: fixed; inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px 20px;
+  overflow-y: auto;
+  animation: fadeIn 0.35s ease;
+}
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── Typography ───────────────────────────────────────────────────── */
+h1 { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p, label { font-size: 0.95rem; line-height: 1.5; color: #c4b8d8; }
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ─── Cards / Glass panels ─────────────────────────────────────────── */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 28px;
+  border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+  width: 100%; max-width: 480px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(192,38,211,0.35);
+}
+.btn-primary:hover { box-shadow: 0 6px 32px rgba(192,38,211,0.5); }
+.btn-secondary {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: #f0eaf8;
+}
+.btn-truth {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+  flex: 1;
+}
+.btn-dare {
+  background: linear-gradient(135deg, #9d174d, #ec4899);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(236,72,153,0.4);
+  flex: 1;
+}
+.btn-gold {
+  background: linear-gradient(135deg, #d97706, var(--gold));
+  color: #0d0d14;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+}
+.btn-sm { padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; max-width: none; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+/* ─── Inputs ───────────────────────────────────────────────────────── */
+input[type="text"], input[type="number"] {
+  width: 100%; padding: 13px 16px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: #f0eaf8;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus { border-color: var(--accent); }
+input::placeholder { color: #7a6b8a; }
+
+/* ─── Tag pills ────────────────────────────────────────────────────── */
+.tag-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 8px;
+}
+.tag-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.07);
+  color: #c4b8d8;
+  transition: all 0.18s;
+  user-select: none;
+}
+.tag-pill.selected-pref {
+  background: rgba(124,58,237,0.25);
+  border-color: var(--accent2);
+  color: #fff;
+}
+.tag-pill.selected-limit {
+  background: rgba(239,68,68,0.2);
+  border-color: var(--danger);
+  color: #fca5a5;
+}
+
+/* ─── Clothing items ───────────────────────────────────────────────── */
+.clothing-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 8px;
+}
+.clothing-row label { min-width: 90px; color: #9b89b4; font-size: 0.82rem; }
+.clothing-row input { flex: 1; padding: 9px 12px; font-size: 0.87rem; }
+.clothing-row .btn-sm { flex-shrink: 0; padding: 9px 12px; }
+
+/* ─── Player list ──────────────────────────────────────────────────── */
+.player-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; }
+.player-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+.player-emoji { font-size: 1.6rem; line-height: 1; }
+.player-name { flex: 1; font-weight: 600; }
+.player-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px;
+  background: rgba(192,38,211,0.25);
+  color: var(--accent);
+}
+.player-badge.host { background: rgba(245,158,11,0.2); color: var(--gold); }
+.player-badge.ready { background: rgba(34,197,94,0.2); color: #4ade80; }
+
+/* ─── QR + Room code ───────────────────────────────────────────────── */
+.room-code-display {
+  font-size: 2.5rem; font-weight: 900; letter-spacing: 0.15em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin: 8px 0;
+}
+.qr-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  display: inline-block;
+  margin: 12px auto;
+}
+.qr-box img { display: block; width: 180px; height: 180px; }
+
+/* ─── Bottle Spin ──────────────────────────────────────────────────── */
+#spin-screen {
+  background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d14 70%);
+}
+.spin-table {
+  position: relative;
+  width: min(90vw, 380px);
+  height: min(90vw, 380px);
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.spin-circle {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(192,38,211,0.2);
+}
+.player-avatar {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  transform: translate(-50%, -50%);
+  cursor: default;
+  transition: transform 0.2s;
+}
+.player-avatar .av-emoji { font-size: 2rem; }
+.player-avatar .av-name {
+  font-size: 0.62rem; font-weight: 600;
+  white-space: nowrap; max-width: 60px;
+  overflow: hidden; text-overflow: ellipsis;
+  color: #c4b8d8;
+  text-align: center;
+}
+.player-avatar.highlighted .av-emoji {
+  filter: drop-shadow(0 0 12px var(--accent));
+  transform: scale(1.3);
+}
+.player-avatar.highlighted .av-name { color: #fff; }
+
+/* The bottle SVG wrapper */
+#bottle-wrap {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 60px; height: 140px;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+#bottle-wrap svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 0 16px rgba(192,38,211,0.6));
+}
+
+/* ─── Truth/Dare card ──────────────────────────────────────────────── */
+.card-reveal {
+  max-width: 480px; width: 100%;
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  animation: cardPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes cardPop {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.card-reveal.truth-card {
+  background: linear-gradient(135deg, #1e3a8a22, #1d4ed822);
+  border: 2px solid #3b82f666;
+}
+.card-reveal.dare-card {
+  background: linear-gradient(135deg, #831843,22, #9d174d22);
+  border: 2px solid #ec489966;
+  background: linear-gradient(135deg, rgba(131,24,67,0.15), rgba(157,23,77,0.15));
+}
+.card-type-label {
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+.card-text {
+  font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.55;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  margin-top: 12px;
+}
+.card-tag {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+}
+
+/* ─── Misc helpers ─────────────────────────────────────────────────── */
+.spacer { flex: 1; }
+.gap-sm { height: 8px; }
+.gap { height: 16px; }
+.gap-lg { height: 24px; }
+.gap-xl { height: 40px; }
+.text-center { text-align: center; }
+.text-muted { color: #7a6b8a; font-size: 0.85rem; }
+.text-success { color: #4ade80; }
+.text-danger { color: #f87171; }
+.w-full { width: 100%; max-width: 480px; }
+.flex-row { display: flex; gap: 12px; width: 100%; max-width: 480px; }
+.section-label {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #7a6b8a;
+  margin-bottom: 8px; margin-top: 20px;
+}
+.divider {
+  width: 100%; max-width: 480px;
+  border: none; border-top: 1px solid var(--glass-border);
+  margin: 16px 0;
+}
+.star-bg {
+  position: fixed; inset: 0; z-index: -1;
+  background: #0d0d14;
+  overflow: hidden;
+}
+.pulse-ring {
+  position: absolute; top: 50%; left: 50%;
+  width: 300px; height: 300px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,38,211,0.08) 0%, transparent 70%);
+  animation: pulse 3s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: rgba(30,20,50,0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  font-weight: 600; font-size: 0.9rem;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* ─── Level picker ─────────────────────────────────────────────────── */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%; max-width: 480px;
+}
+.level-btn {
+  aspect-ratio: 1;
+  border: 2px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass);
+  color: #f0eaf8;
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  transition: all 0.15s;
+  position: relative;
+}
+.level-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: rgba(192,38,211,0.15);
+}
+.level-btn:disabled {
+  opacity: 0.3; cursor: not-allowed;
+}
+.level-btn .lvl-num { font-size: 1.4rem; line-height: 1; }
+.level-btn .lvl-lock { font-size: 0.7rem; }
+.level-btn.unlocked { border-color: rgba(124,58,237,0.4); }
+.level-btn.current  { border-color: var(--accent); background: rgba(192,38,211,0.2); box-shadow: 0 0 12px rgba(192,38,211,0.3); }
+
+/* ─── XP / Coins HUD ───────────────────────────────────────────────── */
+#xp-hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: none;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: rgba(13,13,20,0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.82rem; font-weight: 700;
+}
+#xp-hud.visible { display: flex; }
+.hud-item { display: flex; align-items: center; gap: 5px; }
+.hud-xp-bar {
+  width: 80px; height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.hud-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* ─── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 2px; }
+
+/* ─── Age gate overlay ─────────────────────────────────────────────── */
+#age-gate {
+  position: fixed; inset: 0; z-index: 1000;
+  background: #0d0d14;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px 24px; text-align: center;
+  gap: 16px;
+}
+#age-gate h1 { font-size: 3rem; }
+#age-gate h2 { font-size: 1.5rem; color: #c4b8d8; }
+#age-gate p { max-width: 360px; color: #7a6b8a; }
+</style>
+</head>
+<body>
+
+<!-- XP / Coins HUD (shown during game) -->
+<div id="xp-hud">
+  <div class="hud-item">⚡ <span id="hud-xp">0</span> XP
+    <div class="hud-xp-bar"><div class="hud-xp-fill" id="hud-xp-fill" style="width:0%"></div></div>
+  </div>
+  <div class="hud-item">🪙 <span id="hud-coins">0</span></div>
+  <div class="hud-item">Lvl <span id="hud-level">1</span></div>
+</div>
+
+<!-- Age Gate -->
+<div id="age-gate">
+  <div style="font-size:3rem;">🔞</div>
+  <h2>Adults Only</h2>
+  <p>This game contains adult content. By entering you confirm you are 18 years or older.</p>
+  <div class="gap"></div>
+  <button class="btn btn-primary" style="max-width:280px" onclick="confirmAge()">I am 18+ — Enter</button>
+  <button class="btn btn-secondary" style="max-width:280px;margin-top:8px" onclick="window.history.back()">Leave</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 1: Landing — Create or Join
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div style="height:60px"></div>
+  <div style="font-size:3.5rem; text-align:center;">🔥</div>
+  <div class="gap-sm"></div>
+  <h1 class="gradient-text" style="text-align:center">Truth or Dare 2.0</h1>
+  <div class="gap-sm"></div>
+  <p class="text-center" style="max-width:320px;margin:0 auto">The advanced, erotic, kink-safe party game. Play together — phones welcome.</p>
+  <div class="gap-xl"></div>
+
+  <button class="btn btn-primary" onclick="showScreen('screen-host')">🎉 Host a Game</button>
+  <div class="gap-sm"></div>
+  <button class="btn btn-secondary" onclick="showScreen('screen-join')">📱 Join a Game</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 2: Host — Create room
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-host" class="screen">
+  <div class="gap-lg"></div>
+  <h2>Host a Game</h2>
+  <div class="gap"></div>
+  <p class="text-center" style="max-width:340px;margin:0 auto;color:#9b89b4">
+    A room code and QR code will be generated. Share it so others can join from their phones.
+  </p>
+  <div class="gap-lg"></div>
+  <button class="btn btn-primary" onclick="createRoom()">✨ Create Room</button>
+  <div class="gap-sm"></div>
+  <button class="btn btn-secondary" onclick="showScreen('screen-landing')">← Back</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 3: Join — Enter room code
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-join" class="screen">
+  <div class="gap-lg"></div>
+  <h2>Join a Game</h2>
+  <div class="gap-lg"></div>
+  <div class="w-full">
+    <label class="section-label">Room Code</label>
+    <input type="text" id="join-code-input" placeholder="e.g. X7KQ" maxlength="4"
+      style="text-transform:uppercase; font-size:1.5rem; text-align:center; letter-spacing:0.2em"
+      oninput="this.value=this.value.toUpperCase()"/>
+  </div>
+  <div class="gap-lg"></div>
+  <button class="btn btn-primary" onclick="joinRoom()">Join →</button>
+  <div class="gap-sm"></div>
+  <button class="btn btn-secondary" onclick="showScreen('screen-landing')">← Back</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 4: Player Setup — Name, Clothing, Prefs, Limits
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div class="gap-lg"></div>
+  <h2>Your Profile</h2>
+  <p style="text-align:center; color:#7a6b8a; font-size:0.85rem">Your limits are private — never shown to other players.</p>
+  <div class="gap-lg"></div>
+
+  <!-- Name -->
+  <div class="w-full">
+    <div class="section-label">Your Name</div>
+    <input type="text" id="setup-name" placeholder="How should we call you?" maxlength="20"/>
+  </div>
+
+  <!-- Clothing -->
+  <div class="w-full">
+    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(be specific!)</span></div>
+    <div class="card" style="padding:16px">
+      <div id="clothing-list"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addClothingItem()">+ Add item</button>
+    </div>
+  </div>
+
+  <!-- Preferences -->
+  <div class="w-full">
+    <div class="section-label">Your Preferences <span style="font-weight:400;color:#7a6b8a">(what you enjoy)</span></div>
+    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to select. These help match you to better truths & dares.</p>
+    <div class="tag-grid" id="pref-tags"></div>
+  </div>
+
+  <!-- Limits -->
+  <div class="w-full">
+    <div class="section-label" style="color:#f87171">🔒 Your Limits <span style="font-weight:400;color:#7a6b8a">(what to skip — private)</span></div>
+    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to mark as off-limits. No one else can see this.</p>
+    <div class="tag-grid" id="limit-tags"></div>
+  </div>
+
+  <div class="gap-lg"></div>
+  <button class="btn btn-primary" onclick="submitSetup()">Save & Go to Lobby →</button>
+  <div class="gap"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 5: Lobby — Waiting for players
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-lobby" class="screen">
+  <div class="gap-lg"></div>
+  <div id="lobby-host-section" style="width:100%;max-width:480px;display:none">
+    <div class="card" style="text-align:center">
+      <div class="text-muted">Room Code</div>
+      <div class="room-code-display" id="lobby-code">????</div>
+      <div class="text-muted" style="font-size:0.8rem">Scan to join from phone</div>
+      <div class="qr-box">
+        <img id="qr-img" src="" alt="QR Code"/>
+      </div>
+      <div class="text-muted" style="font-size:0.75rem" id="lobby-url"></div>
+      <div id="lobby-url-copy" class="text-muted" style="font-size:0.75rem;margin-top:4px;word-break:break-all"></div>
+    </div>
+    <div class="gap"></div>
+  </div>
+
+  <div id="lobby-join-section" style="width:100%;max-width:480px;display:none">
+    <div class="card" style="text-align:center;padding:16px">
+      <div class="text-muted">Joined Room</div>
+      <div class="room-code-display" id="lobby-code-join">????</div>
+    </div>
+    <div class="gap"></div>
+  </div>
+
+  <div class="w-full">
+    <div class="section-label">Players <span id="lobby-count">(0)</span></div>
+    <div class="player-list" id="lobby-player-list"></div>
+  </div>
+
+  <div class="gap-lg"></div>
+  <div id="lobby-ready-btn-wrap" class="w-full" style="display:none">
+    <button class="btn btn-secondary" id="lobby-ready-btn" onclick="markReady()">✓ I'm Ready</button>
+  </div>
+  <div id="lobby-start-btn-wrap" class="w-full" style="display:none">
+    <button class="btn btn-primary" id="lobby-start-btn" onclick="startGame()" disabled>Start Game →</button>
+    <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 ready players</p>
+  </div>
+  <div class="gap"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 6: Spin — Bottle spin animation
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-spin" class="screen" style="justify-content:center; gap:24px;">
+  <h3 id="spin-status" class="gradient-text text-center">Spin the bottle...</h3>
+
+  <div class="spin-table" id="spin-table">
+    <div class="spin-circle"></div>
+    <!-- player avatars injected by JS -->
+    <div id="bottle-wrap">
+      <svg viewBox="0 0 60 140" xmlns="http://www.w3.org/2000/svg">
+        <!-- Bottle cap -->
+        <rect x="22" y="0" width="16" height="12" rx="3" fill="#c026d3"/>
+        <!-- Bottle neck -->
+        <rect x="24" y="12" width="12" height="28" rx="2" fill="#7c3aed"/>
+        <!-- Bottle body -->
+        <ellipse cx="30" cy="90" rx="22" ry="38" fill="#7c3aed"/>
+        <ellipse cx="30" cy="90" rx="16" ry="30" fill="#9333ea" opacity="0.5"/>
+        <!-- Shine -->
+        <ellipse cx="22" cy="75" rx="5" ry="14" fill="white" opacity="0.18" transform="rotate(-10 22 75)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="spin-btn-wrap">
+    <button class="btn btn-gold" id="spin-btn" onclick="requestSpin()" style="max-width:300px">🍾 Spin the Bottle</button>
+  </div>
+
+  <div id="spin-result-wrap" style="display:none; text-align:center">
+    <div id="spin-result-name" style="font-size:1.5rem; font-weight:800; color:#fff;"></div>
+    <div class="text-muted" style="margin-top:4px">It's your turn!</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 7: Level Picker
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-level" class="screen" style="justify-content:center; gap:20px;">
+  <div class="pulse-ring"></div>
+  <div style="text-align:center">
+    <div id="level-player-emoji" style="font-size:3rem"></div>
+    <div class="gap-sm"></div>
+    <h2 id="level-player-name"></h2>
+    <p class="text-muted">Choose your level for this turn.</p>
+  </div>
+
+  <div class="level-grid" id="level-grid"></div>
+
+  <p id="level-waiting-msg" class="text-muted text-center" style="display:none">
+    Waiting for <span id="level-waiting-name"></span> to pick a level...
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 8: Choose — Truth or Dare
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-choose" class="screen" style="justify-content:center;">
+  <div class="pulse-ring"></div>
+
+  <div id="choose-target-info" style="text-align:center; margin-bottom:24px">
+    <div id="choose-emoji" style="font-size:3.5rem"></div>
+    <div class="gap-sm"></div>
+    <h2 id="choose-name"></h2>
+    <p class="text-muted">It's your turn — choose wisely.</p>
+  </div>
+
+  <div class="flex-row" style="justify-content:center">
+    <button class="btn btn-truth" id="choose-truth-btn" onclick="pickTruthDare('truth')" style="max-width:200px">
+      💬 Truth
+    </button>
+    <button class="btn btn-dare" id="choose-dare-btn" onclick="pickTruthDare('dare')" style="max-width:200px">
+      🔥 Dare
+    </button>
+  </div>
+
+  <div class="gap-lg"></div>
+  <p id="choose-waiting-msg" class="text-muted text-center" style="display:none">
+    Waiting for <span id="choose-waiting-name"></span> to choose...
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 8: Card — Show the truth/dare
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-card" class="screen" style="justify-content:center; gap:20px;">
+
+  <div style="text-align:center">
+    <div id="card-player-emoji" style="font-size:2.5rem"></div>
+    <div class="gap-sm"></div>
+    <div id="card-player-name" style="font-weight:700; font-size:1.1rem"></div>
+    <div class="text-muted" style="font-size:0.82rem" id="card-player-sub"></div>
+  </div>
+
+  <div id="card-reveal" class="card-reveal">
+    <div class="card-type-label" id="card-type-label"></div>
+    <div class="card-text" id="card-text"></div>
+    <div class="card-tags" id="card-tags-display"></div>
+  </div>
+
+  <!-- Clothing reference (for clothing-tagged dares) -->
+  <div id="card-clothing-ref" class="card" style="display:none; max-width:480px">
+    <div class="section-label" style="margin-top:0">🧥 Their Wardrobe</div>
+    <div id="card-clothing-list" style="font-size:0.9rem; color:#c4b8d8; line-height:1.8"></div>
+  </div>
+
+  <div class="gap"></div>
+  <div id="card-done-wrap" class="w-full" style="display:none">
+    <button class="btn btn-gold" onclick="completeDare()" id="card-done-btn">✓ Done — I completed it</button>
+    <p class="text-muted text-center" style="margin-top:6px;font-size:0.78rem">Tap when you finish the dare to claim your XP &amp; coins.</p>
+  </div>
+  <button class="btn btn-primary" onclick="nextTurn()" id="card-next-btn">Next Round →</button>
+  <div id="card-reward-display" style="display:none;text-align:center;font-size:0.88rem;color:#4ade80;font-weight:700"></div>
+  <div class="gap"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const TAGS = ['general','flirty','clothing','body','physical','feet','mouth','oral','intimate','explicit'];
+const TAG_LABELS = {
+  general: '🎲 General', flirty: '😏 Flirty', clothing: '👗 Clothing',
+  body: '💪 Body', physical: '🏃 Physical', feet: '🦶 Feet',
+  mouth: '👄 Mouth', oral: '🗣️ Oral', intimate: '💋 Intimate', explicit: '🔥 Explicit'
+};
+
+let socket = null;
+let myId = null;
+let myRoom = null;
+let amHost = false;
+let roomState = null;
+let myPrefs = [];
+let myLimits = [];
+let clothingItems = [];  // { label, value }
+let bottleSpinning = false;
+let myReady = false;
+let myLevelChosen = false;  // tracks if current player picked level this turn
+
+// Pre-built clothing slots
+const DEFAULT_SLOTS = [
+  { label: 'Head', placeholder: 'hat, glasses...' },
+  { label: 'Neck', placeholder: 'necklace, scarf...' },
+  { label: 'Top', placeholder: 'shirt, bra, hoodie...' },
+  { label: 'Bottom', placeholder: 'jeans, skirt...' },
+  { label: 'Underwear', placeholder: 'boxers, briefs...' },
+  { label: 'Left sock', placeholder: 'ankle sock, bare...' },
+  { label: 'Right sock', placeholder: 'ankle sock, bare...' },
+  { label: 'Left shoe', placeholder: 'sneaker, bare...' },
+  { label: 'Right shoe', placeholder: 'sneaker, bare...' },
+];
+
+// ─── Age Gate ─────────────────────────────────────────────────────────────────
+function confirmAge() {
+  sessionStorage.setItem('ageConfirmed', '1');
+  document.getElementById('age-gate').style.display = 'none';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('ageConfirmed')) {
+    document.getElementById('age-gate').style.display = 'none';
+  }
+  initSetupScreen();
+  connectSocket();
+  // Auto-join if URL has ?room=CODE
+  const params = new URLSearchParams(location.search);
+  const roomParam = params.get('room');
+  if (roomParam) {
+    document.getElementById('join-code-input').value = roomParam.toUpperCase();
+    showScreen('screen-join');
+  }
+});
+
+// ─── Socket Setup ─────────────────────────────────────────────────────────────
+function connectSocket() {
+  socket = io();
+  socket.on('connect', () => { myId = socket.id; });
+  socket.on('room-state', (state) => {
+    roomState = state;
+    handleRoomState(state);
+  });
+  socket.on('disconnect', () => toast('Disconnected from server', 'danger'));
+}
+
+// ─── Screen Navigation ────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── Room Actions ─────────────────────────────────────────────────────────────
+function createRoom() {
+  socket.emit('create-room', (res) => {
+    if (!res.ok) return toast(res.error, 'danger');
+    myRoom = res.code;
+    amHost = true;
+    showScreen('screen-setup');
+  });
+}
+
+function joinRoom() {
+  const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+  if (code.length < 2) return toast('Enter a room code', 'danger');
+  socket.emit('join-room', { code }, (res) => {
+    if (!res.ok) return toast(res.error, 'danger');
+    myRoom = res.code;
+    amHost = false;
+    showScreen('screen-setup');
+  });
+}
+
+// ─── Setup Screen ─────────────────────────────────────────────────────────────
+function initSetupScreen() {
+  // Clothing slots
+  const list = document.getElementById('clothing-list');
+  list.innerHTML = '';
+  clothingItems = DEFAULT_SLOTS.map(slot => ({ ...slot, value: '' }));
+  renderClothingList();
+
+  // Tag grids
+  renderTagGrid('pref-tags', myPrefs, 'pref');
+  renderTagGrid('limit-tags', myLimits, 'limit');
+}
+
+function renderClothingList() {
+  const list = document.getElementById('clothing-list');
+  list.innerHTML = '';
+  clothingItems.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'clothing-row';
+    row.innerHTML = `
+      <label>${item.label}</label>
+      <input type="text" placeholder="${item.placeholder || ''}" value="${item.value}"
+        oninput="clothingItems[${i}].value=this.value"/>
+      ${i >= DEFAULT_SLOTS.length ? `<button class="btn btn-secondary btn-sm" onclick="removeClothingItem(${i})">✕</button>` : ''}
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addClothingItem() {
+  clothingItems.push({ label: 'Other', placeholder: 'describe it...', value: '' });
+  renderClothingList();
+}
+
+function removeClothingItem(i) {
+  clothingItems.splice(i, 1);
+  renderClothingList();
+}
+
+function renderTagGrid(containerId, selectedArr, type) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  TAGS.forEach(tag => {
+    const pill = document.createElement('div');
+    pill.className = 'tag-pill';
+    pill.textContent = TAG_LABELS[tag];
+    pill.dataset.tag = tag;
+    if (selectedArr.includes(tag)) pill.classList.add(`selected-${type}`);
+    pill.addEventListener('click', () => toggleTag(tag, selectedArr, type, pill));
+    container.appendChild(pill);
+  });
+}
+
+function toggleTag(tag, arr, type, pill) {
+  const idx = arr.indexOf(tag);
+  if (idx === -1) {
+    arr.push(tag);
+    pill.classList.add(`selected-${type}`);
+  } else {
+    arr.splice(idx, 1);
+    pill.classList.remove(`selected-${type}`);
+  }
+}
+
+function submitSetup() {
+  const name = document.getElementById('setup-name').value.trim();
+  if (!name) return toast('Enter your name first', 'danger');
+
+  const clothing = clothingItems
+    .filter(c => c.value.trim())
+    .map(c => ({ label: c.label, value: c.value.trim() }));
+
+  socket.emit('player-setup', {
+    code: myRoom,
+    name,
+    clothing,
+    preferences: [...myPrefs],
+    limits: [...myLimits],
+  }, (res) => {
+    if (!res.ok) return toast(res.error || 'Error', 'danger');
+    showLobby();
+  });
+}
+
+// ─── Lobby ────────────────────────────────────────────────────────────────────
+function showLobby() {
+  showScreen('screen-lobby');
+  if (amHost) {
+    document.getElementById('lobby-host-section').style.display = 'block';
+    document.getElementById('lobby-join-section').style.display = 'none';
+    document.getElementById('lobby-code').textContent = myRoom;
+    document.getElementById('lobby-start-btn-wrap').style.display = 'block';
+    document.getElementById('lobby-ready-btn-wrap').style.display = 'none';
+    // Load QR
+    const img = document.getElementById('qr-img');
+    img.src = `/qr/${myRoom}`;
+    const joinUrl = `${location.origin}?room=${myRoom}`;
+    document.getElementById('lobby-url').textContent = joinUrl;
+  } else {
+    document.getElementById('lobby-host-section').style.display = 'none';
+    document.getElementById('lobby-join-section').style.display = 'block';
+    document.getElementById('lobby-code-join').textContent = myRoom;
+    document.getElementById('lobby-start-btn-wrap').style.display = 'none';
+    document.getElementById('lobby-ready-btn-wrap').style.display = 'block';
+  }
+}
+
+function markReady() {
+  socket.emit('player-ready', { code: myRoom }, () => {
+    myReady = true;
+    document.getElementById('lobby-ready-btn').disabled = true;
+    document.getElementById('lobby-ready-btn').textContent = '✓ Ready!';
+  });
+}
+
+function startGame() {
+  socket.emit('start-game', { code: myRoom }, (res) => {
+    if (!res.ok) return toast(res.error, 'danger');
+  });
+}
+
+function renderLobby(state) {
+  const players = Object.values(state.players);
+  document.getElementById('lobby-count').textContent = `(${players.length})`;
+
+  const list = document.getElementById('lobby-player-list');
+  list.innerHTML = '';
+  players.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'player-item';
+    const badges = [];
+    if (p.isHost) badges.push('<span class="player-badge host">HOST</span>');
+    if (p.ready) badges.push('<span class="player-badge ready">READY</span>');
+    div.innerHTML = `
+      <div class="player-emoji">${p.emoji}</div>
+      <div class="player-name">${p.name}</div>
+      ${badges.join('')}
+    `;
+    list.appendChild(div);
+  });
+
+  if (amHost) {
+    const readyCount = players.filter(p => p.ready).length;
+    const startBtn = document.getElementById('lobby-start-btn');
+    startBtn.disabled = players.length < 2;
+  }
+}
+
+// ─── Game State Handler ───────────────────────────────────────────────────────
+function handleRoomState(state) {
+  roomState = state;
+
+  if (state.phase === 'lobby') {
+    renderLobby(state);
+    return;
+  }
+
+  if (state.phase === 'game') {
+    const turn = state.currentTurn;
+    if (!turn) return;
+    const isMyTurn = turn.performerId === myId;
+
+    if (turn.phase === 'spinning') {
+      myLevelChosen = false;
+      buildSpinScreen(state);
+      showScreen('screen-spin');
+    } else if (turn.phase === 'choosing') {
+      if (isMyTurn && !myLevelChosen) {
+        buildLevelScreen(state);
+        showScreen('screen-level');
+      } else {
+        buildChooseScreen(state);
+        showScreen('screen-choose');
+      }
+    } else if (turn.phase === 'showing') {
+      buildCardScreen(state);
+      showScreen('screen-card');
+    }
+
+    // Update HUD for current player
+    const me = state.players[myId];
+    if (me) updateHud(me);
+  }
+}
+
+// ─── Spin Screen ──────────────────────────────────────────────────────────────
+function buildSpinScreen(state) {
+  const players = Object.values(state.players);
+  const table = document.getElementById('spin-table');
+
+  // Remove old avatars
+  table.querySelectorAll('.player-avatar').forEach(el => el.remove());
+
+  const size = table.offsetWidth || 320;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.42;
+
+  players.forEach((p, i) => {
+    const angle = (2 * Math.PI * i / players.length) - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const av = document.createElement('div');
+    av.className = 'player-avatar';
+    av.id = `avatar-${p.id}`;
+    av.style.left = x + 'px';
+    av.style.top = y + 'px';
+    av.innerHTML = `<div class="av-emoji">${p.emoji}</div><div class="av-name">${p.name}</div>`;
+    table.appendChild(av);
+  });
+
+  document.getElementById('spin-btn-wrap').style.display = 'flex';
+  document.getElementById('spin-result-wrap').style.display = 'none';
+  document.getElementById('spin-status').textContent = 'Spin the bottle...';
+
+  // Only host (or current player, or everyone?) can spin — let's allow anyone
+  document.getElementById('spin-btn').disabled = false;
+}
+
+function requestSpin() {
+  if (bottleSpinning) return;
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('spin-status').textContent = 'Spinning...';
+  bottleSpinning = true;
+
+  socket.emit('request-spin', { code: myRoom }, (res) => {
+    if (!res.ok) { bottleSpinning = false; return; }
+    animateBottle(res.targetId);
+  });
+}
+
+function animateBottle(targetId) {
+  if (!roomState) return;
+  const players = Object.values(roomState.players);
+  const targetIdx = players.findIndex(p => p.id === targetId);
+  if (targetIdx === -1) return;
+
+  const totalPlayers = players.length;
+  const targetAngle = (360 * targetIdx / totalPlayers) - 90; // degrees, offset so top = 0
+  const spins = 3 + Math.floor(Math.random() * 3); // 3–5 full rotations
+  const finalAngle = spins * 360 + targetAngle;
+
+  const bottle = document.getElementById('bottle-wrap');
+  bottle.style.transition = 'none';
+  bottle.style.transform = `translate(-50%, -50%) rotate(0deg)`;
+
+  // Force reflow
+  bottle.offsetHeight;
+
+  bottle.style.transition = `transform ${2.5 + spins * 0.3}s cubic-bezier(0.2, 0.8, 0.4, 1)`;
+  bottle.style.transform = `translate(-50%, -50%) rotate(${finalAngle}deg)`;
+
+  const dur = (2.5 + spins * 0.3) * 1000;
+  setTimeout(() => {
+    bottleSpinning = false;
+    // Highlight target
+    document.querySelectorAll('.player-avatar').forEach(av => av.classList.remove('highlighted'));
+    const av = document.getElementById(`avatar-${targetId}`);
+    if (av) av.classList.add('highlighted');
+
+    const target = players[targetIdx];
+    document.getElementById('spin-status').textContent = `🎯 ${target.name}!`;
+    document.getElementById('spin-result-wrap').style.display = 'block';
+    document.getElementById('spin-result-name').textContent = `${target.emoji} ${target.name}`;
+    document.getElementById('spin-btn-wrap').style.display = 'none';
+    // State change comes via socket room-state event
+  }, dur);
+}
+
+// ─── Choose Screen ────────────────────────────────────────────────────────────
+function buildChooseScreen(state) {
+  const turn = state.currentTurn;
+  const target = state.players[turn.targetId];
+  if (!target) return;
+
+  document.getElementById('choose-emoji').textContent = target.emoji;
+  document.getElementById('choose-name').textContent = target.name;
+
+  const isMe = target.id === myId;
+  document.getElementById('choose-truth-btn').style.display = isMe ? 'flex' : 'none';
+  document.getElementById('choose-dare-btn').style.display = isMe ? 'flex' : 'none';
+
+  const waitMsg = document.getElementById('choose-waiting-msg');
+  const waitName = document.getElementById('choose-waiting-name');
+  waitMsg.style.display = isMe ? 'none' : 'block';
+  waitName.textContent = target.name;
+}
+
+function pickTruthDare(choice) {
+  document.getElementById('choose-truth-btn').disabled = true;
+  document.getElementById('choose-dare-btn').disabled = true;
+  socket.emit('pick-truth-dare', { code: myRoom, choice }, (res) => {
+    if (!res.ok) {
+      toast(res.error || 'Error', 'danger');
+      document.getElementById('choose-truth-btn').disabled = false;
+      document.getElementById('choose-dare-btn').disabled = false;
+    }
+    // state update comes via room-state event
+  });
+}
+
+// ─── Level Picker Screen ──────────────────────────────────────────────────────
+const LEVEL_NAMES = ['','Icebreakers','Flirt','Light Touch','Kiss','Sensual','Seduction','Intimate','Erotic','Explicit','Extreme'];
+
+function buildLevelScreen(state) {
+  const turn = state.currentTurn;
+  const performer = state.players[turn.performerId];
+  if (!performer) return;
+
+  document.getElementById('level-player-emoji').textContent = performer.emoji;
+  document.getElementById('level-player-name').textContent = performer.name;
+
+  const isMe = performer.id === myId;
+  document.getElementById('level-waiting-msg').style.display = isMe ? 'none' : 'block';
+  document.getElementById('level-waiting-name').textContent = performer.name;
+
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+
+  for (let lvl = 1; lvl <= 10; lvl++) {
+    const btn = document.createElement('button');
+    btn.className = 'level-btn';
+
+    const unlocked = canAccessLevelClient(performer, lvl);
+    btn.disabled = !isMe || !unlocked;
+    if (unlocked) btn.classList.add('unlocked');
+    if (performer.currentLevel === lvl) btn.classList.add('current');
+
+    btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lock">${unlocked ? '' : '🔒'}</span>`;
+    btn.title = LEVEL_NAMES[lvl] || '';
+    if (isMe && unlocked) btn.onclick = () => pickLevel(lvl);
+    grid.appendChild(btn);
+  }
+}
+
+function canAccessLevelClient(player, level) {
+  if (level <= 1) return true;
+  const prev = level - 1;
+  const xpThreshold = level * 6;
+  return player.xp >= xpThreshold && (player.clearedLevels || []).includes(prev);
+}
+
+function pickLevel(level) {
+  socket.emit('choose-level', { code: myRoom, level }, (res) => {
+    if (!res || !res.ok) return toast(res?.error || 'Cannot choose that level', 'danger');
+    myLevelChosen = true;
+    // Show the truth/dare choice screen now
+    if (roomState) {
+      buildChooseScreen(roomState);
+      showScreen('screen-choose');
+    }
+  });
+}
+
+// ─── Card Screen ──────────────────────────────────────────────────────────────
+function buildCardScreen(state) {
+  const turn = state.currentTurn;
+  const performer = state.players[turn.performerId] || state.players[turn.targetId];
+  if (!performer || !turn.card) return;
+
+  document.getElementById('card-player-emoji').textContent = performer.emoji;
+  document.getElementById('card-player-name').textContent = performer.name;
+  document.getElementById('card-player-sub').textContent =
+    turn.choice === 'truth' ? 'answered a Truth' : 'accepted a Dare';
+
+  const reveal = document.getElementById('card-reveal');
+  reveal.className = `card-reveal ${turn.choice}-card`;
+
+  document.getElementById('card-type-label').textContent =
+    turn.choice === 'truth' ? '💬 TRUTH' : '🔥 DARE';
+  document.getElementById('card-type-label').style.color =
+    turn.choice === 'truth' ? '#60a5fa' : '#f472b6';
+
+  // v2: text is bilingual object { en, nl }
+  const cardText = turn.card.text;
+  document.getElementById('card-text').textContent =
+    (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
+
+  // Extreme level warning
+  if (turn.card.level === 10) {
+    toast('⚠️ EXTREME level — everyone has consented to this', 'danger');
+  }
+
+  // Recycled pool notice
+  if (turn.recycled) {
+    toast("You've had every card — feel free to make up your own!", 'info');
+  }
+
+  // Tags
+  const tagsEl = document.getElementById('card-tags-display');
+  tagsEl.innerHTML = '';
+  (turn.card.tags || []).forEach(tag => {
+    const span = document.createElement('span');
+    span.className = 'card-tag';
+    span.textContent = TAG_LABELS[tag] || tag;
+    tagsEl.appendChild(span);
+  });
+
+  // Clothing reference (uses clothingItems now)
+  const clothingRef = document.getElementById('card-clothing-ref');
+  const needsClothing = turn.card.tags &&
+    (turn.card.tags.includes('clothing') || turn.card.tags.includes('feet'));
+  if (needsClothing && performer.clothingItems && performer.clothingItems.length > 0) {
+    clothingRef.style.display = 'block';
+    document.getElementById('card-clothing-list').innerHTML =
+      performer.clothingItems.map(c => `<b>${c.label}:</b> ${c.value}`).join('<br>');
+  } else {
+    clothingRef.style.display = 'none';
+  }
+
+  // "Done" button only visible to the performer for dares
+  const isPerformer = performer.id === myId;
+  const doneWrap = document.getElementById('card-done-wrap');
+  const rewardDisplay = document.getElementById('card-reward-display');
+  if (isPerformer && turn.choice === 'dare') {
+    doneWrap.style.display = 'block';
+    document.getElementById('card-done-btn').disabled = false;
+  } else {
+    doneWrap.style.display = 'none';
+  }
+  rewardDisplay.style.display = 'none';
+  document.getElementById('card-next-btn').disabled = false;
+}
+
+function completeDare() {
+  document.getElementById('card-done-btn').disabled = true;
+  socket.emit('complete-dare', { code: myRoom }, (res) => {
+    if (!res || !res.ok) {
+      document.getElementById('card-done-btn').disabled = false;
+      return;
+    }
+    document.getElementById('card-done-wrap').style.display = 'none';
+    const rewardDisplay = document.getElementById('card-reward-display');
+    rewardDisplay.style.display = 'block';
+    rewardDisplay.textContent = `+${res.xpEarned} XP  +${res.coinsEarned} 🪙`;
+    toast(`+${res.xpEarned} XP and +${res.coinsEarned} coins earned!`, 'success');
+  });
+}
+
+function nextTurn() {
+  myLevelChosen = false;
+  socket.emit('next-turn', { code: myRoom }, () => {});
+}
+
+// ─── HUD ──────────────────────────────────────────────────────────────────────
+function updateHud(player) {
+  document.getElementById('xp-hud').classList.add('visible');
+  document.getElementById('hud-xp').textContent = player.xp || 0;
+  document.getElementById('hud-coins').textContent = player.coins || 0;
+  document.getElementById('hud-level').textContent = player.currentLevel || 1;
+  // XP fill: progress toward next unlock = xp / (currentLevel+1)*6
+  const nextThreshold = ((player.currentLevel || 1) + 1) * 6;
+  const pct = Math.min(100, Math.round(((player.xp || 0) / nextThreshold) * 100));
+  document.getElementById('hud-xp-fill').style.width = pct + '%';
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = type === 'danger' ? '#ef4444' : type === 'success' ? '#4ade80' : 'rgba(255,255,255,0.12)';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "truth-or-dare-2",
+  "version": "1.0.0",
+  "description": "Advanced Truth or Dare 2.0 — erotic edition with kinksafe limits",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "qrcode": "^1.5.3"
+  }
+}
