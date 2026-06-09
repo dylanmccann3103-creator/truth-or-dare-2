@@ -766,9 +766,10 @@ input::placeholder { color: #7a6b8a; }
 
   <!-- Clothing -->
   <div class="w-full">
-    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(tap a preset or type your own)</span></div>
+    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(tap presets or type your own)</span></div>
     <div class="card" style="padding:16px">
       <div id="clothing-list"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addClothingItem()">+ Add item</button>
     </div>
   </div>
 
@@ -789,6 +790,7 @@ input::placeholder { color: #7a6b8a; }
     <div class="pill-row" id="setup-bodytype-row">
       <div class="pill-select" data-val="penis"      onclick="selectPill('bodyType','penis',this)">Penis</div>
       <div class="pill-select" data-val="vagina"     onclick="selectPill('bodyType','vagina',this)">Vagina</div>
+      <div class="pill-select" data-val="breasts"    onclick="selectPill('bodyType','breasts',this)">Breasts</div>
       <div class="pill-select" data-val="prefer-not" onclick="selectPill('bodyType','prefer-not',this)">Prefer not to say</div>
     </div>
   </div>
@@ -1344,7 +1346,7 @@ function updateConfigUI(state) {
 
 // ─── Setup Screen ─────────────────────────────────────────────────────────────
 function initSetupScreen() {
-  clothingItems = CLOTHING_SLOTS.map(s => ({ key: s.key, label: s.label, value: '' }));
+  clothingItems = [];
   renderClothingList();
   renderTagGrid('pref-tags',        myPrefs,      'pref');
   renderTagGrid('soft-limit-tags',  mySoftLimits, 'soft');
@@ -1354,11 +1356,8 @@ function initSetupScreen() {
 function renderClothingList() {
   const list = document.getElementById('clothing-list');
   list.innerHTML = '';
-  CLOTHING_SLOTS.forEach(slot => {
-    const item = clothingItems.find(c => c.key === slot.key);
-    const currentVal = item ? item.value : '';
-    const isPreset = slot.presets.includes(currentVal);
 
+  CLOTHING_SLOTS.forEach(slot => {
     const slotDiv = document.createElement('div');
     slotDiv.className = 'clothing-slot';
 
@@ -1370,36 +1369,86 @@ function renderClothingList() {
     const presetsDiv = document.createElement('div');
     presetsDiv.className = 'clothing-presets';
 
-    let otherInput; // defined below, referenced in closures
-
     slot.presets.forEach(preset => {
+      const itemKey = slot.key + '_' + preset.replace(/\s+/g, '_');
+      const isActive = clothingItems.some(c => c.key === itemKey);
       const btn = document.createElement('div');
-      btn.className = 'pill-select clothing-preset' + (currentVal === preset ? ' active' : '');
+      btn.className = 'pill-select clothing-preset' + (isActive ? ' active' : '');
       btn.textContent = preset;
       btn.onclick = () => {
-        const selecting = item.value !== preset;
-        item.value = selecting ? preset : '';
-        presetsDiv.querySelectorAll('.pill-select').forEach(b => b.classList.remove('active'));
-        if (selecting) { btn.classList.add('active'); otherInput.value = ''; }
+        const idx = clothingItems.findIndex(c => c.key === itemKey);
+        if (idx >= 0) { clothingItems.splice(idx, 1); btn.classList.remove('active'); }
+        else { clothingItems.push({ key: itemKey, label: slot.label, value: preset }); btn.classList.add('active'); }
       };
       presetsDiv.appendChild(btn);
     });
     slotDiv.appendChild(presetsDiv);
 
-    otherInput = document.createElement('input');
+    const otherKey = slot.key + '_other';
+    const otherItem = clothingItems.find(c => c.key === otherKey);
+    const otherInput = document.createElement('input');
     otherInput.type = 'text';
     otherInput.className = 'clothing-other-input';
     otherInput.placeholder = 'other...';
-    otherInput.value = isPreset ? '' : currentVal;
+    otherInput.value = otherItem ? otherItem.value : '';
     otherInput.oninput = (e) => {
-      item.value = e.target.value;
-      presetsDiv.querySelectorAll('.pill-select').forEach(b => b.classList.remove('active'));
+      const val = e.target.value;
+      const i2 = clothingItems.findIndex(c => c.key === otherKey);
+      if (val) {
+        if (i2 >= 0) clothingItems[i2].value = val;
+        else clothingItems.push({ key: otherKey, label: slot.label, value: val });
+      } else {
+        if (i2 >= 0) clothingItems.splice(i2, 1);
+      }
     };
     slotDiv.appendChild(otherInput);
-
     list.appendChild(slotDiv);
   });
+
+  // Extra items added via "+ Add item"
+  clothingItems.filter(c => c.key.startsWith('extra_')).forEach(item => {
+    const extraDiv = document.createElement('div');
+    extraDiv.className = 'clothing-slot';
+
+    const lbl2 = document.createElement('div');
+    lbl2.className = 'clothing-slot-label';
+    lbl2.textContent = '➕ Extra item';
+    extraDiv.appendChild(lbl2);
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'clothing-other-input';
+    input.style.flex = '1';
+    input.placeholder = 'describe it...';
+    input.value = item.value;
+    input.oninput = (e) => { item.value = e.target.value; };
+    row.appendChild(input);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn btn-secondary btn-sm';
+    removeBtn.style.flexShrink = '0';
+    removeBtn.textContent = '✕';
+    removeBtn.onclick = () => {
+      const idx = clothingItems.findIndex(c => c.key === item.key);
+      if (idx >= 0) clothingItems.splice(idx, 1);
+      renderClothingList();
+    };
+    row.appendChild(removeBtn);
+
+    extraDiv.appendChild(row);
+    list.appendChild(extraDiv);
+  });
 }
+
+function addClothingItem() {
+  clothingItems.push({ key: 'extra_' + Date.now(), label: '➕ Extra', value: '' });
+  renderClothingList();
+}
+
+function removeClothingItem() { renderClothingList(); }
 
 function renderTagGrid(containerId, selectedArr, type) {
   const container = document.getElementById(containerId);
