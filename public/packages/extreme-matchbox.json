@@ -19,9 +19,13 @@
     "text": { "en": "Upload a picture of your genitals to a porn site and leave it there until the end of the game.", "nl": "Upload een foto van je geslachtsdelen op een pornosite en laat het staan tot het einde van het spel." },
     "tags": ["extreme_exposure"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
-  { "id": "ext_006", "type": "dare", "level": 8, "difficulty": 2,
-    "text": { "en": "Insert an object that isn't a sex toy into your arsehole or vagina at least 5 times.", "nl": "Stop een object dat geen seksspeeltje is minstens 5 keer in je kont of vagina." },
-    "tags": ["explicit", "penetration_vagina", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+  { "id": "ext_006a", "type": "dare", "level": 8, "difficulty": 2,
+    "text": { "en": "Insert an object that isn't a sex toy into your vagina at least 5 times.", "nl": "Stop een object dat geen seksspeeltje is minstens 5 keer in je vagina." },
+    "tags": ["explicit", "penetration_vagina"], "genderRequired": null, "bodyTypeRelevant": true, "bodyTypeRequired": "vagina", "orientationMatters": false, "targetRequired": false },
+
+  { "id": "ext_006b", "type": "dare", "level": 8, "difficulty": 2,
+    "text": { "en": "Insert an object that isn't a sex toy into your arsehole at least 5 times.", "nl": "Stop een object dat geen seksspeeltje is minstens 5 keer in je kont." },
+    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_007", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Allow your partner to take a photo of you in nothing more than underwear and send it to a person of their choice.", "nl": "Laat je partner een foto van je nemen in enkel je ondergoed en het sturen naar een persoon naar keuze." },
@@ -103,9 +107,13 @@
     "text": { "en": "Describe in detail the first time you had sex — at least 2 minutes, whispered in your partner's ear using that person's name — while re-enacting it on your partner.", "nl": "Beschrijf de eerste keer dat je seks had — minimaal 2 minuten, gefluisterd in het oor van je partner met die persoon's naam — en speel het tegelijkertijd na op je partner." },
     "tags": ["intimate", "explicit"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
-  { "id": "ext_027", "type": "dare", "level": 10, "difficulty": 3,
-    "text": { "en": "Allow your partner to give you a handjob or finger you on a cam-sharing website for 5 minutes.", "nl": "Laat je partner je een handjob geven of je vingeren op een adult cam-website gedurende 5 minuten." },
-    "tags": ["extreme_exposure", "explicit", "penetration_vagina", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+  { "id": "ext_027a", "type": "dare", "level": 10, "difficulty": 3,
+    "text": { "en": "Allow your partner to give you a handjob on a cam-sharing website for 5 minutes.", "nl": "Laat je partner je een handjob geven op een adult cam-website gedurende 5 minuten." },
+    "tags": ["extreme_exposure", "explicit"], "genderRequired": null, "bodyTypeRelevant": true, "bodyTypeRequired": "penis", "orientationMatters": false, "targetRequired": true },
+
+  { "id": "ext_027b", "type": "dare", "level": 10, "difficulty": 3,
+    "text": { "en": "Allow your partner to finger you on a cam-sharing website for 5 minutes.", "nl": "Laat je partner je vingeren op een adult cam-website gedurende 5 minuten." },
+    "tags": ["extreme_exposure", "explicit", "penetration_vagina"], "genderRequired": null, "bodyTypeRelevant": true, "bodyTypeRequired": "vagina", "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_028", "type": "dare", "level": 8, "difficulty": 1,
     "text": { "en": "Give your partner a foot job.", "nl": "Geef je partner een voetjob." },
