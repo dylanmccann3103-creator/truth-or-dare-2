@@ -725,6 +725,18 @@ input::placeholder { color: #7a6b8a; }
   <button class="btn btn-secondary" onclick="showScreen('screen-join')">📱 Join a Game</button>
   <div class="gap-sm"></div>
   <a href="/editor" target="_blank" style="font-size:0.82rem;color:#9b89b4;text-decoration:underline">🃏 Card Editor</a>
+
+  <!-- Rejoin banner — only visible when a saved session exists -->
+  <div id="rejoin-banner" style="display:none;width:100%;max-width:400px;margin-top:24px">
+    <div class="card" style="text-align:center;border:1px solid var(--accent);padding:16px 20px">
+      <div style="font-size:1.5rem">🔄</div>
+      <div style="font-weight:700;margin:6px 0 4px" id="rejoin-label">Continue in room …</div>
+      <div style="font-size:0.8rem;color:#9b89b4;margin-bottom:12px" id="rejoin-sublabel">You were disconnected</div>
+      <button class="btn btn-primary" style="margin-bottom:8px" onclick="doRejoin()">Rejoin</button>
+      <button class="btn btn-secondary" style="font-size:0.8rem;padding:6px 14px" onclick="clearRejoin()">Dismiss</button>
+    </div>
+  </div>
+
   <div id="landing-packages" style="width:100%;max-width:400px;margin-top:20px"></div>
 </div>
 
@@ -1352,6 +1364,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initSetupScreen();
   renderLandingPackages();
   connectSocket();
+  checkRejoinBanner();
   const params = new URLSearchParams(location.search);
   const roomParam = params.get('room');
   if (roomParam) {
@@ -1360,16 +1373,72 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ─── Rejoin ───────────────────────────────────────────────────────────────────
+function checkRejoinBanner() {
+  const raw = localStorage.getItem('tod2_session');
+  if (!raw) return;
+  try {
+    const { code, name } = JSON.parse(raw);
+    if (!code || !name) return;
+    document.getElementById('rejoin-label').textContent = `Continue in room ${code}`;
+    document.getElementById('rejoin-sublabel').textContent = `Playing as ${name}`;
+    document.getElementById('rejoin-banner').style.display = 'block';
+  } catch (_) { localStorage.removeItem('tod2_session'); }
+}
+
+function doRejoin() {
+  const raw = localStorage.getItem('tod2_session');
+  if (!raw) return;
+  let session;
+  try { session = JSON.parse(raw); } catch (_) { return; }
+  const { code, token } = session;
+  if (!code || !token) return;
+
+  socket.emit('rejoin-room', { code, token }, (res) => {
+    if (!res.ok) {
+      toast(res.error || 'Could not rejoin', 'danger');
+      clearRejoin();
+      return;
+    }
+    myRoom = code;
+    amHost = false;
+    document.getElementById('rejoin-banner').style.display = 'none';
+    toast(`Welcome back, ${res.name}!`, 'success');
+    // handleRoomState will fire automatically via 'room-state' broadcast
+  });
+}
+
+function clearRejoin() {
+  localStorage.removeItem('tod2_session');
+  document.getElementById('rejoin-banner').style.display = 'none';
+}
+
 // ─── Socket Setup ─────────────────────────────────────────────────────────────
 function connectSocket() {
   socket = io();
-  socket.on('connect', () => { myId = socket.id; });
+  socket.on('connect', () => {
+    myId = socket.id;
+    // Auto-rejoin if we have a saved session and were in a room
+    if (myRoom) {
+      const raw = localStorage.getItem('tod2_session');
+      if (raw) {
+        try {
+          const { code, token } = JSON.parse(raw);
+          if (code === myRoom && token) {
+            socket.emit('rejoin-room', { code, token }, (res) => {
+              if (res.ok) toast(`Reconnected as ${res.name}`, 'success');
+            });
+          }
+        } catch (_) {}
+      }
+    }
+  });
   socket.on('room-state', (state) => {
     roomState = state;
     handleRoomState(state);
   });
   socket.on('toast', ({ msg }) => toast(msg, 'info'));
-  socket.on('disconnect', () => toast('Disconnected from server', 'danger'));
+  socket.on('disconnect', () => toast('Connection lost — reconnecting…', 'danger'));
 }
 
 // ─── Pill selector (gender / orientation — single select) ─────────────────────
@@ -1423,7 +1492,7 @@ function cardText(card) {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 'screen-landing') renderLandingPackages();
+  if (id === 'screen-landing') { renderLandingPackages(); checkRejoinBanner(); }
 }
 
 // ─── Room Actions ─────────────────────────────────────────────────────────────
@@ -1758,6 +1827,9 @@ function submitSetup() {
     language:            myLanguage,
   }, (res) => {
     if (!res.ok) return toast(res.error || 'Error', 'danger');
+    if (res.token) {
+      localStorage.setItem('tod2_session', JSON.stringify({ code: myRoom, token: res.token, name }));
+    }
     showLobby();
   });
 }
@@ -1860,6 +1932,7 @@ function handleRoomState(state) {
   }
 
   if (state.phase === 'ended') {
+    localStorage.removeItem('tod2_session'); // game over — no rejoin needed
     buildEndScreen(state);
     showScreen('screen-ended');
     document.getElementById('xp-hud').classList.remove('visible');

@@ -85,6 +85,10 @@ function createRoom(hostId, hostMode = 'display') {
 
 function getRoom(code) { return rooms[code]; }
 
+function generateToken() {
+  return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+}
+
 // ─── Progression helpers ──────────────────────────────────────────────────────
 
 function canAccessLevel(player, level, room) {
@@ -109,7 +113,7 @@ function maxUnlockedLevel(player, room) {
 // ─── Game helpers ─────────────────────────────────────────────────────────────
 
 function pickTarget(room, performerId, excludeId = null) {
-  let others = room.turnOrder.filter(id => id !== performerId && room.players[id]);
+  let others = room.turnOrder.filter(id => id !== performerId && room.players[id] && room.players[id].connected !== false);
   if (excludeId) others = others.filter(id => id !== excludeId);
   if (others.length === 0) return (excludeId ? null : performerId);
 
@@ -142,9 +146,12 @@ function advanceTurn(room) {
   setTimeout(() => {
     if (!rooms[room.code] || room.phase !== 'game') return;
     if (room.turnOrder.length === 0) return;
+    // Safety: if all players are disconnected, wait — don't spin forever
+    const connectedPlayers = room.turnOrder.filter(id => room.players[id] && room.players[id].connected !== false);
+    if (connectedPlayers.length === 0) return;
     const performerId = room.turnOrder[room.currentTurnIndex % room.turnOrder.length];
-    if (!room.players[performerId]) {
-      // Player gone — skip ahead
+    if (!room.players[performerId] || room.players[performerId].connected === false) {
+      // Player gone or disconnected — skip ahead
       advanceTurn(room);
       return;
     }
@@ -202,6 +209,7 @@ function roomPublicState(room) {
       genitals: p.genitals || [],
       orientation: p.orientation,
       availableForAllCombos: p.availableForAllCombos,
+      connected: p.connected !== false,
       // limits: NEVER sent
     };
   }
@@ -254,9 +262,11 @@ io.on('connection', (socket) => {
   socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft, gender, genitals, orientation, availableForAllCombos, language }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
+    const token = generateToken();
     const emojiIdx = Object.keys(room.players).length % EMOJIS.length;
     room.players[socket.id] = {
       id: socket.id,
+      token,
       name,
       emoji: EMOJIS[emojiIdx],
       clothingItems: clothing,
@@ -278,9 +288,10 @@ io.on('connection', (socket) => {
       orientation: orientation || 'bi',
       availableForAllCombos: availableForAllCombos || false,
       language: language || 'nl',
+      connected: true,
     };
     socket.data.roomCode = code;
-    cb({ ok: true });
+    cb({ ok: true, token });
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
@@ -889,14 +900,24 @@ io.on('connection', (socket) => {
     const room = getRoom(code);
     if (!room) return;
 
+    const player = room.players[socket.id];
     const wasPerformer = room.phase === 'game' && room.currentTurn?.performerId === socket.id;
 
-    if (room.players[socket.id]) {
-      delete room.players[socket.id];
-      room.turnOrder = room.turnOrder.filter(id => id !== socket.id);
+    if (player) {
+      if (room.phase === 'game') {
+        // In-game: keep player state for potential rejoin, just mark disconnected
+        player.connected = false;
+        console.log(`[disconnect] ${socket.id} (${player.name}) marked disconnected in ${code}`);
+      } else {
+        // In lobby: remove entirely (no game state to preserve)
+        delete room.players[socket.id];
+        room.turnOrder = room.turnOrder.filter(id => id !== socket.id);
+        console.log(`[disconnect] ${socket.id} removed from lobby ${code}`);
+      }
     }
 
-    if (Object.keys(room.players).length === 0) {
+    const activePlayers = Object.values(room.players).filter(p => p.connected !== false);
+    if (activePlayers.length === 0 && room.phase !== 'game') {
       delete rooms[code];
       console.log(`[room] ${code} closed (empty)`);
       return;
@@ -904,16 +925,56 @@ io.on('connection', (socket) => {
 
     // Reassign host if player-host disconnected (not display host)
     if (room.host === socket.id && room.hostMode !== 'display') {
-      room.host = Object.keys(room.players)[0] || socket.id;
+      const nextHost = Object.keys(room.players).find(id => room.players[id].connected !== false);
+      if (nextHost) room.host = nextHost;
     }
 
-    if (wasPerformer && room.phase === 'game' && room.turnOrder.length > 0) {
+    if (wasPerformer && room.phase === 'game') {
       advanceTurn(room); // skip disconnected performer's turn
     } else {
       io.to(code).emit('room-state', roomPublicState(room));
     }
+  });
 
-    console.log(`[disconnect] ${socket.id} from ${code}`);
+  // Rejoin a room using a saved token
+  socket.on('rejoin-room', ({ code, token }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb({ ok: false, error: 'Room not found' });
+
+    // Find the player by token
+    const oldId = Object.keys(room.players).find(id => room.players[id].token === token);
+    if (!oldId) return cb({ ok: false, error: 'Session not found — game may have ended' });
+
+    const player = room.players[oldId];
+
+    if (oldId !== socket.id) {
+      // Re-key the player entry under the new socket id
+      room.players[socket.id] = { ...player, id: socket.id, connected: true };
+      delete room.players[oldId];
+
+      // Update turnOrder reference
+      const idx = room.turnOrder.indexOf(oldId);
+      if (idx !== -1) room.turnOrder[idx] = socket.id;
+
+      // Update currentTurn references
+      if (room.currentTurn) {
+        if (room.currentTurn.performerId === oldId) room.currentTurn.performerId = socket.id;
+        if (room.currentTurn.targetId    === oldId) room.currentTurn.targetId    = socket.id;
+      }
+
+      // Update host reference if this was the host
+      if (room.host === oldId) room.host = socket.id;
+    } else {
+      // Same socket reconnecting (unlikely but safe)
+      player.connected = true;
+    }
+
+    socket.join(code);
+    socket.data.roomCode = code;
+
+    console.log(`[rejoin] ${socket.id} rejoined ${code} as ${player.name}`);
+    cb({ ok: true, name: room.players[socket.id].name });
+    io.to(code).emit('room-state', roomPublicState(room));
   });
 });
 
