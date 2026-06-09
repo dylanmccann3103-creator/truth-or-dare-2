@@ -22,6 +22,7 @@ body {
   --accent2: #7c3aed;
   --gold: #f59e0b;
   --danger: #ef4444;
+  --soft: #f59e0b;
   --truth-color: #3b82f6;
   --dare-color: #ec4899;
   --glass: rgba(255,255,255,0.05);
@@ -104,6 +105,16 @@ p, label { font-size: 0.95rem; line-height: 1.5; color: #c4b8d8; }
   color: #0d0d14;
   box-shadow: 0 4px 20px rgba(245,158,11,0.35);
 }
+.btn-soft {
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #fcd34d;
+}
+.btn-danger {
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #f87171;
+}
 .btn-sm { padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; max-width: none; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
@@ -142,6 +153,11 @@ input::placeholder { color: #7a6b8a; }
   background: rgba(124,58,237,0.25);
   border-color: var(--accent2);
   color: #fff;
+}
+.tag-pill.selected-soft {
+  background: rgba(245,158,11,0.2);
+  border-color: var(--gold);
+  color: #fcd34d;
 }
 .tag-pill.selected-limit {
   background: rgba(239,68,68,0.2);
@@ -197,8 +213,29 @@ input::placeholder { color: #7a6b8a; }
 }
 .qr-box img { display: block; width: 180px; height: 180px; }
 
+/* ─── Game config toggles ──────────────────────────────────────────── */
+.config-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 6px;
+}
+.config-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  color: #c4b8d8;
+  transition: all 0.15s;
+}
+.config-btn.active {
+  background: rgba(192,38,211,0.25);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 /* ─── Bottle Spin ──────────────────────────────────────────────────── */
-#spin-screen {
+#screen-spin {
   background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d14 70%);
 }
 .spin-table {
@@ -234,7 +271,6 @@ input::placeholder { color: #7a6b8a; }
 }
 .player-avatar.highlighted .av-name { color: #fff; }
 
-/* The bottle SVG wrapper */
 #bottle-wrap {
   position: absolute;
   left: 50%; top: 50%;
@@ -264,9 +300,8 @@ input::placeholder { color: #7a6b8a; }
   border: 2px solid #3b82f666;
 }
 .card-reveal.dare-card {
-  background: linear-gradient(135deg, #831843,22, #9d174d22);
-  border: 2px solid #ec489966;
   background: linear-gradient(135deg, rgba(131,24,67,0.15), rgba(157,23,77,0.15));
+  border: 2px solid #ec489966;
 }
 .card-type-label {
   font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em;
@@ -292,6 +327,38 @@ input::placeholder { color: #7a6b8a; }
   color: rgba(255,255,255,0.6);
 }
 
+/* ─── Display screen ───────────────────────────────────────────────── */
+#screen-display {
+  background: radial-gradient(ellipse at center, #0d0a20 0%, #0d0d14 70%);
+  justify-content: center;
+  gap: 20px;
+}
+.display-card-text {
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+  text-align: center;
+}
+
+/* ─── End screen ───────────────────────────────────────────────────── */
+.leaderboard-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.lb-rank { font-size: 1.3rem; min-width: 32px; text-align: center; }
+.lb-emoji { font-size: 1.6rem; }
+.lb-name { flex: 1; font-weight: 700; }
+.lb-stats { font-size: 0.82rem; color: #9b89b4; text-align: right; }
+.lb-xp { font-size: 1rem; font-weight: 800; color: #c4b8d8; min-width: 60px; text-align: right; }
+.lb-first { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.1); }
+.lb-second { border-color: rgba(192,192,192,0.4); }
+.lb-third { border-color: rgba(205,127,50,0.4); }
+
 /* ─── Misc helpers ─────────────────────────────────────────────────── */
 .spacer { flex: 1; }
 .gap-sm { height: 8px; }
@@ -314,11 +381,6 @@ input::placeholder { color: #7a6b8a; }
   border: none; border-top: 1px solid var(--glass-border);
   margin: 16px 0;
 }
-.star-bg {
-  position: fixed; inset: 0; z-index: -1;
-  background: #0d0d14;
-  overflow: hidden;
-}
 .pulse-ring {
   position: absolute; top: 50%; left: 50%;
   width: 300px; height: 300px;
@@ -326,6 +388,8 @@ input::placeholder { color: #7a6b8a; }
   border-radius: 50%;
   background: radial-gradient(circle, rgba(192,38,211,0.08) 0%, transparent 70%);
   animation: pulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
 }
 @keyframes pulse {
   0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
@@ -374,9 +438,7 @@ input::placeholder { color: #7a6b8a; }
   border-color: var(--accent);
   background: rgba(192,38,211,0.15);
 }
-.level-btn:disabled {
-  opacity: 0.3; cursor: not-allowed;
-}
+.level-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .level-btn .lvl-num { font-size: 1.4rem; line-height: 1; }
 .level-btn .lvl-lock { font-size: 0.7rem; }
 .level-btn.unlocked { border-color: rgba(124,58,237,0.4); }
@@ -409,6 +471,15 @@ input::placeholder { color: #7a6b8a; }
   border-radius: 3px;
   transition: width 0.5s ease;
 }
+.hud-slots {
+  display: flex; gap: 3px; align-items: center;
+}
+.slot-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.2s;
+}
+.slot-dot.used { background: #ef4444; }
 
 /* ─── Scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
@@ -424,7 +495,6 @@ input::placeholder { color: #7a6b8a; }
   padding: 32px 24px; text-align: center;
   gap: 16px;
 }
-#age-gate h1 { font-size: 3rem; }
 #age-gate h2 { font-size: 1.5rem; color: #c4b8d8; }
 #age-gate p { max-width: 360px; color: #7a6b8a; }
 </style>
@@ -438,6 +508,7 @@ input::placeholder { color: #7a6b8a; }
   </div>
   <div class="hud-item">🪙 <span id="hud-coins">0</span></div>
   <div class="hud-item">Lvl <span id="hud-level">1</span></div>
+  <div class="hud-item">🅿️ <div class="hud-slots" id="hud-slots"></div></div>
 </div>
 
 <!-- Age Gate -->
@@ -468,17 +539,33 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
-     SCREEN 2: Host — Create room
+     SCREEN 2: Host — Choose mode, then create room
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-host" class="screen">
   <div class="gap-lg"></div>
   <h2>Host a Game</h2>
-  <div class="gap"></div>
-  <p class="text-center" style="max-width:340px;margin:0 auto;color:#9b89b4">
-    A room code and QR code will be generated. Share it so others can join from their phones.
-  </p>
   <div class="gap-lg"></div>
-  <button class="btn btn-primary" onclick="createRoom()">✨ Create Room</button>
+
+  <div class="card" style="text-align:center">
+    <div style="font-size:2rem;">🖥️</div>
+    <div class="gap-sm"></div>
+    <h3>Display Host</h3>
+    <p style="font-size:0.85rem;color:#9b89b4;margin:8px 0">Run the game on a TV or big screen. You manage the game — players join from their phones.</p>
+    <div class="gap"></div>
+    <button class="btn btn-primary btn-sm" style="max-width:none" onclick="createRoom('display')">🖥️ Host on Display</button>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="card" style="text-align:center">
+    <div style="font-size:2rem;">🎮</div>
+    <div class="gap-sm"></div>
+    <h3>Play as Host</h3>
+    <p style="font-size:0.85rem;color:#9b89b4;margin:8px 0">You play along with the group. Host privileges + your own turn order.</p>
+    <div class="gap"></div>
+    <button class="btn btn-secondary btn-sm" style="max-width:none" onclick="createRoom('player')">🎮 Play as Host</button>
+  </div>
+
   <div class="gap-sm"></div>
   <button class="btn btn-secondary" onclick="showScreen('screen-landing')">← Back</button>
 </div>
@@ -503,7 +590,7 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
-     SCREEN 4: Player Setup — Name, Clothing, Prefs, Limits
+     SCREEN 4: Player Setup — Name, Clothing, Prefs, Soft Limits, Limits
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-setup" class="screen">
   <div class="gap-lg"></div>
@@ -529,14 +616,21 @@ input::placeholder { color: #7a6b8a; }
   <!-- Preferences -->
   <div class="w-full">
     <div class="section-label">Your Preferences <span style="font-weight:400;color:#7a6b8a">(what you enjoy)</span></div>
-    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to select. These help match you to better truths & dares.</p>
+    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to select — better card matching.</p>
     <div class="tag-grid" id="pref-tags"></div>
   </div>
 
-  <!-- Limits -->
+  <!-- Soft Limits -->
   <div class="w-full">
-    <div class="section-label" style="color:#f87171">🔒 Your Limits <span style="font-weight:400;color:#7a6b8a">(what to skip — private)</span></div>
-    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to mark as off-limits. No one else can see this.</p>
+    <div class="section-label" style="color:#fcd34d">⚠️ Soft Limits <span style="font-weight:400;color:#7a6b8a">(borderline — you'll get a respin option)</span></div>
+    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Cards matching these show a "Respin ↑" button — you can skip or do it.</p>
+    <div class="tag-grid" id="soft-limit-tags"></div>
+  </div>
+
+  <!-- Hard Limits -->
+  <div class="w-full">
+    <div class="section-label" style="color:#f87171">🔒 Hard Limits <span style="font-weight:400;color:#7a6b8a">(never shown — private)</span></div>
+    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">These are completely blocked. No one else can see this.</p>
     <div class="tag-grid" id="limit-tags"></div>
   </div>
 
@@ -546,7 +640,7 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
-     SCREEN 5: Lobby — Waiting for players
+     SCREEN 5: Lobby — Waiting for players + game config
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-lobby" class="screen">
   <div class="gap-lg"></div>
@@ -558,8 +652,34 @@ input::placeholder { color: #7a6b8a; }
       <div class="qr-box">
         <img id="qr-img" src="" alt="QR Code"/>
       </div>
-      <div class="text-muted" style="font-size:0.75rem" id="lobby-url"></div>
-      <div id="lobby-url-copy" class="text-muted" style="font-size:0.75rem;margin-top:4px;word-break:break-all"></div>
+      <div class="text-muted" style="font-size:0.75rem;word-break:break-all" id="lobby-url"></div>
+    </div>
+    <div class="gap"></div>
+
+    <!-- Game Config (host only) -->
+    <div class="card">
+      <div class="section-label" style="margin-top:0">⚙️ Game Settings</div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin-bottom:4px">Targeting</div>
+      <div class="config-row" id="config-targeting">
+        <button class="config-btn" data-key="targetingMode" data-val="self" onclick="setGameConfig('targetingMode','self')">Self</button>
+        <button class="config-btn active" data-key="targetingMode" data-val="50-50" onclick="setGameConfig('targetingMode','50-50')">50-50</button>
+        <button class="config-btn" data-key="targetingMode" data-val="random" onclick="setGameConfig('targetingMode','random')">Random</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Roulette</div>
+      <div class="config-row" id="config-roulette">
+        <button class="config-btn active" data-key="rouletteMode" data-val="off" onclick="setGameConfig('rouletteMode','off')">Off</button>
+        <button class="config-btn" data-key="rouletteMode" data-val="plus1" onclick="setGameConfig('rouletteMode','plus1')">+1 Level</button>
+        <button class="config-btn" data-key="rouletteMode" data-val="block" onclick="setGameConfig('rouletteMode','block')">Block</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Economy</div>
+      <div class="config-row" id="config-economy">
+        <button class="config-btn active" data-key="economyMode" data-val="schaars" onclick="setGameConfig('economyMode','schaars')">Scarce</button>
+        <button class="config-btn" data-key="economyMode" data-val="gemiddeld" onclick="setGameConfig('economyMode','gemiddeld')">Medium</button>
+        <button class="config-btn" data-key="economyMode" data-val="overvloedig" onclick="setGameConfig('economyMode','overvloedig')">Generous</button>
+      </div>
     </div>
     <div class="gap"></div>
   </div>
@@ -568,6 +688,12 @@ input::placeholder { color: #7a6b8a; }
     <div class="card" style="text-align:center;padding:16px">
       <div class="text-muted">Joined Room</div>
       <div class="room-code-display" id="lobby-code-join">????</div>
+    </div>
+    <div class="gap"></div>
+    <!-- Read-only config display for non-host -->
+    <div class="card" id="lobby-config-readonly" style="display:none">
+      <div class="section-label" style="margin-top:0">⚙️ Game Settings</div>
+      <div id="lobby-config-labels" style="font-size:0.85rem;color:#9b89b4;line-height:2"></div>
     </div>
     <div class="gap"></div>
   </div>
@@ -583,55 +709,49 @@ input::placeholder { color: #7a6b8a; }
   </div>
   <div id="lobby-start-btn-wrap" class="w-full" style="display:none">
     <button class="btn btn-primary" id="lobby-start-btn" onclick="startGame()" disabled>Start Game →</button>
-    <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 ready players</p>
+    <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 players</p>
   </div>
   <div class="gap"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
-     SCREEN 6: Spin — Bottle spin animation
+     SCREEN 6: Spin — Bottle spin animation (auto, no button)
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-spin" class="screen" style="justify-content:center; gap:24px;">
-  <h3 id="spin-status" class="gradient-text text-center">Spin the bottle...</h3>
+  <h3 id="spin-status" class="gradient-text text-center">Choosing next player...</h3>
 
   <div class="spin-table" id="spin-table">
     <div class="spin-circle"></div>
-    <!-- player avatars injected by JS -->
     <div id="bottle-wrap">
       <svg viewBox="0 0 60 140" xmlns="http://www.w3.org/2000/svg">
-        <!-- Bottle cap -->
         <rect x="22" y="0" width="16" height="12" rx="3" fill="#c026d3"/>
-        <!-- Bottle neck -->
         <rect x="24" y="12" width="12" height="28" rx="2" fill="#7c3aed"/>
-        <!-- Bottle body -->
         <ellipse cx="30" cy="90" rx="22" ry="38" fill="#7c3aed"/>
         <ellipse cx="30" cy="90" rx="16" ry="30" fill="#9333ea" opacity="0.5"/>
-        <!-- Shine -->
         <ellipse cx="22" cy="75" rx="5" ry="14" fill="white" opacity="0.18" transform="rotate(-10 22 75)"/>
       </svg>
     </div>
-  </div>
-
-  <div id="spin-btn-wrap">
-    <button class="btn btn-gold" id="spin-btn" onclick="requestSpin()" style="max-width:300px">🍾 Spin the Bottle</button>
-  </div>
-
-  <div id="spin-result-wrap" style="display:none; text-align:center">
-    <div id="spin-result-name" style="font-size:1.5rem; font-weight:800; color:#fff;"></div>
-    <div class="text-muted" style="margin-top:4px">It's your turn!</div>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
      SCREEN 7: Level Picker
 ═══════════════════════════════════════════════════════════════════ -->
-<div id="screen-level" class="screen" style="justify-content:center; gap:20px;">
+<div id="screen-level" class="screen" style="justify-content:center; gap:20px; position:relative;">
   <div class="pulse-ring"></div>
   <div style="text-align:center">
     <div id="level-player-emoji" style="font-size:3rem"></div>
     <div class="gap-sm"></div>
     <h2 id="level-player-name"></h2>
     <p class="text-muted">Choose your level for this turn.</p>
+  </div>
+
+  <!-- Parked dare replay (shows if player has parked dares) -->
+  <div id="parked-dare-section" class="w-full" style="display:none">
+    <div class="section-label" style="margin-top:0;color:#fcd34d">🅿️ Parked Dares — Replay now?</div>
+    <div id="parked-dare-list"></div>
+    <div class="gap-sm"></div>
+    <p class="text-muted" style="font-size:0.78rem">Or pick a level below for a new dare.</p>
   </div>
 
   <div class="level-grid" id="level-grid"></div>
@@ -644,7 +764,7 @@ input::placeholder { color: #7a6b8a; }
 <!-- ══════════════════════════════════════════════════════════════════
      SCREEN 8: Choose — Truth or Dare
 ═══════════════════════════════════════════════════════════════════ -->
-<div id="screen-choose" class="screen" style="justify-content:center;">
+<div id="screen-choose" class="screen" style="justify-content:center; position:relative;">
   <div class="pulse-ring"></div>
 
   <div id="choose-target-info" style="text-align:center; margin-bottom:24px">
@@ -670,9 +790,9 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
-     SCREEN 8: Card — Show the truth/dare
+     SCREEN 9: Card — Action view (performer only)
 ═══════════════════════════════════════════════════════════════════ -->
-<div id="screen-card" class="screen" style="justify-content:center; gap:20px;">
+<div id="screen-card" class="screen" style="justify-content:center; gap:16px;">
 
   <div style="text-align:center">
     <div id="card-player-emoji" style="font-size:2.5rem"></div>
@@ -681,25 +801,103 @@ input::placeholder { color: #7a6b8a; }
     <div class="text-muted" style="font-size:0.82rem" id="card-player-sub"></div>
   </div>
 
+  <!-- Roulette upgrade notice -->
+  <div id="card-roulette-notice" style="display:none;text-align:center;font-size:0.82rem;color:#fcd34d;font-weight:700">
+    🎲 Roulette bump! Playing a level higher.
+  </div>
+
   <div id="card-reveal" class="card-reveal">
     <div class="card-type-label" id="card-type-label"></div>
     <div class="card-text" id="card-text"></div>
     <div class="card-tags" id="card-tags-display"></div>
   </div>
 
-  <!-- Clothing reference (for clothing-tagged dares) -->
+  <!-- Clothing reference -->
   <div id="card-clothing-ref" class="card" style="display:none; max-width:480px">
     <div class="section-label" style="margin-top:0">🧥 Their Wardrobe</div>
     <div id="card-clothing-list" style="font-size:0.9rem; color:#c4b8d8; line-height:1.8"></div>
   </div>
 
-  <div class="gap"></div>
-  <div id="card-done-wrap" class="w-full" style="display:none">
+  <!-- Action buttons (performer only) -->
+  <div id="card-action-wrap" class="w-full" style="display:none">
     <button class="btn btn-gold" onclick="completeDare()" id="card-done-btn">✓ Done — I completed it</button>
-    <p class="text-muted text-center" style="margin-top:6px;font-size:0.78rem">Tap when you finish the dare to claim your XP &amp; coins.</p>
+
+    <!-- Respin: only visible when softFlagged -->
+    <div id="card-respin-wrap" style="display:none;margin-top:8px">
+      <button class="btn btn-soft" onclick="respinCard()" id="card-respin-btn">↑ Respin — too spicy for me</button>
+      <p class="text-muted text-center" style="font-size:0.75rem;margin-top:4px">Draws a card at the next level up.</p>
+    </div>
+
+    <!-- Park (break slot) -->
+    <div style="margin-top:8px" id="card-park-wrap">
+      <button class="btn btn-secondary" onclick="useBreakSlot()" id="card-park-btn">🅿️ Park it <span id="card-park-slots"></span></button>
+      <p class="text-muted text-center" style="font-size:0.75rem;margin-top:4px">Save for a later turn. You have a limited number of slots.</p>
+    </div>
+
+    <p class="text-muted text-center" style="margin-top:8px;font-size:0.78rem">Tap Done when you finish the dare.</p>
   </div>
-  <button class="btn btn-primary" onclick="nextTurn()" id="card-next-btn">Next Round →</button>
+
+  <!-- End game button (host only) -->
+  <div id="card-end-game-wrap" style="display:none;width:100%;max-width:480px">
+    <button class="btn btn-danger btn-sm" onclick="endGame()">🏁 End Game</button>
+  </div>
+
   <div id="card-reward-display" style="display:none;text-align:center;font-size:0.88rem;color:#4ade80;font-weight:700"></div>
+  <div class="gap"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 10: Display — Passive view (non-active players + display host)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-display" class="screen">
+  <div class="gap-lg"></div>
+
+  <!-- Waiting sub-view (choosing phase) -->
+  <div id="display-waiting" style="text-align:center;width:100%;max-width:480px">
+    <div id="display-player-emoji" style="font-size:4rem"></div>
+    <div class="gap"></div>
+    <h2 id="display-player-name"></h2>
+    <p class="text-muted" id="display-status-text">is choosing their level...</p>
+  </div>
+
+  <!-- Card sub-view (showing phase) -->
+  <div id="display-card-view" style="display:none;width:100%;max-width:480px">
+    <div style="text-align:center;margin-bottom:16px">
+      <span id="display-card-performer-emoji" style="font-size:2rem"></span>
+      <span id="display-card-performer-name" style="font-weight:700;margin-left:8px"></span>
+      <span id="display-card-type-label" style="margin-left:8px;font-size:0.8rem;opacity:0.7"></span>
+    </div>
+    <div class="card-reveal" id="display-card-reveal">
+      <div class="card-text" id="display-card-text"></div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- End game / Next turn controls (host only in display mode) -->
+  <div id="display-host-controls" style="display:none;width:100%;max-width:480px">
+    <button class="btn btn-secondary btn-sm" style="margin-bottom:8px" onclick="forceNextTurn()">⏭ Skip Turn (emergency)</button>
+    <button class="btn btn-danger btn-sm" onclick="endGame()">🏁 End Game</button>
+  </div>
+  <div class="gap"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 11: End — Leaderboard + Play Again
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-ended" class="screen">
+  <div class="gap-lg"></div>
+  <h2 class="gradient-text text-center">Game Over! 🏆</h2>
+  <div class="gap-sm"></div>
+  <p class="text-muted text-center">Final scores:</p>
+  <div class="gap-lg"></div>
+
+  <div id="ended-leaderboard" class="w-full"></div>
+
+  <div class="gap-lg"></div>
+  <div id="ended-restart-wrap" class="w-full" style="display:none">
+    <button class="btn btn-primary" onclick="playAgain()">🔄 Play Again</button>
+  </div>
   <div class="gap"></div>
 </div>
 
@@ -719,24 +917,24 @@ let socket = null;
 let myId = null;
 let myRoom = null;
 let amHost = false;
+let myHostMode = 'display';   // 'display' | 'player'
 let roomState = null;
 let myPrefs = [];
+let mySoftLimits = [];
 let myLimits = [];
-let clothingItems = [];  // { label, value }
-let bottleSpinning = false;
+let clothingItems = [];
 let myReady = false;
-let myLevelChosen = false;  // tracks if current player picked level this turn
+let myLevelChosen = false;
 
-// Pre-built clothing slots
 const DEFAULT_SLOTS = [
-  { label: 'Head', placeholder: 'hat, glasses...' },
-  { label: 'Neck', placeholder: 'necklace, scarf...' },
-  { label: 'Top', placeholder: 'shirt, bra, hoodie...' },
-  { label: 'Bottom', placeholder: 'jeans, skirt...' },
-  { label: 'Underwear', placeholder: 'boxers, briefs...' },
-  { label: 'Left sock', placeholder: 'ankle sock, bare...' },
+  { label: 'Head',       placeholder: 'hat, glasses...' },
+  { label: 'Neck',       placeholder: 'necklace, scarf...' },
+  { label: 'Top',        placeholder: 'shirt, bra, hoodie...' },
+  { label: 'Bottom',     placeholder: 'jeans, skirt...' },
+  { label: 'Underwear',  placeholder: 'boxers, briefs...' },
+  { label: 'Left sock',  placeholder: 'ankle sock, bare...' },
   { label: 'Right sock', placeholder: 'ankle sock, bare...' },
-  { label: 'Left shoe', placeholder: 'sneaker, bare...' },
+  { label: 'Left shoe',  placeholder: 'sneaker, bare...' },
   { label: 'Right shoe', placeholder: 'sneaker, bare...' },
 ];
 
@@ -751,7 +949,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   initSetupScreen();
   connectSocket();
-  // Auto-join if URL has ?room=CODE
   const params = new URLSearchParams(location.search);
   const roomParam = params.get('room');
   if (roomParam) {
@@ -778,12 +975,18 @@ function showScreen(id) {
 }
 
 // ─── Room Actions ─────────────────────────────────────────────────────────────
-function createRoom() {
-  socket.emit('create-room', (res) => {
+function createRoom(hostMode) {
+  myHostMode = hostMode;
+  socket.emit('create-room', { hostMode }, (res) => {
     if (!res.ok) return toast(res.error, 'danger');
     myRoom = res.code;
     amHost = true;
-    showScreen('screen-setup');
+    if (hostMode === 'display') {
+      // Display host skips setup — goes straight to lobby
+      showLobby();
+    } else {
+      showScreen('screen-setup');
+    }
   });
 }
 
@@ -798,17 +1001,36 @@ function joinRoom() {
   });
 }
 
+// ─── Game Config ──────────────────────────────────────────────────────────────
+function setGameConfig(key, value) {
+  socket.emit('set-game-config', { code: myRoom, [key]: value }, (res) => {
+    if (!res || !res.ok) toast('Config error', 'danger');
+  });
+}
+
+function updateConfigUI(state) {
+  if (!amHost) return;
+  const configs = {
+    targetingMode: state.targetingMode,
+    rouletteMode:  state.rouletteMode,
+    economyMode:   state.economyMode,
+  };
+  ['targeting', 'roulette', 'economy'].forEach(group => {
+    document.querySelectorAll(`#config-${group} .config-btn`).forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.val === configs[btn.dataset.key]);
+    });
+  });
+}
+
 // ─── Setup Screen ─────────────────────────────────────────────────────────────
 function initSetupScreen() {
-  // Clothing slots
   const list = document.getElementById('clothing-list');
   list.innerHTML = '';
   clothingItems = DEFAULT_SLOTS.map(slot => ({ ...slot, value: '' }));
   renderClothingList();
-
-  // Tag grids
-  renderTagGrid('pref-tags', myPrefs, 'pref');
-  renderTagGrid('limit-tags', myLimits, 'limit');
+  renderTagGrid('pref-tags',        myPrefs,      'pref');
+  renderTagGrid('soft-limit-tags',  mySoftLimits, 'soft');
+  renderTagGrid('limit-tags',       myLimits,     'limit');
 }
 
 function renderClothingList() {
@@ -874,8 +1096,9 @@ function submitSetup() {
     code: myRoom,
     name,
     clothing,
-    preferences: [...myPrefs],
-    limits: [...myLimits],
+    preferences:  [...myPrefs],
+    limits:       [...myLimits],
+    limits_soft:  [...mySoftLimits],
   }, (res) => {
     if (!res.ok) return toast(res.error || 'Error', 'danger');
     showLobby();
@@ -891,7 +1114,6 @@ function showLobby() {
     document.getElementById('lobby-code').textContent = myRoom;
     document.getElementById('lobby-start-btn-wrap').style.display = 'block';
     document.getElementById('lobby-ready-btn-wrap').style.display = 'none';
-    // Load QR
     const img = document.getElementById('qr-img');
     img.src = `/qr/${myRoom}`;
     const joinUrl = `${location.origin}?room=${myRoom}`;
@@ -930,7 +1152,7 @@ function renderLobby(state) {
     div.className = 'player-item';
     const badges = [];
     if (p.isHost) badges.push('<span class="player-badge host">HOST</span>');
-    if (p.ready) badges.push('<span class="player-badge ready">READY</span>');
+    if (p.ready)  badges.push('<span class="player-badge ready">READY</span>');
     div.innerHTML = `
       <div class="player-emoji">${p.emoji}</div>
       <div class="player-name">${p.name}</div>
@@ -940,9 +1162,22 @@ function renderLobby(state) {
   });
 
   if (amHost) {
-    const readyCount = players.filter(p => p.ready).length;
     const startBtn = document.getElementById('lobby-start-btn');
     startBtn.disabled = players.length < 2;
+    updateConfigUI(state);
+  } else {
+    // Non-host: show read-only config labels
+    const roCard = document.getElementById('lobby-config-readonly');
+    const roLabels = document.getElementById('lobby-config-labels');
+    roCard.style.display = 'block';
+    const econLabels = { schaars: 'Scarce', gemiddeld: 'Medium', overvloedig: 'Generous' };
+    const roulLabels = { off: 'Off', plus1: '+1 Level', block: 'Block' };
+    const targLabels = { self: 'Self', '50-50': '50-50', random: 'Random' };
+    roLabels.innerHTML = [
+      `Targeting: <b>${targLabels[state.targetingMode] || state.targetingMode}</b>`,
+      `Roulette: <b>${roulLabels[state.rouletteMode] || state.rouletteMode}</b>`,
+      `Economy: <b>${econLabels[state.economyMode] || state.economyMode}</b>`,
+    ].join('<br>');
   }
 }
 
@@ -951,49 +1186,90 @@ function handleRoomState(state) {
   roomState = state;
 
   if (state.phase === 'lobby') {
-    renderLobby(state);
+    // Only re-render lobby if we're currently showing it
+    const isInLobby = document.getElementById('screen-lobby').classList.contains('active') ||
+                      document.getElementById('screen-host').classList.contains('active') ||
+                      document.getElementById('screen-setup').classList.contains('active');
+    if (isInLobby || !document.querySelector('.screen.active')) {
+      renderLobby(state);
+    } else {
+      renderLobby(state);
+    }
+    return;
+  }
+
+  if (state.phase === 'ended') {
+    buildEndScreen(state);
+    showScreen('screen-ended');
+    document.getElementById('xp-hud').classList.remove('visible');
     return;
   }
 
   if (state.phase === 'game') {
     const turn = state.currentTurn;
     if (!turn) return;
-    const isMyTurn = turn.performerId === myId;
+
+    const isDisplayHost = state.displayHostId === myId;
+    const isActive      = turn.performerId === myId;
+    const me = state.players[myId];
+    if (me) updateHud(me);
+
+    // Display host always sees the display screen during game
+    if (isDisplayHost) {
+      buildDisplayScreen(state);
+      showScreen('screen-display');
+      return;
+    }
 
     if (turn.phase === 'spinning') {
       myLevelChosen = false;
       buildSpinScreen(state);
       showScreen('screen-spin');
+
     } else if (turn.phase === 'choosing') {
-      if (isMyTurn && !myLevelChosen) {
+      if (isActive && !myLevelChosen) {
         buildLevelScreen(state);
         showScreen('screen-level');
-      } else {
+      } else if (isActive && myLevelChosen) {
         buildChooseScreen(state);
         showScreen('screen-choose');
+      } else {
+        buildDisplayScreen(state);
+        showScreen('screen-display');
       }
-    } else if (turn.phase === 'showing') {
-      buildCardScreen(state);
-      showScreen('screen-card');
-    }
 
-    // Update HUD for current player
-    const me = state.players[myId];
-    if (me) updateHud(me);
+    } else if (turn.phase === 'showing') {
+      if (isActive) {
+        buildCardScreen(state);
+        showScreen('screen-card');
+      } else {
+        buildDisplayScreen(state);
+        showScreen('screen-display');
+      }
+
+    } else if (turn.phase === 'loss') {
+      // Performer lost — all slots full
+      if (isActive) {
+        toast('🚨 All break slots used — you lose! Accept the group\'s penalty.', 'danger');
+      } else {
+        toast(`🚨 ${state.players[turn.performerId]?.name || 'A player'} ran out of break slots!`, 'danger');
+      }
+      buildDisplayScreen(state);
+      showScreen('screen-display');
+    }
   }
 }
 
 // ─── Spin Screen ──────────────────────────────────────────────────────────────
+let spinAnimRunning = false;
+
 function buildSpinScreen(state) {
   const players = Object.values(state.players);
   const table = document.getElementById('spin-table');
-
-  // Remove old avatars
   table.querySelectorAll('.player-avatar').forEach(el => el.remove());
 
   const size = table.offsetWidth || 320;
-  const cx = size / 2;
-  const cy = size / 2;
+  const cx = size / 2, cy = size / 2;
   const r = size * 0.42;
 
   players.forEach((p, i) => {
@@ -1004,98 +1280,55 @@ function buildSpinScreen(state) {
     av.className = 'player-avatar';
     av.id = `avatar-${p.id}`;
     av.style.left = x + 'px';
-    av.style.top = y + 'px';
+    av.style.top  = y + 'px';
     av.innerHTML = `<div class="av-emoji">${p.emoji}</div><div class="av-name">${p.name}</div>`;
     table.appendChild(av);
   });
 
-  document.getElementById('spin-btn-wrap').style.display = 'flex';
-  document.getElementById('spin-result-wrap').style.display = 'none';
-  document.getElementById('spin-status').textContent = 'Spin the bottle...';
+  document.getElementById('spin-status').textContent = 'Choosing next player...';
 
-  // Only host (or current player, or everyone?) can spin — let's allow anyone
-  document.getElementById('spin-btn').disabled = false;
-}
-
-function requestSpin() {
-  if (bottleSpinning) return;
-  document.getElementById('spin-btn').disabled = true;
-  document.getElementById('spin-status').textContent = 'Spinning...';
-  bottleSpinning = true;
-
-  socket.emit('request-spin', { code: myRoom }, (res) => {
-    if (!res.ok) { bottleSpinning = false; return; }
-    animateBottle(res.targetId);
-  });
-}
-
-function animateBottle(targetId) {
-  if (!roomState) return;
-  const players = Object.values(roomState.players);
-  const targetIdx = players.findIndex(p => p.id === targetId);
-  if (targetIdx === -1) return;
-
-  const totalPlayers = players.length;
-  const targetAngle = (360 * targetIdx / totalPlayers) - 90; // degrees, offset so top = 0
-  const spins = 3 + Math.floor(Math.random() * 3); // 3–5 full rotations
-  const finalAngle = spins * 360 + targetAngle;
-
-  const bottle = document.getElementById('bottle-wrap');
-  bottle.style.transition = 'none';
-  bottle.style.transform = `translate(-50%, -50%) rotate(0deg)`;
-
-  // Force reflow
-  bottle.offsetHeight;
-
-  bottle.style.transition = `transform ${2.5 + spins * 0.3}s cubic-bezier(0.2, 0.8, 0.4, 1)`;
-  bottle.style.transform = `translate(-50%, -50%) rotate(${finalAngle}deg)`;
-
-  const dur = (2.5 + spins * 0.3) * 1000;
-  setTimeout(() => {
-    bottleSpinning = false;
-    // Highlight target
-    document.querySelectorAll('.player-avatar').forEach(av => av.classList.remove('highlighted'));
-    const av = document.getElementById(`avatar-${targetId}`);
-    if (av) av.classList.add('highlighted');
-
-    const target = players[targetIdx];
-    document.getElementById('spin-status').textContent = `🎯 ${target.name}!`;
-    document.getElementById('spin-result-wrap').style.display = 'block';
-    document.getElementById('spin-result-name').textContent = `${target.emoji} ${target.name}`;
-    document.getElementById('spin-btn-wrap').style.display = 'none';
-    // State change comes via socket room-state event
-  }, dur);
+  // Auto-spin animation (server drives the transition to 'choosing')
+  if (!spinAnimRunning) {
+    spinAnimRunning = true;
+    const bottle = document.getElementById('bottle-wrap');
+    const spins  = 3 + Math.random() * 2;
+    bottle.style.transition = 'none';
+    bottle.style.transform = `translate(-50%, -50%) rotate(0deg)`;
+    bottle.offsetHeight; // force reflow
+    bottle.style.transition = `transform 0.7s cubic-bezier(0.2, 0.8, 0.4, 1)`;
+    bottle.style.transform  = `translate(-50%, -50%) rotate(${spins * 360}deg)`;
+    setTimeout(() => { spinAnimRunning = false; }, 800);
+  }
 }
 
 // ─── Choose Screen ────────────────────────────────────────────────────────────
 function buildChooseScreen(state) {
   const turn = state.currentTurn;
-  const target = state.players[turn.targetId];
+  const target = state.players[turn.performerId];
   if (!target) return;
 
   document.getElementById('choose-emoji').textContent = target.emoji;
-  document.getElementById('choose-name').textContent = target.name;
+  document.getElementById('choose-name').textContent  = target.name;
 
   const isMe = target.id === myId;
   document.getElementById('choose-truth-btn').style.display = isMe ? 'flex' : 'none';
-  document.getElementById('choose-dare-btn').style.display = isMe ? 'flex' : 'none';
+  document.getElementById('choose-dare-btn').style.display  = isMe ? 'flex' : 'none';
 
-  const waitMsg = document.getElementById('choose-waiting-msg');
+  const waitMsg  = document.getElementById('choose-waiting-msg');
   const waitName = document.getElementById('choose-waiting-name');
   waitMsg.style.display = isMe ? 'none' : 'block';
-  waitName.textContent = target.name;
+  waitName.textContent  = target.name;
 }
 
 function pickTruthDare(choice) {
   document.getElementById('choose-truth-btn').disabled = true;
-  document.getElementById('choose-dare-btn').disabled = true;
+  document.getElementById('choose-dare-btn').disabled  = true;
   socket.emit('pick-truth-dare', { code: myRoom, choice }, (res) => {
-    if (!res.ok) {
-      toast(res.error || 'Error', 'danger');
+    if (!res || !res.ok) {
+      toast(res?.error || 'Error', 'danger');
       document.getElementById('choose-truth-btn').disabled = false;
-      document.getElementById('choose-dare-btn').disabled = false;
+      document.getElementById('choose-dare-btn').disabled  = false;
     }
-    // state update comes via room-state event
   });
 }
 
@@ -1103,16 +1336,37 @@ function pickTruthDare(choice) {
 const LEVEL_NAMES = ['','Icebreakers','Flirt','Light Touch','Kiss','Sensual','Seduction','Intimate','Erotic','Explicit','Extreme'];
 
 function buildLevelScreen(state) {
-  const turn = state.currentTurn;
+  const turn      = state.currentTurn;
   const performer = state.players[turn.performerId];
   if (!performer) return;
 
   document.getElementById('level-player-emoji').textContent = performer.emoji;
-  document.getElementById('level-player-name').textContent = performer.name;
+  document.getElementById('level-player-name').textContent  = performer.name;
 
   const isMe = performer.id === myId;
   document.getElementById('level-waiting-msg').style.display = isMe ? 'none' : 'block';
-  document.getElementById('level-waiting-name').textContent = performer.name;
+  document.getElementById('level-waiting-name').textContent  = performer.name;
+
+  // Parked dares section
+  const parkedSection = document.getElementById('parked-dare-section');
+  const parkedList    = document.getElementById('parked-dare-list');
+  const parked = isMe ? (performer.breakSlots?.parkedDares || []) : [];
+
+  if (isMe && parked.length > 0) {
+    parkedSection.style.display = 'block';
+    parkedList.innerHTML = '';
+    parked.forEach(d => {
+      const text = d.text && d.text.en ? d.text.en : (d.text || '');
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-soft btn-sm';
+      btn.style.cssText = 'width:100%;max-width:none;text-align:left;margin-bottom:6px;white-space:normal;height:auto;padding:10px 14px;';
+      btn.innerHTML = `<span>🔄 <b>Level ${d.level}</b> — ${text.slice(0, 80)}${text.length > 80 ? '…' : ''}</span>`;
+      btn.onclick = () => replayParkedDare(d.cardId);
+      parkedList.appendChild(btn);
+    });
+  } else {
+    parkedSection.style.display = 'none';
+  }
 
   const grid = document.getElementById('level-grid');
   grid.innerHTML = '';
@@ -1120,12 +1374,10 @@ function buildLevelScreen(state) {
   for (let lvl = 1; lvl <= 10; lvl++) {
     const btn = document.createElement('button');
     btn.className = 'level-btn';
-
     const unlocked = canAccessLevelClient(performer, lvl);
     btn.disabled = !isMe || !unlocked;
     if (unlocked) btn.classList.add('unlocked');
     if (performer.currentLevel === lvl) btn.classList.add('current');
-
     btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lock">${unlocked ? '' : '🔒'}</span>`;
     btn.title = LEVEL_NAMES[lvl] || '';
     if (isMe && unlocked) btn.onclick = () => pickLevel(lvl);
@@ -1144,7 +1396,6 @@ function pickLevel(level) {
   socket.emit('choose-level', { code: myRoom, level }, (res) => {
     if (!res || !res.ok) return toast(res?.error || 'Cannot choose that level', 'danger');
     myLevelChosen = true;
-    // Show the truth/dare choice screen now
     if (roomState) {
       buildChooseScreen(roomState);
       showScreen('screen-choose');
@@ -1152,16 +1403,27 @@ function pickLevel(level) {
   });
 }
 
-// ─── Card Screen ──────────────────────────────────────────────────────────────
+function replayParkedDare(cardId) {
+  socket.emit('replay-parked-dare', { code: myRoom, cardId }, (res) => {
+    if (!res || !res.ok) toast(res?.error || 'Cannot replay', 'danger');
+    // room-state broadcast will navigate to card screen
+  });
+}
+
+// ─── Card Screen (action view — performer only) ───────────────────────────────
 function buildCardScreen(state) {
-  const turn = state.currentTurn;
-  const performer = state.players[turn.performerId] || state.players[turn.targetId];
+  const turn      = state.currentTurn;
+  const performer = state.players[turn.performerId];
   if (!performer || !turn.card) return;
 
   document.getElementById('card-player-emoji').textContent = performer.emoji;
-  document.getElementById('card-player-name').textContent = performer.name;
-  document.getElementById('card-player-sub').textContent =
+  document.getElementById('card-player-name').textContent  = performer.name;
+  document.getElementById('card-player-sub').textContent   =
     turn.choice === 'truth' ? 'answered a Truth' : 'accepted a Dare';
+
+  // Roulette notice
+  document.getElementById('card-roulette-notice').style.display =
+    turn.rouletteUpgrade ? 'block' : 'none';
 
   const reveal = document.getElementById('card-reveal');
   reveal.className = `card-reveal ${turn.choice}-card`;
@@ -1171,20 +1433,12 @@ function buildCardScreen(state) {
   document.getElementById('card-type-label').style.color =
     turn.choice === 'truth' ? '#60a5fa' : '#f472b6';
 
-  // v2: text is bilingual object { en, nl }
   const cardText = turn.card.text;
   document.getElementById('card-text').textContent =
     (cardText && typeof cardText === 'object') ? (cardText.en || cardText.nl || '') : (cardText || '');
 
-  // Extreme level warning
-  if (turn.card.level === 10) {
-    toast('⚠️ EXTREME level — everyone has consented to this', 'danger');
-  }
-
-  // Recycled pool notice
-  if (turn.recycled) {
-    toast("You've had every card — feel free to make up your own!", 'info');
-  }
+  if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
+  if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
 
   // Tags
   const tagsEl = document.getElementById('card-tags-display');
@@ -1196,7 +1450,7 @@ function buildCardScreen(state) {
     tagsEl.appendChild(span);
   });
 
-  // Clothing reference (uses clothingItems now)
+  // Clothing reference
   const clothingRef = document.getElementById('card-clothing-ref');
   const needsClothing = turn.card.tags &&
     (turn.card.tags.includes('clothing') || turn.card.tags.includes('feet'));
@@ -1208,18 +1462,39 @@ function buildCardScreen(state) {
     clothingRef.style.display = 'none';
   }
 
-  // "Done" button only visible to the performer for dares
+  // Action buttons (performer only)
   const isPerformer = performer.id === myId;
-  const doneWrap = document.getElementById('card-done-wrap');
-  const rewardDisplay = document.getElementById('card-reward-display');
-  if (isPerformer && turn.choice === 'dare') {
-    doneWrap.style.display = 'block';
+  const actionWrap  = document.getElementById('card-action-wrap');
+  actionWrap.style.display = isPerformer ? 'block' : 'none';
+
+  if (isPerformer) {
+    // Done button (dares only)
     document.getElementById('card-done-btn').disabled = false;
-  } else {
-    doneWrap.style.display = 'none';
+    document.getElementById('card-done-btn').style.display =
+      turn.choice === 'dare' ? 'flex' : 'none';
+
+    // Respin (only for dares when softFlagged)
+    const respinWrap = document.getElementById('card-respin-wrap');
+    respinWrap.style.display = (turn.choice === 'dare' && turn.softFlagged) ? 'block' : 'none';
+    document.getElementById('card-respin-btn').disabled = false;
+
+    // Park button (dares only, game phase)
+    const parkWrap = document.getElementById('card-park-wrap');
+    parkWrap.style.display = turn.choice === 'dare' ? 'block' : 'none';
+    const me = state.players[myId];
+    if (me) {
+      const slotsLeft = me.breakSlots.total - me.breakSlots.used;
+      document.getElementById('card-park-slots').textContent =
+        `(${slotsLeft} slot${slotsLeft !== 1 ? 's' : ''} left)`;
+      document.getElementById('card-park-btn').disabled = slotsLeft <= 0;
+    }
   }
-  rewardDisplay.style.display = 'none';
-  document.getElementById('card-next-btn').disabled = false;
+
+  // End game button (host only)
+  const endWrap = document.getElementById('card-end-game-wrap');
+  endWrap.style.display = amHost ? 'block' : 'none';
+
+  document.getElementById('card-reward-display').style.display = 'none';
 }
 
 function completeDare() {
@@ -1229,7 +1504,7 @@ function completeDare() {
       document.getElementById('card-done-btn').disabled = false;
       return;
     }
-    document.getElementById('card-done-wrap').style.display = 'none';
+    document.getElementById('card-action-wrap').style.display = 'none';
     const rewardDisplay = document.getElementById('card-reward-display');
     rewardDisplay.style.display = 'block';
     rewardDisplay.textContent = `+${res.xpEarned} XP  +${res.coinsEarned} 🪙`;
@@ -1237,28 +1512,159 @@ function completeDare() {
   });
 }
 
-function nextTurn() {
-  myLevelChosen = false;
+function useBreakSlot() {
+  document.getElementById('card-park-btn').disabled = true;
+  socket.emit('use-break-slot', { code: myRoom }, (res) => {
+    if (!res || !res.ok) {
+      document.getElementById('card-park-btn').disabled = false;
+      toast(res?.error || 'Cannot park', 'danger');
+      return;
+    }
+    toast(`Dare parked! 🅿️ ${res.slotsRemaining} slot${res.slotsRemaining !== 1 ? 's' : ''} remaining`, 'info');
+  });
+}
+
+function respinCard() {
+  document.getElementById('card-respin-btn').disabled = true;
+  socket.emit('respin-card', { code: myRoom }, (res) => {
+    if (!res || !res.ok) {
+      document.getElementById('card-respin-btn').disabled = false;
+      toast(res?.error || 'Cannot respin', 'danger');
+    }
+  });
+}
+
+function endGame() {
+  socket.emit('end-game', { code: myRoom }, (res) => {
+    if (!res || !res.ok) toast(res?.error || 'Error', 'danger');
+  });
+}
+
+function forceNextTurn() {
   socket.emit('next-turn', { code: myRoom }, () => {});
+}
+
+// ─── Display Screen (non-active / display host) ───────────────────────────────
+function buildDisplayScreen(state) {
+  const turn = state.currentTurn;
+  if (!turn) return;
+
+  const isDisplayHost = state.displayHostId === myId;
+
+  const waitingDiv  = document.getElementById('display-waiting');
+  const cardDiv     = document.getElementById('display-card-view');
+  const hostControls = document.getElementById('display-host-controls');
+
+  hostControls.style.display = (amHost || isDisplayHost) ? 'block' : 'none';
+
+  if (turn.phase === 'spinning' || turn.phase === 'choosing') {
+    waitingDiv.style.display = 'block';
+    cardDiv.style.display    = 'none';
+
+    const performer = state.players[turn.performerId];
+    if (performer) {
+      document.getElementById('display-player-emoji').textContent = performer.emoji;
+      document.getElementById('display-player-name').textContent  = performer.name;
+      document.getElementById('display-status-text').textContent  =
+        turn.phase === 'spinning' ? 'is up next...' : 'is choosing their level & dare...';
+    } else {
+      document.getElementById('display-player-emoji').textContent = '🎲';
+      document.getElementById('display-player-name').textContent  = '';
+      document.getElementById('display-status-text').textContent  = 'Choosing next player...';
+    }
+
+  } else if (turn.phase === 'showing' || turn.phase === 'loss') {
+    waitingDiv.style.display = 'none';
+    cardDiv.style.display    = 'block';
+
+    const performer = state.players[turn.performerId];
+    const cardText  = turn.card?.text;
+    const text = (cardText && typeof cardText === 'object')
+      ? (cardText.en || cardText.nl || '')
+      : (cardText || '');
+
+    document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
+    document.getElementById('display-card-performer-name').textContent  = performer?.name || '';
+    document.getElementById('display-card-type-label').textContent      =
+      turn.choice === 'truth' ? '💬 TRUTH' : '🔥 DARE';
+    document.getElementById('display-card-type-label').style.color      =
+      turn.choice === 'truth' ? '#60a5fa' : '#f472b6';
+
+    document.getElementById('display-card-reveal').className =
+      `card-reveal ${turn.choice || 'dare'}-card`;
+    document.getElementById('display-card-text').textContent = text;
+  }
+}
+
+// ─── End Screen ───────────────────────────────────────────────────────────────
+function buildEndScreen(state) {
+  const players = Object.values(state.players).sort((a, b) => b.xp - a.xp);
+  const rankEmojis = ['🥇', '🥈', '🥉'];
+  const rankClasses = ['lb-first', 'lb-second', 'lb-third'];
+
+  const board = document.getElementById('ended-leaderboard');
+  board.innerHTML = '';
+
+  players.forEach((p, i) => {
+    const penalty = (p.breakSlots?.parkedDares || []).reduce((s, d) => s + d.xpPenalty, 0);
+    const parkedCount = (p.breakSlots?.parkedDares || []).length;
+
+    const row = document.createElement('div');
+    row.className = 'leaderboard-row' + (rankClasses[i] ? ` ${rankClasses[i]}` : '');
+    row.innerHTML = `
+      <div class="lb-rank">${rankEmojis[i] || `${i+1}`}</div>
+      <div class="lb-emoji">${p.emoji}</div>
+      <div class="lb-name">${p.name}</div>
+      <div class="lb-stats">
+        🪙 ${p.coins}<br>
+        ${parkedCount > 0 ? `🅿️ ${parkedCount} parked (−${penalty} XP)` : ''}
+      </div>
+      <div class="lb-xp">⚡ ${p.xp}</div>
+    `;
+    board.appendChild(row);
+  });
+
+  // "Play Again" only visible to host
+  document.getElementById('ended-restart-wrap').style.display = amHost ? 'block' : 'none';
+}
+
+function playAgain() {
+  socket.emit('restart-game', { code: myRoom }, (res) => {
+    if (!res || !res.ok) toast(res?.error || 'Error', 'danger');
+    // server broadcasts lobby state which re-renders lobby automatically
+  });
 }
 
 // ─── HUD ──────────────────────────────────────────────────────────────────────
 function updateHud(player) {
   document.getElementById('xp-hud').classList.add('visible');
-  document.getElementById('hud-xp').textContent = player.xp || 0;
-  document.getElementById('hud-coins').textContent = player.coins || 0;
-  document.getElementById('hud-level').textContent = player.currentLevel || 1;
-  // XP fill: progress toward next unlock = xp / (currentLevel+1)*6
+  document.getElementById('hud-xp').textContent     = player.xp || 0;
+  document.getElementById('hud-coins').textContent  = player.coins || 0;
+  document.getElementById('hud-level').textContent  = player.currentLevel || 1;
+
   const nextThreshold = ((player.currentLevel || 1) + 1) * 6;
   const pct = Math.min(100, Math.round(((player.xp || 0) / nextThreshold) * 100));
   document.getElementById('hud-xp-fill').style.width = pct + '%';
+
+  // Break-slot dots
+  const slotsEl = document.getElementById('hud-slots');
+  const total   = player.breakSlots?.total || 3;
+  const used    = player.breakSlots?.used  || 0;
+  slotsEl.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'slot-dot' + (i < used ? ' used' : '');
+    slotsEl.appendChild(dot);
+  }
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function toast(msg, type = 'info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.style.borderColor = type === 'danger' ? '#ef4444' : type === 'success' ? '#4ade80' : 'rgba(255,255,255,0.12)';
+  el.style.borderColor = type === 'danger'
+    ? '#ef4444'
+    : type === 'success' ? '#4ade80' : 'rgba(255,255,255,0.12)';
   el.classList.add('show');
   clearTimeout(el._t);
   el._t = setTimeout(() => el.classList.remove('show'), 2800);

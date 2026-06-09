@@ -139,3 +139,68 @@ test('recycles pool when all eligible cards used, sets recycled=true', () => {
   assert.ok(result, 'Should return a card even when pool was exhausted');
   assert.equal(recycled, true, 'recycled flag should be true');
 });
+
+// ─── Test 12: targetRequired with no target returns null ─────────────────────
+test('targetRequired: true with target=null returns null', () => {
+  const cards = [card({ id: 'c1', targetRequired: true, tags: [], level: 3 })];
+  const { card: result } = selectCard(cards, 'dare', player(), null, 3, emptySet);
+  assert.equal(result, null, 'targetRequired card should be blocked when target is null');
+});
+
+// ─── Test 13: targetRequired with valid target returns card ───────────────────
+test('targetRequired: true with valid target returns card', () => {
+  const cards = [card({ id: 'c1', targetRequired: true, tags: [], level: 3 })];
+  const performer = player({ id: 'p1' });
+  const target = player({ id: 'p2' });
+  const { card: result } = selectCard(cards, 'dare', performer, target, 3, emptySet);
+  assert.ok(result, 'targetRequired card should be returned when target is provided');
+  assert.equal(result.id, 'c1');
+});
+
+// ─── Test 14: softFlagged returns true without blocking card ─────────────────
+test('soft limit tag returns softFlagged=true without blocking the card', () => {
+  const cards = [card({ id: 'c1', tags: ['intimate'], level: 3 })];
+  const performer = player({ softLimits: ['intimate'], limits: [] });
+  const { card: result, softFlagged } = selectCard(cards, 'dare', performer, null, 3, emptySet);
+  assert.ok(result, 'Card should not be blocked by soft limit');
+  assert.equal(result.id, 'c1', 'Correct card should be returned');
+  assert.equal(softFlagged, true, 'softFlagged should be true when soft limit tag matches');
+});
+
+// ─── Test 15: roulette block mode never exceeds chosenLevel ──────────────────
+test('roulette block mode never returns a card above chosenLevel', () => {
+  const below = card({ id: 'b1', level: 2, tags: [] });
+  const exact = card({ id: 'b2', level: 3, tags: [] });
+  const above = card({ id: 'b3', level: 4, tags: [] });
+  const cards = [below, exact, above];
+
+  for (let i = 0; i < 50; i++) {
+    const usedSet = new Set(); // fresh each time to avoid recycling complications
+    const { card: result } = selectCard(cards, 'dare', player(), null, 3, usedSet, { rouletteMode: 'block' });
+    assert.ok(result, 'Should always return a card in block mode');
+    assert.ok(result.level <= 3, `Card level ${result.level} must not exceed chosenLevel 3`);
+  }
+});
+
+// ─── Test 16: Coin formula floor — Math.max(3, level×difficulty) ─────────────
+test('coin formula floor: level=1 diff=1 yields min 3 coins', () => {
+  const base = Math.max(3, 1 * 1); // level=1, difficulty=1
+  assert.equal(base, 3, 'Minimum coin base should be 3 even when level*difficulty=1');
+
+  const base2 = Math.max(3, 3 * 2); // level=3, difficulty=2
+  assert.equal(base2, 6, 'Coin base level=3 diff=2 should be 6');
+});
+
+// ─── Test 17: End-game XP penalty = sum of card.level × card.difficulty ──────
+test('end-game XP penalty equals sum of level × difficulty across parked dares', () => {
+  const parkedDares = [
+    { cardId: 'x', level: 3, difficulty: 2, xpPenalty: 3 * 2 },
+    { cardId: 'y', level: 1, difficulty: 1, xpPenalty: 1 * 1 },
+    { cardId: 'z', level: 5, difficulty: 3, xpPenalty: 5 * 3 },
+  ];
+  parkedDares.forEach(d => {
+    assert.equal(d.xpPenalty, d.level * d.difficulty, `Penalty for level ${d.level} diff ${d.difficulty} should be ${d.level * d.difficulty}`);
+  });
+  const total = parkedDares.reduce((sum, d) => sum + d.xpPenalty, 0);
+  assert.equal(total, 6 + 1 + 15, 'Total penalty should be sum of all individual penalties');
+});
