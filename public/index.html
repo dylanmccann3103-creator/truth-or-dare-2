@@ -944,6 +944,7 @@ input::placeholder { color: #7a6b8a; }
   </div>
   <div id="lobby-start-btn-wrap" class="w-full" style="display:none">
     <button class="btn btn-primary" id="lobby-start-btn" onclick="startGame()" disabled>Start Game →</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="window.open('/editor','_blank')">🃏 Edit Cards</button>
     <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 players</p>
   </div>
   <div class="gap"></div>
@@ -1570,9 +1571,19 @@ function markReady() {
 }
 
 function startGame() {
-  socket.emit('start-game', { code: myRoom }, (res) => {
+  const cardPool = buildActiveCardPool();
+  socket.emit('start-game', { code: myRoom, cardPool: cardPool.length ? cardPool : undefined }, (res) => {
     if (!res.ok) return toast(res.error, 'danger');
   });
+}
+
+function buildActiveCardPool() {
+  try {
+    const packages = JSON.parse(localStorage.getItem('tod2_packages') || '[]');
+    const active = packages.filter(p => p.active);
+    if (!active.length) return []; // server will use ALL_CARDS
+    return active.flatMap(p => p.cards || []);
+  } catch { return []; }
 }
 
 function renderLobby(state) {

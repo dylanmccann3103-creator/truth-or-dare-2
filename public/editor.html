@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Editor — Truth or Dare 2.0</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg: #0d0d14; --surface: #13101e; --surface2: #1a1528;
+  --border: rgba(255,255,255,0.08); --text: #e2d9f0; --muted: #7a6b8a;
+  --accent: #9333ea; --accent2: #c026d3; --danger: #ef4444; --success: #4ade80;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+header h1 { font-size: 1.05rem; background: linear-gradient(135deg,#9333ea,#c026d3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hdr-count { background: var(--accent); color: white; border-radius: 99px; padding: 2px 10px; font-size: 0.75rem; font-weight: 700; }
+.hdr-note { color: var(--muted); font-size: 0.78rem; margin-left: auto; }
+
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── Sidebar ── */
+.sidebar { width: 250px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.sidebar-hdr { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.sidebar-actions { padding: 8px 10px; display: flex; gap: 6px; border-bottom: 1px solid var(--border); }
+.pkg-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+.pkg-item { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border-radius: 8px; margin: 2px 6px; transition: background .15s; }
+.pkg-item:hover { background: rgba(255,255,255,0.04); }
+.pkg-item input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+.pkg-name { flex: 1; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pkg-count { font-size: 0.72rem; color: var(--muted); flex-shrink: 0; }
+.pkg-btns { display: flex; gap: 2px; }
+.icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: 0.85rem; line-height: 1; }
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+.icon-btn.del:hover { color: var(--danger); }
+
+/* ── Browser ── */
+.browser { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.toolbar { padding: 8px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; background: var(--surface); }
+.toolbar input[type=text] { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 5px 10px; font-size: 0.82rem; width: 160px; outline: none; }
+.toolbar input[type=text]:focus { border-color: var(--accent); }
+.flt-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 99px; padding: 3px 10px; font-size: 0.75rem; cursor: pointer; }
+.flt-btn.on { background: var(--accent); border-color: var(--accent); color: white; }
+.flt-sel { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 4px 8px; font-size: 0.8rem; outline: none; cursor: pointer; }
+.sep { color: var(--border); user-select: none; }
+
+.card-table { flex: 1; overflow-y: auto; }
+.card-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.card-row:hover { background: rgba(255,255,255,0.03); }
+.card-row.active { background: rgba(147,51,234,0.12); }
+.badge { border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
+.b-lvl  { background: #1a1040; color: #a78bfa; border: 1px solid #4c1d95; min-width: 26px; text-align: center; }
+.b-truth{ background: #052e16; color: #4ade80; border: 1px solid #14532d; }
+.b-dare { background: #2d0a6e; color: #c084fc; border: 1px solid #4c1d95; }
+.b-duel { background: #431407; color: #fb923c; border: 1px solid #7c2d12; }
+.b-cust { background: #1e1b4b; color: #818cf8; border: 1px solid #312e81; font-size: 0.65rem; }
+.ddots { display: flex; gap: 2px; flex-shrink: 0; }
+.ddot { width: 6px; height: 6px; border-radius: 50%; background: #2a2040; }
+.ddot.on { background: var(--accent2); }
+.card-preview { flex: 1; font-size: 0.83rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tag-pills { display: flex; gap: 3px; flex-shrink: 0; max-width: 180px; overflow: hidden; }
+.tpill { background: rgba(147,51,234,.15); border: 1px solid rgba(147,51,234,.3); border-radius: 99px; padding: 1px 7px; font-size: 0.68rem; color: #a78bfa; white-space: nowrap; }
+.empty { text-align: center; color: var(--muted); padding: 60px 20px; font-size: 0.9rem; line-height: 1.8; }
+
+/* ── Editor Panel ── */
+.ed-panel { width: 360px; flex-shrink: 0; border-left: 1px solid var(--border); background: var(--surface); display: none; flex-direction: column; overflow: hidden; }
+.ed-panel.open { display: flex; }
+.ed-hdr { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.ed-hdr span { font-weight: 600; font-size: 0.9rem; }
+.ed-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.fld { display: flex; flex-direction: column; gap: 4px; }
+.flbl { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.finp, .fsel, .ftxt { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: 0.85rem; font-family: inherit; outline: none; width: 100%; }
+.finp:focus, .fsel:focus, .ftxt:focus { border-color: var(--accent); }
+.finp:disabled, .fsel:disabled, .ftxt:disabled { opacity: .5; cursor: not-allowed; }
+.ftxt { resize: vertical; min-height: 65px; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.spill { border-radius: 99px; padding: 4px 12px; font-size: 0.78rem; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); transition: all .15s; user-select: none; }
+.spill.on { background: var(--accent); border-color: var(--accent); color: white; }
+.spill:disabled, .spill[data-dis] { pointer-events: none; opacity: .5; }
+.tag-editor { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.tchip { background: rgba(147,51,234,.15); border: 1px solid rgba(147,51,234,.3); border-radius: 99px; padding: 3px 8px 3px 10px; font-size: 0.76rem; color: #a78bfa; display: flex; align-items: center; gap: 4px; }
+.tchip button { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem; line-height: 1; padding: 0; }
+.tchip button:hover { color: var(--danger); }
+.tadd { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 99px; padding: 3px 10px; font-size: 0.76rem; outline: none; width: 100px; }
+.tadd:focus { border-color: var(--accent); }
+.cbrow { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.cbrow input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+.cbrow label { font-size: 0.85rem; cursor: pointer; }
+.ed-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── Buttons ── */
+.btn { border: none; border-radius: 10px; padding: 7px 14px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+.btn-p { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; }
+.btn-p:hover { opacity: .88; }
+.btn-s { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-s:hover { background: rgba(255,255,255,0.07); }
+.btn-d { background: rgba(239,68,68,.12); color: var(--danger); border: 1px solid rgba(239,68,68,.25); }
+.btn-d:hover { background: rgba(239,68,68,.22); }
+.btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 8px; }
+
+/* ── Overlay/Modal ── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; width: 100%; max-width: 360px; }
+.modal h3 { margin-bottom: 14px; font-size: 1rem; }
+.mfooter { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+/* ── Toast ── */
+#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(50px); background: rgba(19,16,30,.97); border: 1px solid var(--border); border-radius: 12px; padding: 9px 18px; font-size: 0.85rem; transition: transform .25s, opacity .25s; opacity: 0; pointer-events: none; z-index: 900; white-space: nowrap; }
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+
+/* Tag suggestions datalist */
+datalist option { background: var(--surface2); color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" style="color:var(--muted);text-decoration:none;font-size:1.2rem;line-height:1">←</a>
+  <h1>🃏 Card Editor</h1>
+  <span class="hdr-count" id="hdr-count">0 cards</span>
+  <span class="hdr-note">Packages saved in your browser — changes don't affect GitHub</span>
+</header>
+
+<div class="layout">
+
+  <!-- ── Sidebar: Package Manager ── -->
+  <div class="sidebar">
+    <div class="sidebar-hdr">Packages</div>
+    <div class="sidebar-actions">
+      <button class="btn btn-p btn-sm" onclick="newPackage()">+ New</button>
+      <button class="btn btn-s btn-sm" onclick="importPackage()">↑ Import</button>
+    </div>
+    <div class="pkg-list" id="pkg-list"></div>
+  </div>
+
+  <!-- ── Card Browser ── -->
+  <div class="browser">
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="Search…" oninput="renderBrowser()">
+      <span class="sep">|</span>
+      <button class="flt-btn on" data-t="all"   onclick="setType('all',this)">All</button>
+      <button class="flt-btn"   data-t="truth" onclick="setType('truth',this)">Truth</button>
+      <button class="flt-btn"   data-t="dare"  onclick="setType('dare',this)">Dare</button>
+      <button class="flt-btn"   data-t="duel"  onclick="setType('duel',this)">Duel</button>
+      <span class="sep">|</span>
+      <select class="flt-sel" id="f-level" onchange="renderBrowser()">
+        <option value="0">All Levels</option>
+        <option value="1">Lvl 1</option><option value="2">Lvl 2</option>
+        <option value="3">Lvl 3</option><option value="4">Lvl 4</option>
+        <option value="5">Lvl 5</option><option value="6">Lvl 6</option>
+        <option value="7">Lvl 7</option><option value="8">Lvl 8</option>
+        <option value="9">Lvl 9</option><option value="10">Lvl 10</option>
+      </select>
+      <select class="flt-sel" id="f-tag" onchange="renderBrowser()">
+        <option value="">All Tags</option>
+        <option>general</option><option>flirty</option><option>clothing</option>
+        <option>body</option><option>physical</option><option>feet</option>
+        <option>mouth</option><option>oral</option><option>intimate</option><option>explicit</option>
+      </select>
+      <div style="flex:1"></div>
+      <button class="btn btn-p btn-sm" onclick="newCard()">+ New Card</button>
+    </div>
+    <div class="card-table" id="card-table"></div>
+  </div>
+
+  <!-- ── Card Editor Panel ── -->
+  <div class="ed-panel" id="ed-panel">
+    <div class="ed-hdr">
+      <span id="ed-title">Edit Card</span>
+      <button class="icon-btn" onclick="closeEditor()" style="font-size:1.1rem">✕</button>
+    </div>
+    <div class="ed-body" id="ed-body">
+
+      <div class="fld">
+        <div class="flbl">Package</div>
+        <select class="fsel" id="ed-pkg"></select>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">ID</div>
+        <input class="finp" id="ed-id" readonly style="color:var(--muted);font-size:0.78rem">
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Type</div>
+        <div class="pill-row" id="ed-type">
+          <div class="spill on" data-v="truth" onclick="setPill('ed-type','truth')">Truth</div>
+          <div class="spill"    data-v="dare"  onclick="setPill('ed-type','dare')">Dare</div>
+          <div class="spill"    data-v="duel"  onclick="setPill('ed-type','duel')">Duel</div>
+        </div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Level</div>
+        <div class="pill-row" id="ed-level"></div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Difficulty</div>
+        <div class="pill-row" id="ed-diff">
+          <div class="spill"    data-v="1" onclick="setPill('ed-diff','1')">1 Easy</div>
+          <div class="spill on" data-v="2" onclick="setPill('ed-diff','2')">2 Medium</div>
+          <div class="spill"    data-v="3" onclick="setPill('ed-diff','3')">3 Hard</div>
+        </div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Text — English</div>
+        <textarea class="ftxt" id="ed-en" placeholder="English text…"></textarea>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Text — Dutch</div>
+        <textarea class="ftxt" id="ed-nl" placeholder="Nederlandse tekst…"></textarea>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Tags <span style="font-weight:400;text-transform:none">(Enter to add)</span></div>
+        <div class="tag-editor" id="ed-tags"></div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Gender Required <span style="font-weight:400;text-transform:none">— none = anyone</span></div>
+        <div class="pill-row" id="ed-gender">
+          <div class="spill" data-v="male"       onclick="toggleGender('male',this)">Male</div>
+          <div class="spill" data-v="female"     onclick="toggleGender('female',this)">Female</div>
+          <div class="spill" data-v="non-binary" onclick="toggleGender('non-binary',this)">Non-binary</div>
+          <div class="spill" data-v="other"      onclick="toggleGender('other',this)">Other</div>
+        </div>
+      </div>
+
+      <div class="fld">
+        <div class="flbl">Body Type Required</div>
+        <select class="fsel" id="ed-body">
+          <option value="">None (anyone)</option>
+          <option value="penis">Penis</option>
+          <option value="vagina">Vagina</option>
+          <option value="breasts">Breasts</option>
+        </select>
+      </div>
+
+      <div class="fld" style="gap:9px">
+        <label class="cbrow"><input type="checkbox" id="ed-orient"> <label for="ed-orient">Orientation matters</label></label>
+        <label class="cbrow"><input type="checkbox" id="ed-target"> <label for="ed-target">Target required</label></label>
+        <label class="cbrow"><input type="checkbox" id="ed-avail">  <label for="ed-avail">Available for all combos</label></label>
+      </div>
+
+    </div><!-- ed-body -->
+
+    <div class="ed-footer" id="ed-footer">
+      <button class="btn btn-p" style="flex:1" onclick="saveCard()">Save</button>
+      <button class="btn btn-s" onclick="copyCardToPkg()">📋 Copy to…</button>
+      <button class="btn btn-d" onclick="deleteCard()">Delete</button>
+    </div>
+  </div><!-- ed-panel -->
+
+</div><!-- layout -->
+
+<!-- New Package Modal -->
+<div class="overlay" id="new-pkg-modal" onclick="if(event.target===this)closeModal('new-pkg-modal')">
+  <div class="modal">
+    <h3>New Package</h3>
+    <div class="fld">
+      <div class="flbl">Name</div>
+      <input class="finp" id="new-pkg-name" placeholder="e.g. Whipped Cream Dares" onkeydown="if(event.key==='Enter')createPackage()">
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-s" onclick="closeModal('new-pkg-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="createPackage()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Copy-to-package Modal -->
+<div class="overlay" id="copy-pkg-modal" onclick="if(event.target===this)closeModal('copy-pkg-modal')">
+  <div class="modal">
+    <h3>Copy card to package</h3>
+    <div class="fld">
+      <div class="flbl">Target Package</div>
+      <select class="fsel" id="copy-pkg-sel"></select>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-s" onclick="closeModal('copy-pkg-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="doCopyCard()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json,.zip" style="display:none" onchange="handleImport(event)">
+<datalist id="tag-opts">
+  <option>general</option><option>flirty</option><option>clothing</option>
+  <option>body</option><option>physical</option><option>feet</option>
+  <option>mouth</option><option>oral</option><option>intimate</option><option>explicit</option>
+</datalist>
+<div id="toast"></div>
+
+<script>
+// ─── Constants ────────────────────────────────────────────────────────────────
+const KEY        = 'tod2_packages';
+const BUILTIN_ID = '__builtin__';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let pkgs      = [];    // [{ id, name, active, builtin, cards[] }]
+let typeFilter = 'all';
+let editing   = null;  // { card (merged with _pkgId/_builtin), pkgId }
+let edGenders  = [];   // working copy
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+async function init() {
+  loadPkgs();
+  // Ensure built-in package exists and cards are current
+  let bi = pkgs.find(p => p.id === BUILTIN_ID);
+  if (!bi || !bi.cards?.length) {
+    const cards = await fetchBuiltin();
+    if (!bi) {
+      pkgs.unshift({ id: BUILTIN_ID, name: 'Built-in', active: true, builtin: true, cards });
+    } else {
+      bi.cards = cards;
+    }
+    savePkgs();
+  }
+  buildLevelPills();
+  renderSidebar();
+  renderBrowser();
+}
+
+async function fetchBuiltin() {
+  try { return await (await fetch('/cards')).json(); }
+  catch { return []; }
+}
+
+function loadPkgs() {
+  try { pkgs = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { pkgs = []; }
+}
+
+function savePkgs() {
+  localStorage.setItem(KEY, JSON.stringify(pkgs));
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('pkg-list');
+  list.innerHTML = '';
+  for (const p of pkgs) {
+    const n = p.cards?.length || 0;
+    const div = document.createElement('div');
+    div.className = 'pkg-item';
+    div.innerHTML = `
+      <input type="checkbox" ${p.active?'checked':''} onclick="togglePkg('${p.id}',event)">
+      <span class="pkg-name">${p.builtin?'🔒 ':''}<b>${h(p.name)}</b></span>
+      <span class="pkg-count">${n}</span>
+      <div class="pkg-btns">
+        ${!p.builtin?`<button class="icon-btn" title="Export" onclick="exportPkg('${p.id}',event)">↓</button>`:''}
+        ${!p.builtin?`<button class="icon-btn del" title="Delete" onclick="deletePkg('${p.id}',event)">🗑</button>`:''}
+      </div>`;
+    list.appendChild(div);
+  }
+}
+
+function togglePkg(id, e) {
+  e.stopPropagation();
+  const p = pkgs.find(x => x.id === id);
+  if (p) { p.active = !p.active; savePkgs(); renderSidebar(); renderBrowser(); }
+}
+
+// ─── Package CRUD ─────────────────────────────────────────────────────────────
+function newPackage() {
+  document.getElementById('new-pkg-name').value = '';
+  openModal('new-pkg-modal');
+  setTimeout(() => document.getElementById('new-pkg-name').focus(), 60);
+}
+
+function createPackage() {
+  const name = document.getElementById('new-pkg-name').value.trim();
+  if (!name) return;
+  pkgs.push({ id: 'pkg_' + Date.now(), name, active: true, builtin: false, cards: [] });
+  savePkgs();
+  closeModal('new-pkg-modal');
+  renderSidebar();
+  renderBrowser();
+  toast('Package "' + name + '" created');
+}
+
+function deletePkg(id, e) {
+  e.stopPropagation();
+  const p = pkgs.find(x => x.id === id);
+  if (!p || p.builtin) return;
+  if (!confirm(`Delete package "${p.name}" (${p.cards.length} cards)?`)) return;
+  pkgs = pkgs.filter(x => x.id !== id);
+  if (editing?.pkgId === id) closeEditor();
+  savePkgs(); renderSidebar(); renderBrowser();
+  toast('Package deleted');
+}
+
+function exportPkg(id, e) {
+  e.stopPropagation();
+  const p = pkgs.find(x => x.id === id);
+  if (!p) return;
+  const json = JSON.stringify(p.cards, null, 2);
+  const safeName = p.name.replace(/[^a-z0-9]/gi, '_');
+  if (typeof JSZip !== 'undefined') {
+    const zip = new JSZip();
+    zip.file('package.json', json);
+    zip.generateAsync({ type: 'blob' }).then(blob => dl(safeName + '.zip', blob, 'application/zip'));
+  } else {
+    dl(safeName + '.json', new Blob([json], { type: 'application/json' }), 'application/json');
+  }
+  toast('Exported "' + p.name + '"');
+}
+
+function importPackage() {
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-file').click();
+}
+
+async function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    let cards;
+    if (file.name.endsWith('.zip')) {
+      if (typeof JSZip === 'undefined') { toast('JSZip unavailable — import .json instead', 'danger'); return; }
+      const zip = await JSZip.loadAsync(file);
+      const jf  = zip.file('package.json');
+      if (!jf) { toast('No package.json found in zip', 'danger'); return; }
+      cards = JSON.parse(await jf.async('string'));
+    } else {
+      cards = JSON.parse(await file.text());
+    }
+    if (!Array.isArray(cards)) { toast('Expected an array of cards', 'danger'); return; }
+    const valid   = cards.filter(validate);
+    const invalid = cards.length - valid.length;
+    const name    = file.name.replace(/\.(zip|json)$/i,'').replace(/_/g,' ');
+    pkgs.push({ id: 'pkg_' + Date.now(), name, active: true, builtin: false, cards: valid });
+    savePkgs(); renderSidebar(); renderBrowser();
+    toast(`Imported ${valid.length} cards${invalid?` (${invalid} skipped)`:''}`);
+  } catch(err) { toast('Import failed: ' + err.message, 'danger'); }
+}
+
+function validate(c) {
+  return c && typeof c.id==='string' && c.id
+    && ['truth','dare','duel'].includes(c.type)
+    && c.level>=1 && c.level<=10
+    && c.difficulty>=1 && c.difficulty<=3
+    && typeof c.text?.en==='string' && c.text.en
+    && Array.isArray(c.tags);
+}
+
+// ─── Browser ──────────────────────────────────────────────────────────────────
+function merged() {
+  return pkgs.filter(p => p.active)
+    .flatMap(p => (p.cards||[]).map(c => ({ ...c, _pkgId: p.id, _pkgName: p.name, _builtin: p.builtin })));
+}
+
+function setType(t, btn) {
+  typeFilter = t;
+  document.querySelectorAll('.flt-btn').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  renderBrowser();
+}
+
+function renderBrowser() {
+  const q   = document.getElementById('search').value.toLowerCase();
+  const lvl = parseInt(document.getElementById('f-level').value) || 0;
+  const tag = document.getElementById('f-tag').value;
+  const all = merged();
+
+  let cards = all;
+  if (typeFilter !== 'all') cards = cards.filter(c => c.type === typeFilter);
+  if (lvl)  cards = cards.filter(c => c.level === lvl);
+  if (tag)  cards = cards.filter(c => c.tags?.includes(tag));
+  if (q)    cards = cards.filter(c =>
+    c.text?.en?.toLowerCase().includes(q) ||
+    c.text?.nl?.toLowerCase().includes(q) ||
+    c.id?.toLowerCase().includes(q));
+
+  document.getElementById('hdr-count').textContent = all.length + ' cards';
+  const tbl = document.getElementById('card-table');
+  if (!cards.length) {
+    tbl.innerHTML = `<div class="empty">No cards match.<br>Adjust filters or add a new card.</div>`;
+    return;
+  }
+  tbl.innerHTML = '';
+  for (const c of cards) {
+    const isActive = editing?.card?.id === c.id && editing?.pkgId === c._pkgId;
+    const row = document.createElement('div');
+    row.className = 'card-row' + (isActive ? ' active' : '');
+    row.onclick = () => openEditor(c, c._pkgId);
+    const dots = [1,2,3].map(n => `<div class="ddot ${n<=c.difficulty?'on':''}"></div>`).join('');
+    const tags = (c.tags||[]).slice(0,3).map(t => `<span class="tpill">${h(t)}</span>`).join('');
+    const custom = !c._builtin ? `<span class="badge b-cust">custom</span>` : '';
+    row.innerHTML = `
+      <span class="badge b-lvl">L${c.level}</span>
+      <span class="badge b-${c.type}">${c.type}</span>
+      <div class="ddots">${dots}</div>
+      <div class="card-preview">${h((c.text?.en||'').slice(0,90))}</div>
+      <div class="tag-pills">${tags}</div>
+      ${custom}`;
+    tbl.appendChild(row);
+  }
+}
+
+// ─── Editor ───────────────────────────────────────────────────────────────────
+function buildLevelPills() {
+  const wrap = document.getElementById('ed-level');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const d = document.createElement('div');
+    d.className = 'spill' + (i===1?' on':'');
+    d.dataset.v = i;
+    d.textContent = i;
+    d.onclick = () => setPill('ed-level', String(i));
+    wrap.appendChild(d);
+  }
+}
+
+function openEditor(card, pkgId) {
+  editing   = { card, pkgId };
+  edGenders = Array.isArray(card.genderRequired) ? [...card.genderRequired] : [];
+  const ro  = !!card._builtin;
+
+  document.getElementById('ed-title').textContent = ro ? '🔒 View Card (Built-in)' : (card.id.startsWith('custom_') && !pkgs.find(p=>p.id===pkgId)?.cards?.some(c=>c.id===card.id) ? 'New Card' : 'Edit Card');
+  document.getElementById('ed-id').value = card.id;
+
+  // Package selector (custom pkgs only as move target)
+  const customs = pkgs.filter(p => !p.builtin);
+  const pkgSel  = document.getElementById('ed-pkg');
+  pkgSel.innerHTML = ro
+    ? `<option>Built-in (read-only)</option>`
+    : customs.map(p => `<option value="${p.id}" ${p.id===pkgId?'selected':''}>${h(p.name)}</option>`).join('');
+  pkgSel.disabled = ro || customs.length === 0;
+
+  setPill('ed-type', card.type || 'truth');
+  setPill('ed-level', String(card.level || 1));
+  setPill('ed-diff',  String(card.difficulty || 2));
+
+  document.getElementById('ed-en').value = card.text?.en || '';
+  document.getElementById('ed-nl').value = card.text?.nl || '';
+
+  renderTags(card.tags || [], ro);
+
+  document.getElementById('ed-gender').querySelectorAll('.spill').forEach(p => {
+    p.classList.toggle('on', edGenders.includes(p.dataset.v));
+    p.style.pointerEvents = ro ? 'none' : '';
+  });
+
+  document.getElementById('ed-body').value   = card.bodyTypeRequired   || '';
+  document.getElementById('ed-orient').checked = !!card.orientationMatters;
+  document.getElementById('ed-target').checked = !!card.targetRequired;
+  document.getElementById('ed-avail').checked  = !!card.availableForAllCombos;
+
+  // Disable all inputs for built-in cards
+  ['ed-en','ed-nl','ed-body'].forEach(id => document.getElementById(id).disabled = ro);
+  ['ed-orient','ed-target','ed-avail'].forEach(id => document.getElementById(id).disabled = ro);
+  if (ro) {
+    ['ed-type','ed-level','ed-diff'].forEach(id =>
+      document.getElementById(id).querySelectorAll('.spill').forEach(p => p.style.pointerEvents='none'));
+  } else {
+    ['ed-type','ed-level','ed-diff'].forEach(id =>
+      document.getElementById(id).querySelectorAll('.spill').forEach(p => p.style.pointerEvents=''));
+  }
+
+  // Footer: hide Delete for built-in, show Copy for all
+  document.getElementById('ed-footer').innerHTML = ro
+    ? `<button class="btn btn-s" style="flex:1" onclick="copyCardToPkg()">📋 Copy to Package</button>`
+    : `<button class="btn btn-p" style="flex:1" onclick="saveCard()">Save</button>
+       <button class="btn btn-s" onclick="copyCardToPkg()">📋 Copy</button>
+       <button class="btn btn-d" onclick="deleteCard()">Delete</button>`;
+
+  document.getElementById('ed-panel').classList.add('open');
+  renderBrowser();
+}
+
+function setPill(group, val) {
+  document.getElementById(group).querySelectorAll('.spill').forEach(p =>
+    p.classList.toggle('on', p.dataset.v === val));
+}
+
+function getPill(group) {
+  const a = document.getElementById(group).querySelector('.spill.on');
+  return a ? a.dataset.v : null;
+}
+
+function toggleGender(val, el) {
+  if (editing?.card?._builtin) return;
+  const i = edGenders.indexOf(val);
+  if (i === -1) edGenders.push(val); else edGenders.splice(i, 1);
+  el.classList.toggle('on', edGenders.includes(val));
+}
+
+function renderTags(tags, ro) {
+  const wrap = document.getElementById('ed-tags');
+  wrap.innerHTML = '';
+  for (const t of tags) {
+    const chip = document.createElement('div');
+    chip.className = 'tchip';
+    chip.innerHTML = `${h(t)}${ro?'':` <button onclick="removeTag('${h(t)}')" title="Remove">✕</button>`}`;
+    wrap.appendChild(chip);
+  }
+  if (!ro) {
+    const inp = document.createElement('input');
+    inp.className = 'tadd'; inp.placeholder = 'Add tag…'; inp.setAttribute('list','tag-opts');
+    inp.onkeydown = ev => {
+      if (ev.key==='Enter'||ev.key===',') {
+        ev.preventDefault();
+        const v = ev.target.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+        if (v && !currentTags().includes(v)) { renderTags([...currentTags(),v], false); }
+        ev.target.value='';
+        // refocus new input
+        setTimeout(()=>document.querySelector('#ed-tags .tadd')?.focus(),0);
+      }
+    };
+    wrap.appendChild(inp);
+  }
+}
+
+function currentTags() {
+  return [...document.querySelectorAll('#ed-tags .tchip')].map(c=>c.childNodes[0].textContent.trim());
+}
+
+function removeTag(tag) {
+  renderTags(currentTags().filter(t=>t!==tag), false);
+}
+
+function closeEditor() {
+  editing = null;
+  document.getElementById('ed-panel').classList.remove('open');
+  renderBrowser();
+}
+
+function saveCard() {
+  if (!editing) return;
+  const pkgId = document.getElementById('ed-pkg').value || editing.pkgId;
+  const pkg   = pkgs.find(p => p.id === pkgId);
+  if (!pkg) { toast('Package not found', 'danger'); return; }
+
+  const en = document.getElementById('ed-en').value.trim();
+  if (!en) { toast('English text is required', 'danger'); return; }
+
+  const card = {
+    id:               editing.card.id,
+    type:             getPill('ed-type') || 'dare',
+    level:            parseInt(getPill('ed-level')) || 1,
+    difficulty:       parseInt(getPill('ed-diff'))  || 2,
+    text:             { en, nl: document.getElementById('ed-nl').value.trim() },
+    tags:             currentTags(),
+    genderRequired:   edGenders.length ? [...edGenders] : null,
+    bodyTypeRequired: document.getElementById('ed-body').value || null,
+    orientationMatters:   document.getElementById('ed-orient').checked,
+    targetRequired:       document.getElementById('ed-target').checked,
+    availableForAllCombos:document.getElementById('ed-avail').checked,
+  };
+
+  // If package changed, remove from old
+  if (editing.pkgId !== pkgId) {
+    const old = pkgs.find(p => p.id === editing.pkgId);
+    if (old) old.cards = old.cards.filter(c => c.id !== card.id);
+  }
+
+  const idx = pkg.cards.findIndex(c => c.id === card.id);
+  if (idx === -1) pkg.cards.push(card); else pkg.cards[idx] = card;
+
+  editing = { card: { ...card, _pkgId: pkgId, _builtin: false }, pkgId };
+  savePkgs(); renderSidebar(); renderBrowser();
+  toast('Card saved ✓');
+}
+
+function deleteCard() {
+  if (!editing) return;
+  const { card, pkgId } = editing;
+  if (!confirm(`Delete card "${card.id}"?`)) return;
+  const pkg = pkgs.find(p => p.id === pkgId);
+  if (pkg) pkg.cards = pkg.cards.filter(c => c.id !== card.id);
+  savePkgs(); closeEditor(); renderSidebar();
+  toast('Card deleted');
+}
+
+function newCard() {
+  const customs = pkgs.filter(p => !p.builtin);
+  if (!customs.length) { toast('Create a custom package first', 'danger'); return; }
+  const pkg  = customs[0];
+  const card = {
+    id: 'custom_' + Date.now(),
+    type: 'dare', level: 1, difficulty: 2,
+    text: { en: '', nl: '' }, tags: [],
+    genderRequired: null, bodyTypeRequired: null,
+    orientationMatters: false, targetRequired: false, availableForAllCombos: false,
+    _pkgId: pkg.id, _pkgName: pkg.name, _builtin: false,
+  };
+  openEditor(card, pkg.id);
+  document.getElementById('ed-title').textContent = 'New Card';
+}
+
+function copyCardToPkg() {
+  if (!editing) return;
+  const customs = pkgs.filter(p => !p.builtin);
+  if (!customs.length) { toast('Create a custom package first', 'danger'); return; }
+  const sel = document.getElementById('copy-pkg-sel');
+  sel.innerHTML = customs.map(p => `<option value="${p.id}">${h(p.name)}</option>`).join('');
+  openModal('copy-pkg-modal');
+}
+
+function doCopyCard() {
+  const targetId = document.getElementById('copy-pkg-sel').value;
+  const pkg = pkgs.find(p => p.id === targetId);
+  if (!pkg || !editing) { closeModal('copy-pkg-modal'); return; }
+  const src   = editing.card;
+  const newId = 'custom_' + Date.now();
+  const copy  = {
+    id: newId, type: src.type, level: src.level, difficulty: src.difficulty,
+    text: { ...src.text }, tags: [...(src.tags||[])],
+    genderRequired:       src.genderRequired ? [...src.genderRequired] : null,
+    bodyTypeRequired:     src.bodyTypeRequired || null,
+    orientationMatters:   !!src.orientationMatters,
+    targetRequired:       !!src.targetRequired,
+    availableForAllCombos:!!src.availableForAllCombos,
+  };
+  pkg.cards.push(copy);
+  savePkgs(); closeModal('copy-pkg-modal'); renderSidebar();
+  // Open the copy for editing
+  openEditor({ ...copy, _pkgId: targetId, _pkgName: pkg.name, _builtin: false }, targetId);
+  toast('Copied to "' + pkg.name + '"');
+}
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+function h(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function dl(name, blob, type) {
+  const url = URL.createObjectURL(blob instanceof Blob ? blob : new Blob([blob],{type}));
+  const a = Object.assign(document.createElement('a'),{href:url,download:name});
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = type==='danger'?'#ef4444':type==='success'?'#4ade80':'rgba(255,255,255,.08)';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+init();
+</script>
+</body>
+</html>

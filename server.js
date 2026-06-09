@@ -16,6 +16,8 @@ const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
 const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
 
+function getRoomCards(room) { return room.cardPool || ALL_CARDS; }
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
@@ -69,6 +71,7 @@ function createRoom(hostId, hostMode = 'display') {
     economyMode: 'schaars',         // 'schaars' | 'gemiddeld' | 'overvloedig'
     enabledPowerups: [],
     activeEvent: null,
+    cardPool: null,          // null = use ALL_CARDS; set from host's active packages
   };
   return rooms[code];
 }
@@ -298,12 +301,18 @@ io.on('connection', (socket) => {
   });
 
   // Host starts the game
-  socket.on('start-game', ({ code }, cb) => {
+  socket.on('start-game', ({ code, cardPool }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
     if (room.host !== socket.id) return cb({ ok: false, error: 'Only the host can start' });
     const playerIds = Object.keys(room.players);
     if (playerIds.length < 2) return cb({ ok: false, error: 'Need at least 2 players' });
+
+    // Accept custom card pool from host's active packages (validated client-side)
+    if (Array.isArray(cardPool) && cardPool.length > 0) {
+      room.cardPool = cardPool;
+      console.log(`[cards] Room ${code} using custom pool: ${cardPool.length} cards`);
+    }
 
     room.phase = 'game';
     room.turnOrder = playerIds.sort(() => Math.random() - 0.5);
@@ -367,7 +376,7 @@ io.on('connection', (socket) => {
     // Duel roll: 25% chance when choice is 'dare' and a different target exists
     if (choice === 'dare' && target && Math.random() < 0.25) {
       const duelResult = selectCard(
-        ALL_CARDS, 'duel', performer, target, effectiveLevel,
+        getRoomCards(room), 'duel', performer, target, effectiveLevel,
         performer.usedCardIds, { rouletteMode: scMode }
       );
       if (duelResult.card) {
@@ -387,7 +396,7 @@ io.on('connection', (socket) => {
     }
 
     const { card, recycled, softFlagged } = selectCard(
-      ALL_CARDS, choice, performer, target, effectiveLevel,
+      getRoomCards(room), choice, performer, target, effectiveLevel,
       performer.usedCardIds, { rouletteMode: scMode }
     );
 
@@ -498,8 +507,8 @@ io.on('connection', (socket) => {
     const parked = performer.breakSlots.parkedDares.splice(parkedIdx, 1)[0];
     performer.breakSlots.used = Math.max(0, performer.breakSlots.used - 1);
 
-    // Reconstruct card from ALL_CARDS (for full card object)
-    const card = ALL_CARDS.find(c => c.id === parked.cardId) || {
+    // Reconstruct card from room pool (for full card object)
+    const card = getRoomCards(room).find(c => c.id === parked.cardId) || {
       id: parked.cardId, type: 'dare', level: parked.level,
       difficulty: parked.difficulty, text: parked.text, tags: [],
     };
@@ -535,7 +544,7 @@ io.on('connection', (socket) => {
     const respinLevel = Math.min(currentLevel + 1, maxLevel);
 
     const { card, recycled, softFlagged } = selectCard(
-      ALL_CARDS, choice, performer, target, respinLevel,
+      getRoomCards(room), choice, performer, target, respinLevel,
       performer.usedCardIds,
       { rouletteMode: 'off' }
     );
@@ -650,7 +659,7 @@ io.on('connection', (socket) => {
     let forfeitCard = null;
     if (loser) {
       const forfeitLevel = Math.max(1, Math.min(3, Math.ceil(turn.card.level / 3)));
-      const fr = selectCard(ALL_CARDS, 'dare', loser, null, forfeitLevel, loser.usedCardIds, { rouletteMode: 'off' });
+      const fr = selectCard(getRoomCards(room), 'dare', loser, null, forfeitLevel, loser.usedCardIds, { rouletteMode: 'off' });
       if (fr.card && fr.card.type === 'dare') {
         forfeitCard = fr.card;
         loser.usedCardIds.add(forfeitCard.id);
@@ -773,12 +782,12 @@ io.on('connection', (socket) => {
       // Trial draw to reveal dare type
       const trialTarget = (turn.targetId && turn.targetId !== socket.id) ? room.players[turn.targetId] : null;
       const trialDuel = (trialTarget && Math.random() < 0.25)
-        ? selectCard(ALL_CARDS, 'duel', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' })
+        ? selectCard(getRoomCards(room), 'duel', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' })
         : { card: null };
       if (trialDuel.card) {
         turn.insightType = 'duel';
       } else {
-        const trialDare = selectCard(ALL_CARDS, 'dare', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' });
+        const trialDare = selectCard(getRoomCards(room), 'dare', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' });
         turn.insightType = trialDare.card ? 'dare' : 'truth';
       }
       turn.insightRevealed = true;
@@ -860,6 +869,8 @@ io.on('connection', (socket) => {
 
 // ─── HTTP Routes ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true }));
+app.get('/cards',  (req, res) => res.json(ALL_CARDS));
+app.get('/editor', (req, res) => res.sendFile(path.join(__dirname, 'public', 'editor.html')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
