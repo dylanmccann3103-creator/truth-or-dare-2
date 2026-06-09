@@ -758,6 +758,21 @@ input::placeholder { color: #7a6b8a; }
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 2b: Equipment / Room Modifiers (host-only, before QR)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-equipment" class="screen">
+  <div class="gap-lg"></div>
+  <h2>Room Setup</h2>
+  <p style="color:#9b89b4;font-size:0.88rem;text-align:center;margin-bottom:4px">What equipment do you have available?<br><span style="font-size:0.78rem;color:#7a6b8a">Cards that need unavailable equipment will be hidden.</span></p>
+  <div class="gap"></div>
+  <div id="equipment-list" style="width:100%;max-width:480px;display:flex;flex-direction:column;gap:10px"></div>
+  <div class="gap-lg"></div>
+  <button class="btn btn-primary" style="max-width:480px" onclick="confirmEquipment()">Continue → Show QR Code</button>
+  <div class="gap-sm"></div>
+  <button class="btn btn-secondary" onclick="showScreen('screen-host')">← Back</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
      SCREEN 3: Join — Enter room code
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-join" class="screen">
@@ -1321,18 +1336,58 @@ function showScreen(id) {
 }
 
 // ─── Room Actions ─────────────────────────────────────────────────────────────
+// ─── Equipment / Room Modifiers ───────────────────────────────────────────────
+const EQUIPMENT_ITEMS = [
+  { id: 'equip_anal_beads', label: 'Anal Beads',     emoji: '🔴', desc: 'Anal bead insertion dares' },
+  { id: 'equip_whip',       label: 'Whip / Flogger', emoji: '🎯', desc: 'Whipping & impact dares' },
+  { id: 'equip_wax_candle', label: 'Wax Candle',     emoji: '🕯️', desc: 'Hot wax dares' },
+];
+let equipmentAvailable = new Set();
+
+function initEquipmentScreen() {
+  equipmentAvailable = new Set(EQUIPMENT_ITEMS.map(e => e.id)); // default: all available
+  renderEquipmentScreen();
+}
+
+function renderEquipmentScreen() {
+  document.getElementById('equipment-list').innerHTML = EQUIPMENT_ITEMS.map(item => {
+    const on = equipmentAvailable.has(item.id);
+    return `<div onclick="toggleEquipment('${item.id}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:2px solid ${on ? 'var(--accent)' : 'var(--border)'};border-radius:14px;cursor:pointer;transition:border-color .15s">
+      <span style="font-size:1.6rem">${item.emoji}</span>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:0.95rem">${item.label}</div>
+        <div style="font-size:0.78rem;color:#7a6b8a">${item.desc}</div>
+      </div>
+      <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;background:${on ? 'var(--accent)' : 'var(--surface2)'};color:${on ? 'white' : '#7a6b8a'};border:2px solid ${on ? 'var(--accent)' : 'var(--border)'}">
+        ${on ? '✓' : '✗'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleEquipment(id) {
+  if (equipmentAvailable.has(id)) equipmentAvailable.delete(id);
+  else equipmentAvailable.add(id);
+  renderEquipmentScreen();
+}
+
+function confirmEquipment() {
+  const limits = EQUIPMENT_ITEMS.map(e => e.id).filter(id => !equipmentAvailable.has(id));
+  socket.emit('set-equipment', { code: myRoom, limits }, (res) => {
+    if (res && !res.ok) return toast(res.error || 'Error', 'danger');
+    if (myHostMode === 'display') showLobby();
+    else showScreen('screen-setup');
+  });
+}
+
 function createRoom(hostMode) {
   myHostMode = hostMode;
   socket.emit('create-room', { hostMode }, (res) => {
     if (!res.ok) return toast(res.error, 'danger');
     myRoom = res.code;
     amHost = true;
-    if (hostMode === 'display') {
-      // Display host skips setup — goes straight to lobby
-      showLobby();
-    } else {
-      showScreen('screen-setup');
-    }
+    initEquipmentScreen();
+    showScreen('screen-equipment');
   });
 }
 

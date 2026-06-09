@@ -16,7 +16,11 @@ const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
 const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
 
-function getRoomCards(room) { return room.cardPool || ALL_CARDS; }
+function getRoomCards(room) {
+  const cards = room.cardPool || ALL_CARDS;
+  if (!room.equipmentLimits || room.equipmentLimits.length === 0) return cards;
+  return cards.filter(c => !c.tags || !c.tags.some(t => room.equipmentLimits.includes(t)));
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -72,6 +76,7 @@ function createRoom(hostId, hostMode = 'display') {
     enabledPowerups: [],
     activeEvent: null,
     cardPool: null,          // null = use ALL_CARDS; set from host's active packages
+    equipmentLimits: [],     // equip_* tags for unavailable equipment — filtered from card pool
   };
   return rooms[code];
 }
@@ -275,6 +280,16 @@ io.on('connection', (socket) => {
     room.players[socket.id].ready = true;
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  // Host sets available equipment (before QR lobby, lobby phase only)
+  socket.on('set-equipment', ({ code, limits }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false, error: 'Room not found' });
+    if (room.host !== socket.id) return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby') return cb && cb({ ok: false, error: 'Lobby only' });
+    room.equipmentLimits = Array.isArray(limits) ? limits.filter(t => typeof t === 'string') : [];
+    cb && cb({ ok: true });
   });
 
   // Host updates game config (lobby phase only)

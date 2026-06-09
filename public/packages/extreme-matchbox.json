@@ -61,19 +61,19 @@
 
   { "id": "ext_016", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Insert anal beads to the second ball, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen tot aan het tweede balletje, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass", "equip_anal_beads"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_017", "type": "dare", "level": 9, "difficulty": 1,
     "text": { "en": "Insert anal beads halfway, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen halverwege, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass", "equip_anal_beads"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_018", "type": "dare", "level": 9, "difficulty": 3,
     "text": { "en": "Insert the anal beads all the way, pull them out, and repeat 10 times.", "nl": "Stop de anale kralen er helemaal in, trek ze eruit en herhaal dit 10 keer." },
-    "tags": ["explicit", "penetration_ass"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
+    "tags": ["explicit", "penetration_ass", "equip_anal_beads"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": false },
 
   { "id": "ext_019", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Receive 10 hard whips from your partner.", "nl": "Ontvang 10 harde zweepslagen van je partner." },
-    "tags": ["explicit"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "equip_whip"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_020", "type": "dare", "level": 9, "difficulty": 3,
     "text": { "en": "Allow your partner to insert their toe into your arsehole as far as possible.", "nl": "Laat je partner zijn/haar teen zo ver mogelijk in je kont steken." },
@@ -93,7 +93,7 @@
 
   { "id": "ext_024", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Allow your partner to drip hot candle wax on your body (be careful not to burn yourself).", "nl": "Laat je partner hete kaarsenwas op je lijf druppelen (let op: niet verbranden)." },
-    "tags": ["explicit", "intimate"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
+    "tags": ["explicit", "intimate", "equip_wax_candle"], "genderRequired": null, "bodyTypeRelevant": false, "bodyTypeRequired": null, "orientationMatters": false, "targetRequired": true },
 
   { "id": "ext_025", "type": "dare", "level": 9, "difficulty": 2,
     "text": { "en": "Describe in detail a sexual act you have performed on someone other than your partner — at least 2 minutes, whispered in your partner's ear using that person's name — while re-enacting it on your partner.", "nl": "Beschrijf een seksuele handeling die je hebt uitgevoerd op iemand die niet je partner is — minimaal 2 minuten, gefluisterd in het oor van je partner met die persoon's naam — en speel het tegelijkertijd na op je partner." },
