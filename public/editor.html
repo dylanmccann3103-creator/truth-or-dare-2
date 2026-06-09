@@ -497,11 +497,13 @@ async function handleImport(e) {
 }
 
 function validate(c) {
+  const hasText = (typeof c.text === 'string' && c.text) ||
+                  (c.text && (typeof c.text.en === 'string' || typeof c.text.nl === 'string'));
   return c && typeof c.id==='string' && c.id
     && ['truth','dare','duel'].includes(c.type)
     && c.level>=1 && c.level<=10
     && c.difficulty>=1 && c.difficulty<=3
-    && typeof c.text?.en==='string' && c.text.en
+    && hasText
     && Array.isArray(c.tags);
 }
 
