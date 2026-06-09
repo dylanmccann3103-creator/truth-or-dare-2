@@ -173,8 +173,28 @@ haal je het level dus precies in 3 dares; krijg je drie 1-pointers, dan heb je p
 | Cooldown reset | 7 | reset cooldown |
 
 ### §7.4 Limit-tags (hard block) — *English v1-lijst, werkend; definitieve review na build*
-`general · flirty · clothing · body · physical · feet · mouth · oral · intimate · explicit`
-(uitbreidbaar; finale lijst wordt samen met de content-review bevestigd ná de build.)
+`general · flirty · clothing · body · physical · feet · mouth · oral · intimate · explicit · anal · bondage · toy · public · exposure`
+
+Tag-omschrijvingen (voor speler-setup UI én selectCard-filtering):
+| Tag | Blokkeert |
+|-----|-----------|
+| `general` | algemene/neutrale dares |
+| `flirty` | flirterige, complimenteuze dares |
+| `clothing` | kleding uittrekken / stripping |
+| `body` | lichaamsgericht (aanraking, massage) |
+| `physical` | fysieke uitdagingen |
+| `feet` | voeten-gerelateerd |
+| `mouth` | mond/kus-gericht |
+| `oral` | orale seks |
+| `intimate` | intieme aanraking (niet-seksueel) |
+| `explicit` | seksuele handelingen |
+| `anal` | anale stimulatie (plug, vinger, tong) |
+| `bondage` | vastbinden, halsband/riem, BDSM-elementen |
+| `toy` | gebruik van seksspeeltjes |
+| `public` | semi-publieke setting (auto, balkon, etc.) |
+| `exposure` | blootstelling buiten het spel: nudes sturen, contact iets bekennen, selfies posten, etc. |
+
+(Finale lijst wordt samen met de content-review bevestigd ná de build.)
 
 ### §7.5 Turn-flow & rollen
 **Host-rol = keuze (host-mode).** Bij het aanmaken kiest de host:
