@@ -69,8 +69,10 @@ function createRoom(hostId, hostMode = 'display') {
     currentTurnIndex: -1,           // -1 so first advanceTurn yields index 0
     currentTurn: null,
     // Host config
-    minStartLevel: 1,
-    rouletteMode: 'off',            // 'off' | 'plus1' | 'block'
+    minLevel: 1,                     // lowest level players may choose
+    maxLevel: 10,                    // highest level players may choose
+    levelMode: 'locked',             // 'locked' = earn access; 'free' = all open from start
+    rouletteMode: 'off',             // 'off' | 'plus1' | 'block'
     targetingMode: '50-50',         // 'self' | '50-50' | 'random'
     economyMode: 'schaars',         // 'schaars' | 'gemiddeld' | 'overvloedig'
     enabledPowerups: [],
@@ -85,18 +87,23 @@ function getRoom(code) { return rooms[code]; }
 
 // ─── Progression helpers ──────────────────────────────────────────────────────
 
-function canAccessLevel(player, level) {
+function canAccessLevel(player, level, room) {
+  const maxLvl = room?.maxLevel ?? 10;
+  if (level > maxLvl) return false;
+  if (level <= (room?.minLevel ?? 1)) return true;
+  if (room?.levelMode === 'free') return true;
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = 3 * level * (level - 1); // cumulative max-XP across prior levels
+  const xpThreshold = 3 * level * (level - 1);
   return player.xp >= xpThreshold && player.clearedLevels.includes(prev);
 }
 
-function maxUnlockedLevel(player) {
-  for (let lvl = 10; lvl >= 1; lvl--) {
-    if (canAccessLevel(player, lvl)) return lvl;
+function maxUnlockedLevel(player, room) {
+  const max = room?.maxLevel ?? 10;
+  for (let lvl = max; lvl >= 1; lvl--) {
+    if (canAccessLevel(player, lvl, room)) return lvl;
   }
-  return 1;
+  return room?.minLevel ?? 1;
 }
 
 // ─── Game helpers ─────────────────────────────────────────────────────────────
@@ -210,6 +217,9 @@ function roomPublicState(room) {
     targetingMode: room.targetingMode,
     rouletteMode: room.rouletteMode,
     economyMode: room.economyMode,
+    minLevel: room.minLevel ?? 1,
+    maxLevel: room.maxLevel ?? 10,
+    levelMode: room.levelMode ?? 'locked',
     minStartLevel: room.minStartLevel,
     enabledPowerups: room.enabledPowerups || [],
   };
@@ -294,20 +304,30 @@ io.on('connection', (socket) => {
   });
 
   // Host updates game config (lobby phase only)
-  socket.on('set-game-config', ({ code, targetingMode, rouletteMode, economyMode, enabledPowerups }, cb) => {
+  socket.on('set-game-config', ({ code, targetingMode, rouletteMode, economyMode, enabledPowerups, minLevel, maxLevel, levelMode }, cb) => {
     const room = getRoom(code);
     if (!room) return cb && cb({ ok: false, error: 'Room not found' });
     if (room.host !== socket.id) return cb && cb({ ok: false, error: 'Only the host can configure' });
     if (room.phase !== 'lobby') return cb && cb({ ok: false, error: 'Can only configure in lobby' });
 
-    const validTargeting = ['self', '50-50', 'random'];
-    const validRoulette  = ['off', 'plus1', 'block'];
-    const validEconomy   = ['schaars', 'gemiddeld', 'overvloedig'];
-    const validPowerups  = Object.keys(POWERUP_COSTS);
+    const validTargeting  = ['self', '50-50', 'random'];
+    const validRoulette   = ['off', 'plus1', 'block'];
+    const validEconomy    = ['schaars', 'gemiddeld', 'overvloedig'];
+    const validLevelModes = ['locked', 'free'];
+    const validPowerups   = Object.keys(POWERUP_COSTS);
 
-    if (targetingMode && validTargeting.includes(targetingMode)) room.targetingMode = targetingMode;
-    if (rouletteMode  && validRoulette.includes(rouletteMode))   room.rouletteMode  = rouletteMode;
-    if (economyMode   && validEconomy.includes(economyMode))     room.economyMode   = economyMode;
+    if (targetingMode && validTargeting.includes(targetingMode))   room.targetingMode = targetingMode;
+    if (rouletteMode  && validRoulette.includes(rouletteMode))     room.rouletteMode  = rouletteMode;
+    if (economyMode   && validEconomy.includes(economyMode))       room.economyMode   = economyMode;
+    if (levelMode     && validLevelModes.includes(levelMode))      room.levelMode     = levelMode;
+    if (minLevel !== undefined) {
+      const n = parseInt(minLevel, 10);
+      if (n >= 1 && n <= 9) room.minLevel = n;
+    }
+    if (maxLevel !== undefined) {
+      const n = parseInt(maxLevel, 10);
+      if (n >= 2 && n <= 10 && n > room.minLevel) room.maxLevel = n;
+    }
     if (Array.isArray(enabledPowerups)) {
       room.enabledPowerups = enabledPowerups.filter(p => validPowerups.includes(p));
     }
@@ -332,8 +352,22 @@ io.on('connection', (socket) => {
 
     room.phase = 'game';
     room.turnOrder = playerIds.sort(() => Math.random() - 0.5);
-    room.currentTurnIndex = -1;     // advanceTurn will increment to 0
+    room.currentTurnIndex = -1;
     room.currentTurn = null;
+    // Apply minLevel: everyone starts at the configured floor
+    const startLevel = room.minLevel ?? 1;
+    if (startLevel > 1) {
+      playerIds.forEach(id => {
+        const p = room.players[id];
+        p.currentLevel = startLevel;
+        // In free mode we don't need progression tracking; in locked mode pre-clear all prior levels
+        if (room.levelMode === 'locked') {
+          for (let l = 1; l < startLevel; l++) {
+            if (!p.clearedLevels.includes(l)) p.clearedLevels.push(l);
+          }
+        }
+      });
+    }
     cb({ ok: true });
     advanceTurn(room);              // kicks off the first turn
   });
@@ -349,7 +383,7 @@ io.on('connection', (socket) => {
 
     const lvl = parseInt(level, 10);
     if (!lvl || lvl < 1 || lvl > 10) return cb && cb({ ok: false, error: 'Invalid level' });
-    if (!canAccessLevel(player, lvl)) {
+    if (!canAccessLevel(player, lvl, room)) {
       return cb && cb({ ok: false, error: `Level ${lvl} not yet unlocked` });
     }
 
@@ -381,7 +415,7 @@ io.on('connection', (socket) => {
     // plus1 roulette: 20% chance of bumping level, never to 10
     if (room.rouletteMode === 'plus1' && Math.random() < 0.2) {
       const bumped = effectiveLevel + 1;
-      if (bumped < 10 && canAccessLevel(performer, bumped)) {
+      if (bumped < 10 && canAccessLevel(performer, bumped, room)) {
         effectiveLevel = bumped;
         rouletteUpgrade = true;
       }
@@ -555,7 +589,7 @@ io.on('connection', (socket) => {
     const choice = room.currentTurn.choice;
 
     const currentLevel = performer.currentLevel || 1;
-    const maxLevel = maxUnlockedLevel(performer);
+    const maxLevel = maxUnlockedLevel(performer, room);
     // Try level+1, capped at maxLevel; if already at max, stay at same level
     const respinLevel = Math.min(currentLevel + 1, maxLevel);
 

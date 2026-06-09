@@ -916,7 +916,39 @@ input::placeholder { color: #7a6b8a; }
     <div class="card">
       <div class="section-label" style="margin-top:0">⚙️ Game Settings</div>
 
-      <div style="font-size:0.8rem;color:#7a6b8a;margin-bottom:4px">Targeting</div>
+      <div style="font-size:0.8rem;color:#7a6b8a;margin-bottom:4px">Level Mode</div>
+      <div class="config-row" id="config-levelmode">
+        <button class="config-btn active" data-key="levelMode" data-val="locked" onclick="setGameConfig('levelMode','locked')">🔒 Progressive</button>
+        <button class="config-btn"        data-key="levelMode" data-val="free"   onclick="setGameConfig('levelMode','free')">🔓 All Unlocked</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Start Level <span style="font-weight:400" id="config-minlevel-val">(1)</span></div>
+      <div class="config-row" id="config-minlevel" style="flex-wrap:wrap">
+        <button class="config-btn active" data-val="1" onclick="setGameConfig('minLevel',1)">1</button>
+        <button class="config-btn" data-val="2" onclick="setGameConfig('minLevel',2)">2</button>
+        <button class="config-btn" data-val="3" onclick="setGameConfig('minLevel',3)">3</button>
+        <button class="config-btn" data-val="4" onclick="setGameConfig('minLevel',4)">4</button>
+        <button class="config-btn" data-val="5" onclick="setGameConfig('minLevel',5)">5</button>
+        <button class="config-btn" data-val="6" onclick="setGameConfig('minLevel',6)">6</button>
+        <button class="config-btn" data-val="7" onclick="setGameConfig('minLevel',7)">7</button>
+        <button class="config-btn" data-val="8" onclick="setGameConfig('minLevel',8)">8</button>
+        <button class="config-btn" data-val="9" onclick="setGameConfig('minLevel',9)">9</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Max Level <span style="font-weight:400" id="config-maxlevel-val">(10)</span></div>
+      <div class="config-row" id="config-maxlevel" style="flex-wrap:wrap">
+        <button class="config-btn" data-val="2"  onclick="setGameConfig('maxLevel',2)">2</button>
+        <button class="config-btn" data-val="3"  onclick="setGameConfig('maxLevel',3)">3</button>
+        <button class="config-btn" data-val="4"  onclick="setGameConfig('maxLevel',4)">4</button>
+        <button class="config-btn" data-val="5"  onclick="setGameConfig('maxLevel',5)">5</button>
+        <button class="config-btn" data-val="6"  onclick="setGameConfig('maxLevel',6)">6</button>
+        <button class="config-btn" data-val="7"  onclick="setGameConfig('maxLevel',7)">7</button>
+        <button class="config-btn" data-val="8"  onclick="setGameConfig('maxLevel',8)">8</button>
+        <button class="config-btn" data-val="9"  onclick="setGameConfig('maxLevel',9)">9</button>
+        <button class="config-btn active" data-val="10" onclick="setGameConfig('maxLevel',10)">10</button>
+      </div>
+
+      <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Targeting</div>
       <div class="config-row" id="config-targeting">
         <button class="config-btn" data-key="targetingMode" data-val="self" onclick="setGameConfig('targetingMode','self')">Self</button>
         <button class="config-btn active" data-key="targetingMode" data-val="50-50" onclick="setGameConfig('targetingMode','50-50')">50-50</button>
@@ -1544,6 +1576,26 @@ function updateConfigUI(state) {
       btn.classList.toggle('active', btn.dataset.val === configs[btn.dataset.key]);
     });
   });
+
+  // Level mode
+  document.querySelectorAll('#config-levelmode .config-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === (state.levelMode || 'locked'));
+  });
+  // Start level
+  const minLvl = state.minLevel ?? 1;
+  const maxLvl = state.maxLevel ?? 10;
+  document.querySelectorAll('#config-minlevel .config-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) === minLvl);
+  });
+  const minValEl = document.getElementById('config-minlevel-val');
+  if (minValEl) minValEl.textContent = `(${minLvl})`;
+  // Max level
+  document.querySelectorAll('#config-maxlevel .config-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) === maxLvl);
+  });
+  const maxValEl = document.getElementById('config-maxlevel-val');
+  if (maxValEl) maxValEl.textContent = `(${maxLvl})`;
+
   // Sync local powerup list from state (in case of reconnect)
   localEnabledPowerups = [...(state.enabledPowerups || [])];
   document.querySelectorAll('#config-powerups .config-btn').forEach(btn => {
@@ -2002,24 +2054,35 @@ function buildLevelScreen(state) {
   const grid = document.getElementById('level-grid');
   grid.innerHTML = '';
 
+  const minLvl  = roomState?.minLevel  ?? 1;
+  const maxLvl  = roomState?.maxLevel  ?? 10;
+  const freeMode = roomState?.levelMode === 'free';
+
   for (let lvl = 1; lvl <= 10; lvl++) {
     const btn = document.createElement('button');
     btn.className = 'level-btn';
-    const unlocked = canAccessLevelClient(performer, lvl);
+    const inRange  = lvl >= minLvl && lvl <= maxLvl;
+    const unlocked = inRange && canAccessLevelClient(performer, lvl, freeMode, minLvl);
+    const outOfRange = !inRange;
     btn.disabled = !isMe || !unlocked;
     if (unlocked) btn.classList.add('unlocked');
+    if (outOfRange) btn.style.opacity = '0.25';
     if (performer.currentLevel === lvl) btn.classList.add('current');
-    btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lock">${unlocked ? '' : '🔒'}</span>`;
-    btn.title = LEVEL_NAMES[lvl] || '';
+    btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lock">${outOfRange ? '⛔' : unlocked ? '' : '🔒'}</span>`;
+    btn.title = outOfRange
+      ? (lvl < minLvl ? `Below start level (${minLvl})` : `Above max level (${maxLvl})`)
+      : (LEVEL_NAMES[lvl] || '');
     if (isMe && unlocked) btn.onclick = () => pickLevel(lvl);
     grid.appendChild(btn);
   }
 }
 
-function canAccessLevelClient(player, level) {
+function canAccessLevelClient(player, level, freeMode, minLvl) {
+  if (level < (minLvl ?? 1)) return false;
+  if (freeMode) return true;
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = 3 * level * (level - 1); // cumulative max-XP across prior levels
+  const xpThreshold = 3 * level * (level - 1);
   return player.xp >= xpThreshold && (player.clearedLevels || []).includes(prev);
 }
 
