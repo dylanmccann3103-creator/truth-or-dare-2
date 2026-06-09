@@ -166,13 +166,20 @@ input::placeholder { color: #7a6b8a; }
 }
 
 /* ─── Clothing items ───────────────────────────────────────────────── */
-.clothing-row {
-  display: flex; gap: 8px; align-items: center;
-  margin-bottom: 8px;
+.clothing-slot { margin-bottom: 12px; }
+.clothing-slot-label {
+  font-size: 0.75rem; font-weight: 600; color: #9b89b4;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
 }
-.clothing-row label { min-width: 90px; color: #9b89b4; font-size: 0.82rem; }
-.clothing-row input { flex: 1; padding: 9px 12px; font-size: 0.87rem; }
-.clothing-row .btn-sm { flex-shrink: 0; padding: 9px 12px; }
+.clothing-presets { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+.clothing-preset { padding: 4px 11px; font-size: 0.78rem; font-weight: 500; border-radius: 14px; }
+.clothing-other-input {
+  width: 100%; padding: 6px 10px; font-size: 0.82rem; box-sizing: border-box;
+  background: rgba(255,255,255,0.05); border: 1px solid #3d2a5e; border-radius: 8px;
+  color: #e8d8f8;
+}
+.clothing-other-input:focus { border-color: var(--accent2); outline: none; }
+.clothing-other-input::placeholder { color: #5a4a6a; }
 
 /* ─── Player list ──────────────────────────────────────────────────── */
 .player-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; }
@@ -759,10 +766,9 @@ input::placeholder { color: #7a6b8a; }
 
   <!-- Clothing -->
   <div class="w-full">
-    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(be specific!)</span></div>
+    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(tap a preset or type your own)</span></div>
     <div class="card" style="padding:16px">
       <div id="clothing-list"></div>
-      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addClothingItem()">+ Add item</button>
     </div>
   </div>
 
@@ -1214,16 +1220,15 @@ let myBodyType = null;
 let myOrientation = 'bi';
 let myAvailableForAllCombos = false;
 
-const DEFAULT_SLOTS = [
-  { label: 'Head',       placeholder: 'hat, glasses...' },
-  { label: 'Neck',       placeholder: 'necklace, scarf...' },
-  { label: 'Top',        placeholder: 'shirt, bra, hoodie...' },
-  { label: 'Bottom',     placeholder: 'jeans, skirt...' },
-  { label: 'Underwear',  placeholder: 'boxers, briefs...' },
-  { label: 'Left sock',  placeholder: 'ankle sock, bare...' },
-  { label: 'Right sock', placeholder: 'ankle sock, bare...' },
-  { label: 'Left shoe',  placeholder: 'sneaker, bare...' },
-  { label: 'Right shoe', placeholder: 'sneaker, bare...' },
+const CLOTHING_SLOTS = [
+  { key: 'head',       label: '🧢 Head',       presets: ['hat', 'cap', 'beanie', 'headband'] },
+  { key: 'neck',       label: '📿 Neck',       presets: ['scarf', 'necklace', 'choker', 'tie'] },
+  { key: 'jacket',     label: '🧥 Jacket',     presets: ['jacket', 'hoodie', 'cardigan', 'coat'] },
+  { key: 'body',       label: '👕 Body',        presets: ['t-shirt', 'sweater', 'vest top', 'tank top', 'blouse'] },
+  { key: 'underwear',  label: '🩲 Underwear',  presets: ['boxers', 'briefs', 'string', 'bra', 'bodysuit'] },
+  { key: 'legs',       label: '👖 Legs',        presets: ['pants', 'shorts', 'skirt', 'leggings', 'jeans'] },
+  { key: 'foot_left',  label: '🧦 Left foot',  presets: ['socks', 'shoes', 'sandals', 'slippers'] },
+  { key: 'foot_right', label: '🧦 Right foot', presets: ['socks', 'shoes', 'sandals', 'slippers'] },
 ];
 
 // ─── Age Gate ─────────────────────────────────────────────────────────────────
@@ -1339,9 +1344,7 @@ function updateConfigUI(state) {
 
 // ─── Setup Screen ─────────────────────────────────────────────────────────────
 function initSetupScreen() {
-  const list = document.getElementById('clothing-list');
-  list.innerHTML = '';
-  clothingItems = DEFAULT_SLOTS.map(slot => ({ ...slot, value: '' }));
+  clothingItems = CLOTHING_SLOTS.map(s => ({ key: s.key, label: s.label, value: '' }));
   renderClothingList();
   renderTagGrid('pref-tags',        myPrefs,      'pref');
   renderTagGrid('soft-limit-tags',  mySoftLimits, 'soft');
@@ -1351,27 +1354,51 @@ function initSetupScreen() {
 function renderClothingList() {
   const list = document.getElementById('clothing-list');
   list.innerHTML = '';
-  clothingItems.forEach((item, i) => {
-    const row = document.createElement('div');
-    row.className = 'clothing-row';
-    row.innerHTML = `
-      <label>${item.label}</label>
-      <input type="text" placeholder="${item.placeholder || ''}" value="${item.value}"
-        oninput="clothingItems[${i}].value=this.value"/>
-      ${i >= DEFAULT_SLOTS.length ? `<button class="btn btn-secondary btn-sm" onclick="removeClothingItem(${i})">✕</button>` : ''}
-    `;
-    list.appendChild(row);
+  CLOTHING_SLOTS.forEach(slot => {
+    const item = clothingItems.find(c => c.key === slot.key);
+    const currentVal = item ? item.value : '';
+    const isPreset = slot.presets.includes(currentVal);
+
+    const slotDiv = document.createElement('div');
+    slotDiv.className = 'clothing-slot';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'clothing-slot-label';
+    lbl.textContent = slot.label;
+    slotDiv.appendChild(lbl);
+
+    const presetsDiv = document.createElement('div');
+    presetsDiv.className = 'clothing-presets';
+
+    let otherInput; // defined below, referenced in closures
+
+    slot.presets.forEach(preset => {
+      const btn = document.createElement('div');
+      btn.className = 'pill-select clothing-preset' + (currentVal === preset ? ' active' : '');
+      btn.textContent = preset;
+      btn.onclick = () => {
+        const selecting = item.value !== preset;
+        item.value = selecting ? preset : '';
+        presetsDiv.querySelectorAll('.pill-select').forEach(b => b.classList.remove('active'));
+        if (selecting) { btn.classList.add('active'); otherInput.value = ''; }
+      };
+      presetsDiv.appendChild(btn);
+    });
+    slotDiv.appendChild(presetsDiv);
+
+    otherInput = document.createElement('input');
+    otherInput.type = 'text';
+    otherInput.className = 'clothing-other-input';
+    otherInput.placeholder = 'other...';
+    otherInput.value = isPreset ? '' : currentVal;
+    otherInput.oninput = (e) => {
+      item.value = e.target.value;
+      presetsDiv.querySelectorAll('.pill-select').forEach(b => b.classList.remove('active'));
+    };
+    slotDiv.appendChild(otherInput);
+
+    list.appendChild(slotDiv);
   });
-}
-
-function addClothingItem() {
-  clothingItems.push({ label: 'Other', placeholder: 'describe it...', value: '' });
-  renderClothingList();
-}
-
-function removeClothingItem(i) {
-  clothingItems.splice(i, 1);
-  renderClothingList();
 }
 
 function renderTagGrid(containerId, selectedArr, type) {
