@@ -1,94 +1,126 @@
 # Truth or Dare 2.0 🔥
 
-Advanced, erotic, kink-safe party game. LAN multiplayer — phones welcome.
+Advanced, erotic, **kink-safe** party game for consenting adults (18+).  
+LAN multiplayer — everyone plays from their phone, no app needed.
 
 ---
 
-## Requirements
+## Download & run
 
-- [Node.js](https://nodejs.org) v18 or newer
+### Option A — Download the release zip (recommended)
 
----
+1. Go to the [**Releases**](../../releases) page and download the latest `truth-or-dare-2.zip`
+2. Unzip it anywhere on your computer
+3. **Windows:** double-click `start.bat`  
+   **Mac / Linux:** open Terminal in the folder and run `./start.sh`
+4. The terminal shows your local URL + network URL + QR code
+5. Open the **network URL** on everyone's phone (same Wi-Fi)
 
-## Setup (first time only)
+> Node.js is required. Get it free at [nodejs.org](https://nodejs.org) (v18+).  
+> The zip already contains all dependencies — no `npm install` needed.
 
-Open a terminal in this folder and run:
+### Option B — Clone the repo
 
 ```bash
+git clone https://github.com/dylanmccann3103-creator/truth-or-dare-2.git
+cd truth-or-dare-2
 npm install
+node server.js
 ```
-
----
-
-## Start the game
-
-```bash
-npm start
-```
-
-The terminal will print:
-
-```
-╔══════════════════════════════════════╗
-║   Truth or Dare 2.0  🔥  Server Up   ║
-╠══════════════════════════════════════╣
-║  Local:   http://localhost:3000       ║
-║  Network: http://192.168.1.x:3000    ║
-╚══════════════════════════════════════╝
-```
-
-- **Host** opens `http://localhost:3000` in their browser
-- **Other players** open the **Network** URL on their phone (same WiFi required)
-- Or players can scan the QR code shown in the lobby
 
 ---
 
 ## How to play
 
-1. **Host** clicks "Host a Game" → a room code + QR code appears
-2. **Players** join via QR, URL, or room code
-3. Each player fills in:
-   - Their **name**
-   - **Clothing** they're wearing (detailed — left sock, right sock, underwear, etc.)
-   - **Preferences** — tags they enjoy (used to pick better cards for them)
-   - **Limits** — tags to skip (🔒 private, never shown to anyone else)
-4. Host clicks **Start Game**
-5. **Spin the bottle** → the bottle lands on a player
-6. That player picks **Truth** or **Dare**
-7. A card is drawn — filtered to respect their private limits
-8. Play, repeat, have fun
+1. **Host** opens the network URL and clicks **Host a Game**  
+   *(or scans the QR code that appears in the terminal)*
+2. **Players** join by scanning the QR in the lobby, entering the URL, or typing the room code
+3. Each player fills in their setup:
+   - **Name** and **language** (🇳🇱 Dutch / 🇬🇧 English)
+   - **Clothing** they're wearing (the game tracks what gets removed)
+   - **Gender**, **orientation**, **genitals** — used to filter dares to what's relevant
+   - **Preferences** — tags you enjoy (used to weight card selection toward you)
+   - **Limits** — hard blocks (🔒 never shown to anyone else)
+   - **Soft limits** — dares you'd rather skip but are open to discussing
+4. Host configures the room (level range, economy, targeting mode, power-ups) and clicks **Start**
+5. The bottle spins → active player picks **Truth** or **Dare** + a level
+6. A card is drawn — filtered server-side to respect everyone's limits
+7. Earn XP and coins, unlock higher levels, buy power-ups
+
+---
+
+## Level ladder
+
+| Level | Vibe |
+|-------|------|
+| 1 | Icebreakers — fun, no touching |
+| 2 | Flirty — compliments, eye contact |
+| 3 | Light touch — holding hands, hugs |
+| 4 | Kissing — cheek, hand, short kiss |
+| 5 | Sensual — longer kiss, clothing teasing |
+| 6 | Seduction — massage, lap, water/ice dares |
+| 7 | Intimate — heavier touching, clothing removal |
+| 8 | Erotic — explicit dares, body-type filtering active |
+| 9 | Explicit — kinky categories (bondage, spanking…) |
+| 10 | **Extreme** ⚠️ — the hardest allowed by everyone's limits |
+
+Higher levels unlock progressively as you complete dares.
+
+---
+
+## Kink-safety guarantee
+
+- **Limits are strictly private** — stored server-side, never broadcast to other players
+- Card selection is a hard filter, not a suggestion — a card with a blocked tag is **never** shown
+- Filtering covers both the performer **and** the target of every dare
+- The 18+ gate must be confirmed before anything is visible
 
 ---
 
 ## Tag system
 
-| Tag | What it covers |
-|---|---|
-| 🎲 General | Clean/fun for anyone |
-| 😏 Flirty | Light flirting |
-| 👗 Clothing | Involves clothing removal/swap |
-| 💪 Body | Body contact or display |
-| 🏃 Physical | Movement/physical challenges |
-| 🦶 Feet | Foot-related |
-| 👄 Mouth | Mouth/kiss related |
-| 🗣️ Oral | Speaking dares or oral activities |
-| 💋 Intimate | Intimate contact |
-| 🔥 Explicit | Sexually explicit |
+| Tag | Blocks |
+|-----|--------|
+| 🎲 General | General/neutral dares |
+| 😏 Flirty | Flirty, complimentary |
+| 👗 Clothing | Stripping / clothing swap |
+| 💪 Body | Body contact, massage |
+| 🏃 Physical | Physical challenges |
+| 🦶 Feet | Feet-related |
+| 💋 Kissing | Any kissing (cheek, mouth, body) |
+| 🗣️ Speaking | Say something aloud — whisper, describe fantasy |
+| 👅 Oral sex | Oral sex acts |
+| 🔥 Intimate | Intimate (non-sexual) touch |
+| 🌡️ Explicit | Sexual acts |
+| 🍑 Anal | Anal stimulation |
+| ⛓️ Bondage | Restraint, collar, BDSM elements |
+| 🎀 Toy | Sex toys |
+| 🌍 Public | Semi-public setting (car, balcony…) |
+| 📸 Exposure | Nudes, selfies, telling someone outside the game |
 
 ---
 
-## Kink-safety
+## Card Editor
 
-Limits are **strictly private** — they are stored server-side and never sent to other players. The card engine silently filters out any truth or dare that contains a tag the player has marked as a limit.
+Open `http://localhost:3000/editor` while the server is running to add, edit, or remove cards.  
+Cards live in `data/dares.json` — editing the file directly also works; restart the server to reload.
+
+### Card packages
+
+Extra card packs (e.g. *His & Her*) can be downloaded and activated from the Package Library on the landing screen.
 
 ---
 
-## Adding content
+## Extending the game
 
-Open `server.js` and find the `CONTENT` object near the top. Add truths/dares to either array following the format:
+- **Add cards:** use the editor at `/editor`, or edit `data/dares.json` directly
+- **Add a language:** drop a file at `data/lang/<code>.json` mapping card `id → translated text`
+- **Add a card pack:** add an entry to `public/packages/index.json` and a matching JSON file
 
-```js
-{ text: "Your dare text here.", tags: ['dare_tag', 'another_tag'] }
-```
+---
 
-Restart the server after editing.
+## Requirements
+
+- [Node.js](https://nodejs.org) v18 or newer (free, one-time install)
+- A local network (Wi-Fi) so phones can reach the host's computer
+- A modern browser on each device (Chrome, Safari, Firefox — recent versions)
