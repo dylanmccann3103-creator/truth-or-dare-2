@@ -164,6 +164,43 @@ duel auto-win: duelAutoWinnerId set → winnerId locked to performer
 
 ---
 
+## Ideas backlog — future phases
+
+These are scoped-out concepts, not yet scheduled. Each is self-contained enough to become its own phase.
+
+### Expanded shop — buffs and actions
+Push the coin economy further: multi-round buffs (e.g. "XP boost for 3 turns", "immunity shield for 2 rounds"), and mid-game action cards you spend coins on — force another player to redo a dare at a higher level, block someone from using a power-up for a round, steal coins. Separates "persistent buff" from "one-shot action" as distinct shop categories. Needs a buff-state tracker on the player and a broadcast of active buffs.
+
+### Game memory — save, export, resume
+Session snapshots: export a JSON of full game state (players, XP, coins, which card IDs have been played per player) so a session can be resumed another night without repeating cards. Same mechanism as card packages — export JSON, import next session. Needs a `POST /export` endpoint and an import flow in the lobby. `usedCardIds` per player is already the right structure; just needs serialisation.
+
+### Dom/Sub edition
+Dedicated game mode that layers D/s roles onto the existing structure. Doms get "directing" cards, subs get "receiving" cards. Role assignment (Dom/Sub/Switch) added to player setup; `selectCard()` gets a new filter step for `card.roleRequired`. Targeting logic respects role pairings. The full kink-safe guarantee (limits, consent, hard blocks) applies unchanged — the role only changes card flavour.
+
+### Partner mode — targeted groups
+For mixed parties where not everyone is comfortable playing with everyone. During setup, players mark their declared partners. For intimate/explicit cards (`card.level >= 7`), the targeting system only pairs you with your declared partners. You still play in the full group for lower-level cards. Needs a `player.partners: [playerId]` field and a targeting override in `pickTarget()` for high-level cards.
+
+### Chaos mode — simultaneous active players
+For large groups. Instead of one active player at a time, `Math.max(1, Math.floor(playerCount / 3))` players are active simultaneously (16 players → 4 active at once). Uses a queue instead of a round-robin index:
+
+**Data model changes:**
+- `room.chaosMode: bool` (host toggles in lobby)
+- `room.activeSlots: number` = `floor(N/3)`, recalculated when players join/leave
+- `room.turnQueue: [playerId, ...]` — ordered waiting list; all non-active players
+- `room.activeturns: { [playerId]: currentTurn }` — one `currentTurn` object per active slot
+
+**Flow:**
+- Game start: first `activeSlots` players from `turnQueue` become active simultaneously; each gets their own `currentTurn` (phase `'choosing'`)
+- When a player completes their dare: their slot frees up, they move to the **back** of `turnQueue`, and the **front** of `turnQueue` becomes the next active player
+- No waiting for other active players — as soon as one finishes, the next starts independently
+- Targeting: a currently-active player can never be a target (they're busy). `pickTarget()` draws only from `turnQueue`.
+
+**Display view:** TV screen shows all active cards simultaneously (e.g. a 2-column grid for 4 active players). Each active player's phone shows only their own card + controls.
+
+**Safety:** `selectCard()` per active slot runs identically to normal mode — full limit/gender/body/orientation filtering, one-at-a-time card selection per performer. No changes to the safety guarantee.
+
+---
+
 ## Architecture rules (never break)
 
 1. All game logic server-side. Clients send intents, display state.
