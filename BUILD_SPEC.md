@@ -199,6 +199,26 @@ For large groups. Instead of one active player at a time, `Math.max(1, Math.floo
 
 **Safety:** `selectCard()` per active slot runs identically to normal mode — full limit/gender/body/orientation filtering, one-at-a-time card selection per performer. No changes to the safety guarantee.
 
+### Zero-install distribution — bundled Node.js binary
+Right now the host needs Node.js installed. Eliminate that requirement by bundling a portable Node.js binary inside the zip, so the experience is: unzip → double-click → play.
+
+**Preferred approach — portable Node.js in the zip:**
+- Download the official Node.js "binary only" builds (a single `node.exe` for Windows, `node` for Mac, no installer):
+  - Windows: `node-v22.x.x-win-x64.zip` → extract `node.exe` (~30 MB)
+  - Mac: `node-v22.x.x-darwin-arm64.tar.gz` → extract `bin/node` (~35 MB)
+- Place `node.exe` / `node` in the project root (git-ignored)
+- `start.bat` changes from `node server.js` to `.\node.exe server.js`
+- `start.sh` changes from `node server.js` to `./node server.js`
+- Zip ships with: `node.exe`, `node`, `server.js`, `public/`, `data/`, `lib/`, `package.json`, `node_modules/` (or just the needed deps)
+- No Node.js installation required on the host machine
+
+**Alternative — `pkg` compiled single binary:**
+- `pkg server.js --targets node22-win-x64,node22-macos-arm64` → produces `start.exe` + `start-macos`
+- Pros: single file, no node_modules needed in zip. Cons: requires a build step, `pkg` as dev dependency, harder to debug.
+- Recommended only if the portable approach causes issues (antivirus flagging, etc.)
+
+**Note:** this is a distribution improvement only — no code changes to server logic, safety system, or tests.
+
 ---
 
 ## Architecture rules (never break)
