@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to create releases and upload assets
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -28,23 +28,22 @@ jobs:
                 start.bat start.sh README.md data lib public node_modules \
                 /tmp/pkg/truth-or-dare-2/
           cd /tmp/pkg && zip -qr truth-or-dare-2.zip truth-or-dare-2/
-          echo "ZIP_SIZE=$(du -sh /tmp/pkg/truth-or-dare-2.zip | cut -f1)" >> $GITHUB_ENV
 
-      - name: Create GitHub release with zip
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NOTES: |
+            ## Download
+
+            Download **truth-or-dare-2.zip**, unzip it, then:
+
+            - **Windows:** double-click `start.bat`
+            - **Mac / Linux:** run `./start.sh`
+
+            No installation needed — Node.js is bundled inside the zip.
         run: |
+          echo "$RELEASE_NOTES" > /tmp/notes.md
           gh release create "${{ github.ref_name }}" \
             /tmp/pkg/truth-or-dare-2.zip \
             --title "Truth or Dare 2.0 ${{ github.ref_name }}" \
-            --notes "## Download
-
-Download **truth-or-dare-2.zip**, unzip it, then:
-
-- **Windows:** double-click \`start.bat\`
-- **Mac / Linux:** open Terminal in the folder and run \`./start.sh\`
-
-**Requires [Node.js](https://nodejs.org) v18+.**
-The zip includes all dependencies — no \`npm install\` needed.
-
-See [README](https://github.com/${{ github.repository }}/blob/main/README.md) for full setup and gameplay instructions."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            --notes-file /tmp/notes.md
