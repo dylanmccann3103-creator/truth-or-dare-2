@@ -11,6 +11,9 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      NODE_BUNDLE_VERSION: v22.16.0
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,7 +30,35 @@ jobs:
           cp -r server.js package.json package-lock.json \
                 start.bat start.sh README.md data lib public node_modules \
                 /tmp/pkg/truth-or-dare-2/
+
+      - name: Bundle portable Node.js binaries
+        run: |
+          TMPDIR_NODE=$(mktemp -d)
+          STAGE=/tmp/pkg/truth-or-dare-2
+          VER=$NODE_BUNDLE_VERSION
+
+          echo "Downloading node.exe (Windows x64)..."
+          curl -fsSL "https://nodejs.org/dist/${VER}/node-${VER}-win-x64.zip" \
+            -o "$TMPDIR_NODE/node-win.zip"
+          unzip -j -q "$TMPDIR_NODE/node-win.zip" \
+            "node-${VER}-win-x64/node.exe" -d "$STAGE/"
+
+          echo "Downloading node-arm64 (macOS Apple Silicon)..."
+          curl -fsSL "https://nodejs.org/dist/${VER}/node-${VER}-darwin-arm64.tar.gz" \
+            | tar -xzf - -C "$TMPDIR_NODE"
+          cp "$TMPDIR_NODE/node-${VER}-darwin-arm64/bin/node" "$STAGE/node-arm64"
+
+          echo "Downloading node-x64 (macOS Intel)..."
+          curl -fsSL "https://nodejs.org/dist/${VER}/node-${VER}-darwin-x64.tar.gz" \
+            | tar -xzf - -C "$TMPDIR_NODE"
+          cp "$TMPDIR_NODE/node-${VER}-darwin-x64/bin/node" "$STAGE/node-x64"
+
+          rm -rf "$TMPDIR_NODE"
+
+      - name: Zip
+        run: |
           cd /tmp/pkg && zip -qr truth-or-dare-2.zip truth-or-dare-2/
+          echo "ZIP_SIZE=$(du -sh /tmp/pkg/truth-or-dare-2.zip | cut -f1)" >> $GITHUB_ENV
 
       - name: Create GitHub release
         env:
@@ -40,7 +71,7 @@ jobs:
             - **Windows:** double-click `start.bat`
             - **Mac / Linux:** run `./start.sh`
 
-            No installation needed — Node.js is bundled inside the zip.
+            No installation needed — Node.js ${{ env.NODE_BUNDLE_VERSION }} is bundled inside the zip.
         run: |
           echo "$RELEASE_NOTES" > /tmp/notes.md
           gh release create "${{ github.ref_name }}" \
