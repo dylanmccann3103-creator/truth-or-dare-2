@@ -15,6 +15,8 @@ const path = require('path');
 const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
 const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
+const { canAccessLevel, maxUnlockedLevel } = require('./lib/progressionHelpers');
+const { pickTarget } = require('./lib/targeting');
 
 function getRoomCards(room) {
   const cards = room.cardPool || ALL_CARDS;
@@ -89,42 +91,7 @@ function generateToken() {
   return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
 }
 
-// ─── Progression helpers ──────────────────────────────────────────────────────
-
-function canAccessLevel(player, level, room) {
-  const maxLvl = room?.maxLevel ?? 10;
-  if (level > maxLvl) return false;
-  if (level <= (room?.minLevel ?? 1)) return true;
-  if (room?.levelMode === 'free') return true;
-  if (level <= 1) return true;
-  const prev = level - 1;
-  const xpThreshold = 3 * level * (level - 1);
-  return player.xp >= xpThreshold && player.clearedLevels.includes(prev);
-}
-
-function maxUnlockedLevel(player, room) {
-  const max = room?.maxLevel ?? 10;
-  for (let lvl = max; lvl >= 1; lvl--) {
-    if (canAccessLevel(player, lvl, room)) return lvl;
-  }
-  return room?.minLevel ?? 1;
-}
-
 // ─── Game helpers ─────────────────────────────────────────────────────────────
-
-function pickTarget(room, performerId, excludeId = null) {
-  let others = room.turnOrder.filter(id => id !== performerId && room.players[id] && room.players[id].connected !== false);
-  if (excludeId) others = others.filter(id => id !== excludeId);
-  if (others.length === 0) return (excludeId ? null : performerId);
-
-  const mode = room.targetingMode;
-  if (mode === 'self') return performerId;
-  if (mode === 'random') return others[Math.floor(Math.random() * others.length)];
-  // '50-50': half chance self, half chance random other
-  return Math.random() < 0.5
-    ? performerId
-    : others[Math.floor(Math.random() * others.length)];
-}
 
 function advanceTurn(room) {
   room.currentTurnIndex++;
