@@ -17,7 +17,7 @@ const { selectCard } = require('./lib/selectCard');
 const {
   coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS,
   BASE_GENDERS, mergeGenders, clothingCategory,
-  isClothingRemovalCard, clothingTokenKind, eligibleClothingItems,
+  isClothingRemovalCard, clothingTokenKind, stillOnItems, autoPickableItems,
   pickClothingItem, renderTokens, selectTarget,
 } = require('./lib/gameHelpers');
 
@@ -153,19 +153,18 @@ function prepareServedCard(room, turn, performer, sel) {
     const owner = (kind === 'ct') ? target : performer;
     turn.clothingOwner = (kind === 'ct') ? 'target' : 'performer';
     if (owner) {
-      const eligible = eligibleClothingItems(card, owner.clothingItems);
       if (kind === 'c' || kind === 'ct') {
-        // Auto-pick: choose now, consume on completion.
-        const pick = pickClothingItem(eligible, card.level);
+        // Auto-pick: weighted pick now (no underwear below level 6), consume on completion.
+        const pick = pickClothingItem(autoPickableItems(owner.clothingItems, card.level));
         if (pick) {
           turn.clothingMode = 'auto';
           turn.clothingPick = { key: pick.key };
           if (kind === 'ct') ctLabel = pick.value; else cLabel = pick.value;
         }
       } else {
-        // Player-choice: offer the eligible still-on items to the client.
+        // Player-choice: offer every still-on item (player may take off anything).
         turn.clothingMode = 'choice';
-        turn.clothingEligibleKeys = eligible.map(it => it.key);
+        turn.clothingEligibleKeys = stillOnItems(owner.clothingItems).map(it => it.key);
       }
     }
   }

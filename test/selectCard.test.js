@@ -6,7 +6,7 @@ const { selectCard } = require('../lib/selectCard');
 const {
   calcRewards, applyImmunity, POWERUP_COSTS,
   GENITAL_VOCAB, GENDER_WILDCARD, mergeGenders,
-  clothingCategory, eligibleClothingItems, pickClothingItem,
+  clothingCategory, stillOnItems, autoPickableItems, pickClothingItem,
   isClothingRemovalCard, clothingTokenKind, renderTokens, selectTarget,
 } = require('../lib/gameHelpers');
 
@@ -439,70 +439,74 @@ test('clothingCategory maps slot keys to categories', () => {
   assert.equal(clothingCategory({ key: 'extra_123', value: 'lace bra' }), 'underwear', 'free-text fallback');
 });
 
-// ─── Clothing: eligibility by level + difficulty tier ─────────────────────────
+// ─── Clothing: still-on / auto-pickable (underwear auto only at level >= 6) ────
 const wardrobe = () => ([
-  { key: 'head_hat',         value: 'hat',    removed: false }, // headwear d1 minLvl6
-  { key: 'body_t-shirt',     value: 't-shirt', removed: false }, // upper d2 minLvl7
-  { key: 'underwear_boxers', value: 'boxers', removed: false }, // underwear d3 (d2 @8) minLvl7
+  { key: 'head_hat',         value: 'hat',    removed: false },
+  { key: 'body_t-shirt',     value: 't-shirt', removed: false },
+  { key: 'underwear_boxers', value: 'boxers', removed: false },
 ]);
 
-test('no clothing removal below level 6 — nothing eligible at level 5', () => {
-  const c = { level: 5, difficulty: 1, tags: ['clothing'] };
-  assert.equal(eligibleClothingItems(c, wardrobe()).length, 0);
+test('stillOnItems excludes removed garments', () => {
+  const items = [{ key: 'head_hat', removed: false }, { key: 'legs_pants', removed: true }];
+  assert.deepEqual(stillOnItems(items).map(i => i.key), ['head_hat']);
 });
 
-test('level 6 difficulty 1 makes only headwear/scarf/socks eligible', () => {
-  const c = { level: 6, difficulty: 1, tags: ['clothing'] };
-  const elig = eligibleClothingItems(c, wardrobe());
-  assert.deepEqual(elig.map(i => i.key), ['head_hat']);
+test('autoPickableItems excludes underwear below level 6', () => {
+  const elig = autoPickableItems(wardrobe(), 5);
+  assert.ok(!elig.some(i => i.key === 'underwear_boxers'), 'system cannot auto-pick underwear below level 6');
+  assert.ok(elig.some(i => i.key === 'head_hat'), 'non-underwear is still auto-pickable');
 });
 
-test('level 7 difficulty 2 makes upper/pants eligible (not underwear yet)', () => {
-  const c = { level: 7, difficulty: 2, tags: ['clothing'] };
-  const elig = eligibleClothingItems(c, wardrobe());
-  assert.deepEqual(elig.map(i => i.key), ['body_t-shirt']);
+test('autoPickableItems includes underwear at level 6+', () => {
+  assert.ok(autoPickableItems(wardrobe(), 6).some(i => i.key === 'underwear_boxers'), 'underwear auto-pickable at level 6');
 });
 
-test('level 7 difficulty 3 makes underwear eligible', () => {
-  const c = { level: 7, difficulty: 3, tags: ['clothing'] };
-  const elig = eligibleClothingItems(c, wardrobe());
-  assert.deepEqual(elig.map(i => i.key), ['underwear_boxers']);
+// ─── Clothing: selectCard serving (old leveling kept) ─────────────────────────
+test('player-choice clothing card serves at low level as long as something is still on', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })]; // no {{c}} → player-choice
+  const performer = player({ clothingItems: [{ key: 'legs_pants', value: 'jeans', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
+  assert.ok(result, 'old leveling kept: a level-4 player-choice strip card still serves');
 });
 
-test('level 8 underwear adjustment: underwear becomes difficulty 2', () => {
-  const d2 = { level: 8, difficulty: 2, tags: ['clothing'] };
-  const d3 = { level: 8, difficulty: 3, tags: ['clothing'] };
-  assert.ok(eligibleClothingItems(d2, wardrobe()).some(i => i.key === 'underwear_boxers'), 'underwear is difficulty 2 at level 8');
-  assert.ok(!eligibleClothingItems(d3, wardrobe()).some(i => i.key === 'underwear_boxers'), 'underwear no longer difficulty 3 at level 8');
+test('player-choice card can target underwear even below level 6 (player’s own choice)', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })];
+  const performer = player({ clothingItems: [{ key: 'underwear_boxers', value: 'boxers', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
+  assert.ok(result, 'player-choice may remove underwear at any level');
 });
 
-test('removed items are never eligible', () => {
-  const items = [{ key: 'head_hat', value: 'hat', removed: true }];
-  assert.equal(eligibleClothingItems({ level: 6, difficulty: 1, tags: ['clothing'] }, items).length, 0);
+test('{{c}} auto card filtered below level 6 when only underwear remains', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 5, difficulty: 2, text: 'take off your {{c}}' })];
+  const performer = player({ clothingItems: [{ key: 'underwear_boxers', value: 'boxers', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 5, emptySet);
+  assert.equal(result, null, 'system cannot auto-force underwear below level 6');
 });
 
-// ─── Clothing: selectCard serving eligibility + pacing ────────────────────────
-test('clothing-removal card filtered out when performer has no eligible garment', () => {
+test('{{c}} auto card serves below level 6 when a non-underwear item is available', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 5, difficulty: 2, text: 'take off your {{c}}' })];
+  const performer = player({ clothingItems: [
+    { key: 'head_hat', value: 'hat', removed: false },
+    { key: 'underwear_boxers', value: 'boxers', removed: false },
+  ] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 5, emptySet);
+  assert.ok(result, 'auto-pick can take the hat (non-underwear) below level 6');
+});
+
+test('clothing card filtered when performer is fully undressed', () => {
   const cards = [card({ id: 'c1', tags: ['clothing'], level: 7, difficulty: 2 })];
-  const performer = player({ clothingItems: [{ key: 'head_hat', value: 'hat', removed: false }] }); // only headwear (d1)
+  const performer = player({ clothingItems: [{ key: 'head_hat', value: 'hat', removed: true }] });
   const { card: result } = selectCard(cards, 'dare', performer, [], 7, emptySet);
-  assert.equal(result, null, 'no still-on item in the card tier → not served');
-});
-
-test('clothing-removal card served when performer has an eligible garment', () => {
-  const cards = [card({ id: 'c1', tags: ['clothing'], level: 6, difficulty: 1 })];
-  const performer = player({ clothingItems: [{ key: 'head_hat', value: 'hat', removed: false }] });
-  const { card: result } = selectCard(cards, 'dare', performer, [], 6, emptySet);
-  assert.ok(result, 'eligible headwear at level 6 difficulty 1 → served');
+  assert.equal(result, null, 'nothing left to remove → not served');
 });
 
 test('strip-streak guardrail: clothing card filtered after 2 strips in a row', () => {
-  const cards = [card({ id: 'c1', tags: ['clothing'], level: 6, difficulty: 1 })];
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })];
   const performer = player({
-    clothingItems: [{ key: 'head_hat', value: 'hat', removed: false }],
+    clothingItems: [{ key: 'legs_pants', value: 'jeans', removed: false }],
     clothingStreak: 2,
   });
-  const { card: result } = selectCard(cards, 'dare', performer, [], 6, emptySet);
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
   assert.equal(result, null, 'after 2 strips in a row the next draw must be non-clothing');
 });
 
@@ -528,7 +532,7 @@ test('renderTokens substitutes PA/PB/c/ct in a string and an {nl,en} object', ()
 });
 
 test('pickClothingItem returns null on empty list and an item otherwise', () => {
-  assert.equal(pickClothingItem([], 6), null);
+  assert.equal(pickClothingItem([]), null);
   const items = [{ key: 'head_hat', value: 'hat', removed: false }];
-  assert.equal(pickClothingItem(items, 6, () => 0).key, 'head_hat');
+  assert.equal(pickClothingItem(items, () => 0).key, 'head_hat');
 });
