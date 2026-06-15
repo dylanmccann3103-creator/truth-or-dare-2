@@ -843,15 +843,14 @@ input::placeholder { color: #7a6b8a; }
   <div class="w-full">
     <div class="section-label">Gender</div>
     <div class="pill-row" id="setup-gender-row">
-      <div class="pill-select" data-val="male"       onclick="selectPill('gender','male',this)">Male</div>
-      <div class="pill-select" data-val="female"     onclick="selectPill('gender','female',this)">Female</div>
-      <div class="pill-select" data-val="non-binary" onclick="selectPill('gender','non-binary',this)">Non-binary</div>
-      <div class="pill-select" data-val="prefer-not" onclick="selectPill('gender','prefer-not',this)">Prefer not to say</div>
+      <div class="pill-select" data-val="male"              onclick="selectPill('gender','male',this)">Male</div>
+      <div class="pill-select" data-val="female"            onclick="selectPill('gender','female',this)">Female</div>
+      <div class="pill-select" data-val="prefer_not_to_say" onclick="selectPill('gender','prefer_not_to_say',this)">Prefer not to say</div>
     </div>
-    <input type="text" id="setup-gender-custom" placeholder="Or type your own… (e.g. attack helicopter)" maxlength="40"
+    <input type="text" id="setup-gender-custom" placeholder="Or type your own… (e.g. femboy)" maxlength="40"
       oninput="onCustomGender(this.value)"
       style="margin-top:8px;font-size:0.88rem;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);width:100%;box-sizing:border-box"/>
-    <p style="font-size:0.75rem;color:#7a6b8a;margin-top:4px">Custom gender lets pack creators target specific identities — base packs use only Male/Female/Non-binary.</p>
+    <p style="font-size:0.75rem;color:#7a6b8a;margin-top:4px">Base options are Male / Female / Prefer not to say. "Prefer not to say" is never excluded from gendered cards (body-specific cards are gated by your body parts instead). Packs may add custom genders.</p>
   </div>
 
   <div class="w-full">
@@ -861,7 +860,6 @@ input::placeholder { color: #7a6b8a; }
       <div class="pill-select" data-val="vagina"  onclick="toggleGenital('vagina',this)">🌸 Vagina</div>
       <div class="pill-select" data-val="breasts" onclick="toggleGenital('breasts',this)">🫧 Breasts</div>
       <div class="pill-select" data-val="anus"    onclick="toggleGenital('anus',this)">🍑 Anus</div>
-      <div class="pill-select" data-val="mouth"   onclick="toggleGenital('mouth',this)">👄 Mouth</div>
     </div>
     <p style="font-size:0.78rem;color:#7a6b8a;margin-top:6px">Cards requiring body parts you haven't selected won't appear.</p>
   </div>
@@ -2177,6 +2175,13 @@ function replayParkedDare(cardId) {
   });
 }
 
+function removeClothing(itemKey) {
+  socket.emit('remove-clothing', { code: myRoom, itemKey }, (res) => {
+    if (!res || !res.ok) toast(res?.error || 'Cannot remove that item', 'danger');
+    // room-state broadcast refreshes the wardrobe view
+  });
+}
+
 // ─── Card Screen (action view — performer only) ───────────────────────────────
 function buildCardScreen(state) {
   const turn      = state.currentTurn;
@@ -2215,14 +2220,40 @@ function buildCardScreen(state) {
     tagsEl.appendChild(span);
   });
 
-  // Clothing reference
+  // Clothing reference + player-choice removal
   const clothingRef = document.getElementById('card-clothing-ref');
   const needsClothing = turn.card.tags &&
     (turn.card.tags.includes('clothing') || turn.card.tags.includes('feet'));
-  if (needsClothing && performer.clothingItems && performer.clothingItems.length > 0) {
+  // For {{ct}} cards the wardrobe shown belongs to the target; otherwise the performer.
+  const clothingOwner = turn.clothingOwner === 'target'
+    ? state.players[turn.targetId]
+    : performer;
+  const stillOn = (clothingOwner?.clothingItems || []).filter(c => !c.removed);
+
+  if (needsClothing && stillOn.length > 0) {
     clothingRef.style.display = 'block';
-    document.getElementById('card-clothing-list').innerHTML =
-      performer.clothingItems.map(c => `<b>${c.label}:</b> ${c.value}`).join('<br>');
+    const listEl = document.getElementById('card-clothing-list');
+    listEl.innerHTML = stillOn.map(c => `<b>${c.label}:</b> ${c.value}`).join('<br>');
+
+    // Player-choice clothing card: let the actor tap a still-on eligible item to remove it.
+    const iAmActor = myId === turn.performerId || myId === turn.targetId;
+    const eligibleKeys = turn.clothingEligibleKeys || [];
+    if (turn.clothingMode === 'choice' && iAmActor && eligibleKeys.length > 0) {
+      const removable = stillOn.filter(c => eligibleKeys.includes(c.key));
+      if (removable.length > 0) {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'margin-top:10px;display:flex;flex-wrap:wrap;gap:6px';
+        wrap.innerHTML = '<div style="width:100%;font-size:0.8rem;color:#7a6b8a">Tap a garment to take it off:</div>';
+        removable.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'btn btn-soft btn-sm';
+          b.textContent = `👕 ${c.value}`;
+          b.onclick = () => removeClothing(c.key);
+          wrap.appendChild(b);
+        });
+        listEl.appendChild(wrap);
+      }
+    }
   } else {
     clothingRef.style.display = 'none';
   }

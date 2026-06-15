@@ -14,7 +14,12 @@ const path = require('path');
 
 const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
-const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
+const {
+  coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS,
+  BASE_GENDERS, mergeGenders, clothingCategory,
+  isClothingRemovalCard, clothingTokenKind, eligibleClothingItems,
+  pickClothingItem, renderTokens, selectTarget,
+} = require('./lib/gameHelpers');
 
 function getRoomCards(room) {
   const cards = room.cardPool || ALL_CARDS;
@@ -79,11 +84,121 @@ function createRoom(hostId, hostMode = 'display') {
     activeEvent: null,
     cardPool: null,          // null = use ALL_CARDS; set from host's active packages
     equipmentLimits: [],     // equip_* tags for unavailable equipment — filtered from card pool
+    knownGenders: BASE_GENDERS.map(g => ({ ...g })), // base + merged pack genders
   };
   return rooms[code];
 }
 
 function getRoom(code) { return rooms[code]; }
+
+// Normalise incoming clothing items: add removed:false + a mapped category to each.
+function normalizeClothing(clothing) {
+  if (!Array.isArray(clothing)) return [];
+  return clothing
+    .filter(c => c && typeof c === 'object')
+    .map(c => ({
+      key: c.key,
+      label: c.label,
+      value: c.value,
+      removed: false,
+      category: clothingCategory(c),
+    }));
+}
+
+// Connected players (excluding `performerId`) eligible to be drawn as a target.
+function connectedCandidates(room, performerId) {
+  return room.turnOrder
+    .filter(id => id !== performerId && room.players[id] && room.players[id].connected !== false)
+    .map(id => room.players[id]);
+}
+
+// Mark a player's clothing item removed (idempotent — never removes twice).
+function markClothingRemoved(player, itemKey) {
+  if (!player || !Array.isArray(player.clothingItems)) return false;
+  const item = player.clothingItems.find(c => c.key === itemKey && !c.removed);
+  if (!item) return false;
+  item.removed = true;
+  return true;
+}
+
+/**
+ * Resolve a freshly-selected card onto the current turn: draw the target (PB) for
+ * targetRequired cards, auto-pick clothing for {{c}}/{{ct}} cards, and render all
+ * tokens into a served copy of the card. Mutates `turn` only (never the shared card
+ * object or — for auto-pick — the wardrobe, which is consumed on completion).
+ */
+function prepareServedCard(room, turn, performer, sel) {
+  const card = sel.card;
+  // Reset per-turn clothing bookkeeping.
+  turn.clothingMode = null;       // 'auto' | 'choice' | null
+  turn.clothingOwner = null;      // 'performer' | 'target'
+  turn.clothingPick = null;       // { key } for auto cards
+  turn.clothingEligibleKeys = []; // keys offered for player-choice cards
+
+  // 1) Target draw (only for targetRequired cards with valid candidates).
+  let target = null;
+  if (card.targetRequired) {
+    target = selectTarget(sel.validTargets || [], card);
+    turn.targetId = target ? target.id : null;
+    turn.validTargetIds = (sel.validTargets || []).map(t => t.id);
+  } else {
+    turn.targetId = null;
+    turn.validTargetIds = [];
+  }
+
+  // 2) Clothing resolution.
+  let cLabel = null, ctLabel = null;
+  if (isClothingRemovalCard(card)) {
+    const kind = clothingTokenKind(card);             // 'c' | 'ct' | null
+    const owner = (kind === 'ct') ? target : performer;
+    turn.clothingOwner = (kind === 'ct') ? 'target' : 'performer';
+    if (owner) {
+      const eligible = eligibleClothingItems(card, owner.clothingItems);
+      if (kind === 'c' || kind === 'ct') {
+        // Auto-pick: choose now, consume on completion.
+        const pick = pickClothingItem(eligible, card.level);
+        if (pick) {
+          turn.clothingMode = 'auto';
+          turn.clothingPick = { key: pick.key };
+          if (kind === 'ct') ctLabel = pick.value; else cLabel = pick.value;
+        }
+      } else {
+        // Player-choice: offer the eligible still-on items to the client.
+        turn.clothingMode = 'choice';
+        turn.clothingEligibleKeys = eligible.map(it => it.key);
+      }
+    }
+  }
+
+  // 3) Token render into a served copy ({{PB}}/{{ct}} only valid on target cards).
+  const subs = { paName: performer.name };
+  if (card.targetRequired && target) subs.pbName = target.name;
+  if (cLabel != null) subs.cLabel = cLabel;
+  if (ctLabel != null) subs.ctLabel = ctLabel;
+  return { ...card, text: renderTokens(card.text, subs) };
+}
+
+/**
+ * On dare completion: consume the clothing pick (auto cards) and advance the strip
+ * streak. A completed strip card bumps the stripper's streak (2-in-a-row triggers the
+ * "next draw must be non-clothing" guardrail in selectCard); any non-strip completion
+ * resets the active performer's streak.
+ */
+function applyClothingCompletion(room, turn, performer) {
+  const card = turn && turn.card;
+  if (!card || !isClothingRemovalCard(card)) {
+    if (performer) performer.clothingStreak = 0; // non-strip turn resets the streak
+    return;
+  }
+  const owner = turn.clothingOwner === 'target' ? room.players[turn.targetId] : performer;
+  if (turn.clothingMode === 'auto' && turn.clothingPick && owner) {
+    markClothingRemoved(owner, turn.clothingPick.key);
+  }
+  // (player-choice removals already applied via the 'remove-clothing' event)
+  if (owner) owner.clothingStreak = (owner.clothingStreak || 0) + 1;
+  // If the performer wasn't the one who stripped ({{ct}} card), reset their streak.
+  if (owner !== performer && performer) performer.clothingStreak = 0;
+}
 
 function generateToken() {
   return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
@@ -155,9 +270,9 @@ function advanceTurn(room) {
       advanceTurn(room);
       return;
     }
-    const targetId = pickTarget(room, performerId);
+    // Target (PB) is drawn AFTER card selection — not here. Choosing phase has no target.
     room.currentTurn = {
-      targetId, performerId,
+      targetId: null, performerId,
       choice: null, card: null,
       phase: 'choosing',
       recycled: false, softFlagged: false, rouletteUpgrade: false,
@@ -230,6 +345,7 @@ function roomPublicState(room) {
     levelMode: room.levelMode ?? 'locked',
     minStartLevel: room.minStartLevel,
     enabledPowerups: room.enabledPowerups || [],
+    knownGenders: room.knownGenders || [],
   };
 }
 
@@ -269,7 +385,8 @@ io.on('connection', (socket) => {
       token,
       name,
       emoji: EMOJIS[emojiIdx],
-      clothingItems: clothing,
+      clothingItems: normalizeClothing(clothing),
+      clothingStreak: 0,              // consecutive completed strip cards (pacing guardrail)
       preferences: preferences || [],
       limits: limits || [],           // PRIVATE: never broadcast
       softLimits: limits_soft || [],  // safe to broadcast
@@ -348,7 +465,7 @@ io.on('connection', (socket) => {
   });
 
   // Host starts the game
-  socket.on('start-game', ({ code, cardPool }, cb) => {
+  socket.on('start-game', ({ code, cardPool, genders }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
     if (room.host !== socket.id) return cb({ ok: false, error: 'Only the host can start' });
@@ -359,6 +476,11 @@ io.on('connection', (socket) => {
     if (Array.isArray(cardPool) && cardPool.length > 0) {
       room.cardPool = cardPool;
       console.log(`[cards] Room ${code} using custom pool: ${cardPool.length} cards`);
+    }
+
+    // Merge any pack-declared custom genders into the known list (data-driven gender).
+    if (Array.isArray(genders) && genders.length > 0) {
+      room.knownGenders = mergeGenders(room.knownGenders, genders);
     }
 
     room.phase = 'game';
@@ -411,8 +533,6 @@ io.on('connection', (socket) => {
     if (room.currentTurn.phase !== 'choosing') return cb && cb({ ok: false, error: 'Wrong phase' });
 
     const performer = room.players[socket.id];
-    const targetId  = room.currentTurn.targetId;
-    const target = (targetId && targetId !== socket.id) ? room.players[targetId] : null;
 
     // Immunity auto-roll: before card selection
     if (applyImmunity(performer)) {
@@ -434,21 +554,32 @@ io.on('connection', (socket) => {
 
     const scMode = room.rouletteMode === 'block' ? 'block' : 'off';
 
-    // Duel roll: 25% chance when choice is 'dare' and a different target exists
-    if (choice === 'dare' && target && Math.random() < 0.25) {
+    // targetingMode decides self vs. other; the actual PB is drawn AFTER card selection
+    // (only for the 'other' branch). We pass selectCard ALL valid candidates so it only
+    // serves a target-required card when at least one candidate passes the target checks.
+    const candidates = connectedCandidates(room, socket.id);
+    let allowOther;
+    if (room.targetingMode === 'self')        allowOther = false;
+    else if (room.targetingMode === 'random') allowOther = true;
+    else                                       allowOther = Math.random() < 0.5; // 50-50
+    const candidatePool = (allowOther && candidates.length > 0) ? candidates : [];
+
+    // Duel roll: 25% chance when choice is 'dare' and an opponent is available
+    if (choice === 'dare' && candidatePool.length > 0 && Math.random() < 0.25) {
       const duelResult = selectCard(
-        getRoomCards(room), 'duel', performer, target, effectiveLevel,
+        getRoomCards(room), 'duel', performer, candidatePool, effectiveLevel,
         performer.usedCardIds, { rouletteMode: scMode }
       );
       if (duelResult.card) {
         performer.usedCardIds.add(duelResult.card.id);
+        const served = prepareServedCard(room, room.currentTurn, performer, duelResult);
         room.currentTurn.choice          = 'dare';
-        room.currentTurn.card            = duelResult.card;
+        room.currentTurn.card            = served;
         room.currentTurn.phase           = 'duel';
         room.currentTurn.recycled        = duelResult.recycled;
         room.currentTurn.softFlagged     = false;
         room.currentTurn.rouletteUpgrade = rouletteUpgrade;
-        room.currentTurn.attribution     = { type: 'duel', performerId: socket.id, targetId };
+        room.currentTurn.attribution     = { type: 'duel', performerId: socket.id, targetId: room.currentTurn.targetId };
         room.currentTurn.duelAutoWinnerId = null;
         cb && cb({ ok: true, isDuel: true });
         io.to(code).emit('room-state', roomPublicState(room));
@@ -456,22 +587,24 @@ io.on('connection', (socket) => {
       }
     }
 
-    const { card, recycled, softFlagged } = selectCard(
-      getRoomCards(room), choice, performer, target, effectiveLevel,
+    const sel = selectCard(
+      getRoomCards(room), choice, performer, candidatePool, effectiveLevel,
       performer.usedCardIds, { rouletteMode: scMode }
     );
 
-    if (card) performer.usedCardIds.add(card.id);
+    if (sel.card) performer.usedCardIds.add(sel.card.id);
+
+    const served = sel.card ? prepareServedCard(room, room.currentTurn, performer, sel) : null;
 
     room.currentTurn.choice          = choice;
-    room.currentTurn.card            = card;
+    room.currentTurn.card            = served;
     room.currentTurn.phase           = 'showing';
-    room.currentTurn.recycled        = recycled;
-    room.currentTurn.softFlagged     = softFlagged;
+    room.currentTurn.recycled        = sel.recycled;
+    room.currentTurn.softFlagged     = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = rouletteUpgrade;
     room.currentTurn.attribution     = { type: 'solo', performerId: socket.id };
 
-    cb && cb({ ok: true, recycled, softFlagged, rouletteUpgrade });
+    cb && cb({ ok: true, recycled: sel.recycled, softFlagged: sel.softFlagged, rouletteUpgrade });
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
@@ -505,6 +638,9 @@ io.on('connection', (socket) => {
       performer.clearedLevels.push(lvl);
     }
 
+    // Clothing removal + strip-streak pacing — consumed on COMPLETION only.
+    applyClothingCompletion(room, room.currentTurn, performer);
+
     console.log(`[xp] ${performer.name} +${xpEarned}xp +${coinsEarned}coins (level ${lvl})`);
     cb && cb({ ok: true, xpEarned, coinsEarned });
 
@@ -513,6 +649,30 @@ io.on('connection', (socket) => {
       if (!rooms[room.code] || room.phase !== 'game') return;
       advanceTurn(room);
     }, 1500);
+  });
+
+  // Player-choice clothing removal: the performer (or, for {{ct}} cards, the target
+  // actor) removes a still-on garment. Never removes an already-removed item twice.
+  socket.on('remove-clothing', ({ code, itemKey }, cb) => {
+    const room = getRoom(code);
+    if (!room || room.phase !== 'game') return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || turn.phase !== 'showing') return cb && cb({ ok: false, error: 'Wrong phase' });
+    if (!isClothingRemovalCard(turn.card)) return cb && cb({ ok: false, error: 'Not a clothing card' });
+
+    // Owner is whose wardrobe loses the item (performer for {{c}}/player-choice, target for {{ct}}).
+    const ownerId = turn.clothingOwner === 'target' ? turn.targetId : turn.performerId;
+    const owner   = room.players[ownerId];
+    // Only the performer or the drawn target (the actor) may trigger the removal.
+    if (socket.id !== turn.performerId && socket.id !== turn.targetId) {
+      return cb && cb({ ok: false, error: 'Not part of this card' });
+    }
+    if (!owner) return cb && cb({ ok: false, error: 'No clothing owner' });
+    if (!markClothingRemoved(owner, itemKey)) {
+      return cb && cb({ ok: false, error: 'Item not available' });
+    }
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
   });
 
   // Park a dare — consumes a break slot, no XP awarded
@@ -594,27 +754,25 @@ io.on('connection', (socket) => {
     if (room.currentTurn?.phase !== 'showing') return cb && cb({ ok: false, error: 'Wrong phase' });
 
     const performer = room.players[socket.id];
-    const target = room.currentTurn.targetId !== socket.id
-      ? room.players[room.currentTurn.targetId]
-      : null;
     const choice = room.currentTurn.choice;
+    const candidatePool = connectedCandidates(room, socket.id);
 
     const currentLevel = performer.currentLevel || 1;
     const maxLevel = maxUnlockedLevel(performer, room);
     // Try level+1, capped at maxLevel; if already at max, stay at same level
     const respinLevel = Math.min(currentLevel + 1, maxLevel);
 
-    const { card, recycled, softFlagged } = selectCard(
-      getRoomCards(room), choice, performer, target, respinLevel,
+    const sel = selectCard(
+      getRoomCards(room), choice, performer, candidatePool, respinLevel,
       performer.usedCardIds,
       { rouletteMode: 'off' }
     );
 
-    if (card) performer.usedCardIds.add(card.id);
+    if (sel.card) performer.usedCardIds.add(sel.card.id);
 
-    room.currentTurn.card        = card;
-    room.currentTurn.recycled    = recycled;
-    room.currentTurn.softFlagged = softFlagged;
+    room.currentTurn.card        = sel.card ? prepareServedCard(room, room.currentTurn, performer, sel) : null;
+    room.currentTurn.recycled    = sel.recycled;
+    room.currentTurn.softFlagged = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = false;
 
     cb && cb({ ok: true });
@@ -656,6 +814,9 @@ io.on('connection', (socket) => {
       player.immunity = 0;
       player.activePowerups = [];
       player.ready = false;
+      player.clothingStreak = 0;
+      // Restore wardrobe (setup is kept, but removed garments come back for a fresh game).
+      if (Array.isArray(player.clothingItems)) player.clothingItems.forEach(c => { c.removed = false; });
     }
 
     room.phase = 'lobby';
@@ -818,8 +979,11 @@ io.on('connection', (socket) => {
     if (powerupId === 'force_swap') {
       if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
       if (!turn?.targetId) return cb && cb({ ok: false, error: 'No current target' });
-      const newTarget = pickTarget(room, socket.id, turn.targetId);
-      if (!newTarget || newTarget === turn.targetId) return cb && cb({ ok: false, error: 'No alternative target available' });
+      // Swap only to another VALID target for this card (limits/orientation/genitals safe).
+      const alternatives = (turn.validTargetIds || [])
+        .filter(id => id !== turn.targetId && room.players[id] && room.players[id].connected !== false);
+      if (alternatives.length === 0) return cb && cb({ ok: false, error: 'No alternative target available' });
+      const newTarget = alternatives[Math.floor(Math.random() * alternatives.length)];
       turn.targetId = newTarget;
       if (turn.attribution) turn.attribution.targetId = newTarget;
       player.activePowerups.splice(idx, 1);

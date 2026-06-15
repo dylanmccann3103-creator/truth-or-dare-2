@@ -1911,7 +1911,9 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus"
+      ]
     },
     {
       "id": "d064",
@@ -1929,7 +1931,9 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus"
+      ]
     },
     {
       "id": "d065",
@@ -2402,7 +2406,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "vagina"
+      ]
     },
     {
       "id": "hh010",
@@ -2496,7 +2502,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "vagina"
+      ]
     },
     {
       "id": "hh015",
@@ -2611,7 +2619,10 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus",
+        "vagina"
+      ]
     },
     {
       "id": "hh021",
@@ -2630,7 +2641,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus"
+      ]
     },
     {
       "id": "hh022",
@@ -2988,7 +3001,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "penis"
+      ]
     },
     {
       "id": "hh041",
@@ -3118,7 +3133,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus"
+      ]
     },
     {
       "id": "hh048",
@@ -3138,7 +3155,9 @@
       "orientationMatters": true,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "penis"
+      ]
     },
     {
       "id": "hh049",
@@ -3437,7 +3456,9 @@
       "genderRequired": null,
       "orientationMatters": false,
       "targetRequired": false,
-      "performerGenitals": null,
+      "performerGenitals": [
+        "anus"
+      ],
       "targetGenitals": null
     },
     {
@@ -3507,7 +3528,9 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": [
+        "anus"
+      ]
     },
     {
       "id": "hh070",
