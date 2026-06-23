@@ -259,16 +259,17 @@ io.on('connection', (socket) => {
   });
 
   // Player submits setup (name, clothingItems, prefs, limits, softLimits, gender, genitals, orientation, language)
-  socket.on('player-setup', ({ code, name, clothing, preferences, limits, limits_soft, gender, genitals, orientation, availableForAllCombos, language }, cb) => {
+  socket.on('player-setup', ({ code, name, emoji, clothing, preferences, limits, limits_soft, gender, genitals, orientation, availableForAllCombos, language }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
     const token = generateToken();
     const emojiIdx = Object.keys(room.players).length % EMOJIS.length;
+    const chosenEmoji = (emoji && EMOJIS.includes(emoji)) ? emoji : EMOJIS[emojiIdx];
     room.players[socket.id] = {
       id: socket.id,
       token,
       name,
-      emoji: EMOJIS[emojiIdx],
+      emoji: chosenEmoji,
       clothingItems: clothing,
       preferences: preferences || [],
       limits: limits || [],           // PRIVATE: never broadcast
@@ -994,6 +995,12 @@ app.get('/editor',  sendNoCache('editor.html'));
 app.get('/host',    sendNoCache('host.html'));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/tags', (req, res) => {
+  const tags = new Set();
+  ALL_CARDS.forEach(c => (c.tags || []).forEach(t => tags.add(t)));
+  res.json({ tags: [...tags].sort() });
+});
 
 app.get('/qr/:code', async (req, res) => {
   const base = BASE_URL || `http://${getLocalIP()}:${PORT}`;
