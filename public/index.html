@@ -5,19 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Truth or Dare 2.0 🔥</title>
 <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 /* ─── Reset & Base ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: #0d0d14;
+  font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  background: #0b0810;
   color: #f0eaf8;
   min-height: 100dvh;
 }
 
 /* ─── Variables ────────────────────────────────────────────────────── */
 :root {
+  --ember: #ff5a1f;
   --accent: #c026d3;
   --accent2: #7c3aed;
   --gold: #f59e0b;
@@ -29,6 +33,21 @@ body {
   --glass-border: rgba(255,255,255,0.12);
   --radius: 16px;
 }
+
+/* ─── Ember animations ─────────────────────────────────────────────── */
+@keyframes emberGlow { 0%,100% { opacity:.55; transform:translate(-50%,-50%) scale(1); } 50% { opacity:.95; transform:translate(-50%,-50%) scale(1.12); } }
+@keyframes emberGlowF { 0%,100% { opacity:.55; transform:translateX(-50%) scale(1); } 50% { opacity:.95; transform:translateX(-50%) scale(1.12); } }
+@keyframes flameSway { 0%,100% { transform:translateY(0) rotate(-2deg) scale(1); } 50% { transform:translateY(-5px) rotate(2deg) scale(1.06); } }
+@keyframes rise { 0% { transform:translateY(0) scale(1); opacity:0; } 15% { opacity:.9; } 85% { opacity:.5; } 100% { transform:translateY(-130px) scale(.4); opacity:0; } }
+@keyframes sweep { 0% { background-position:-160% 0; } 100% { background-position:260% 0; } }
+@keyframes floaty { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-7px); } }
+@keyframes cardLift { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+@keyframes coinPop { 0%,100% { transform:scale(1); } 50% { transform:scale(1.14); } }
+@keyframes ringPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,90,31,0); } 50% { box-shadow:0 0 0 8px rgba(255,90,31,.10); } }
+@keyframes confettiFall { 0% { transform:translateY(-30px) rotate(0); opacity:0; } 12% { opacity:1; } 100% { transform:translateY(120vh) rotate(720deg); opacity:.85; } }
+@keyframes emberRay { 0% { transform:translate(-50%,-50%) rotate(0); } 100% { transform:translate(-50%,-50%) rotate(360deg); } }
+@keyframes emberPop { 0% { transform:scale(.4); opacity:0; } 60% { transform:scale(1.14); } 100% { transform:scale(1); opacity:1; } }
+@keyframes badgeFloat { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-9px) scale(1.05); } }
 
 /* ─── Screens ──────────────────────────────────────────────────────── */
 .screen {
@@ -45,15 +64,20 @@ body {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ─── Typography ───────────────────────────────────────────────────── */
-h1 { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
-h2 { font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; }
-h3 { font-size: 1.1rem; font-weight: 600; }
+h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; }
+h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; }
 p, label { font-size: 0.95rem; line-height: 1.5; color: #c4b8d8; }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  background: linear-gradient(135deg, #ff7a9c, var(--accent) 55%, var(--accent2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+.mono-label {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
 }
 
 /* ─── Cards / Glass panels ─────────────────────────────────────────── */
@@ -78,11 +102,19 @@ p, label { font-size: 0.95rem; line-height: 1.5; color: #c4b8d8; }
 }
 .btn:active { transform: scale(0.97); }
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--ember), var(--accent) 60%, var(--accent2));
   color: #fff;
-  box-shadow: 0 4px 24px rgba(192,38,211,0.35);
+  box-shadow: 0 8px 28px -6px rgba(255,90,31,0.55), inset 0 1px 0 rgba(255,255,255,0.22);
 }
-.btn-primary:hover { box-shadow: 0 6px 32px rgba(192,38,211,0.5); }
+.btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.42) 50%, transparent 65%);
+  background-size: 200% 100%;
+  animation: sweep 3.2s linear infinite;
+}
+.btn-primary:hover { box-shadow: 0 10px 34px -6px rgba(255,90,31,0.7); }
 .btn-secondary {
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -243,7 +275,7 @@ input::placeholder { color: #7a6b8a; }
 
 /* ─── Bottle Spin ──────────────────────────────────────────────────── */
 #screen-spin {
-  background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d14 70%);
+  background: radial-gradient(ellipse at 50% 45%, #25092f 0%, #120712 55%, #0b0810 100%);
 }
 .spin-table {
   position: relative;
@@ -255,7 +287,20 @@ input::placeholder { color: #7a6b8a; }
 .spin-circle {
   position: absolute; inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(192,38,211,0.2);
+  border: 2px solid rgba(255,90,31,0.18);
+  animation: ringPulse 3.5s ease-in-out infinite;
+}
+.spin-circle-inner {
+  position: absolute; inset: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,90,31,0.10);
+}
+.spin-glow {
+  position: absolute; top: 50%; left: 50%;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(255,90,31,.16), transparent 70%);
+  animation: emberGlow 4s ease-in-out infinite;
+  pointer-events: none;
 }
 .player-avatar {
   position: absolute;
@@ -303,12 +348,14 @@ input::placeholder { color: #7a6b8a; }
   to { transform: scale(1) translateY(0); opacity: 1; }
 }
 .card-reveal.truth-card {
-  background: linear-gradient(135deg, #1e3a8a22, #1d4ed822);
-  border: 2px solid #3b82f666;
+  background: linear-gradient(160deg, rgba(59,130,246,0.14), rgba(29,78,216,0.10));
+  border: 1.5px solid #3b82f666;
 }
 .card-reveal.dare-card {
-  background: linear-gradient(135deg, rgba(131,24,67,0.15), rgba(157,23,77,0.15));
-  border: 2px solid #ec489966;
+  background: linear-gradient(160deg, rgba(255,90,31,.14), rgba(192,38,211,.10));
+  border: 1.5px solid rgba(255,90,31,.45);
+  box-shadow: 0 20px 50px -20px rgba(255,45,85,.5), inset 0 1px 0 rgba(255,255,255,.10);
+  animation: cardLift 5s ease-in-out infinite;
 }
 .card-type-label {
   font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em;
@@ -336,7 +383,7 @@ input::placeholder { color: #7a6b8a; }
 
 /* ─── Display screen ───────────────────────────────────────────────── */
 #screen-display {
-  background: radial-gradient(ellipse at center, #0d0a20 0%, #0d0d14 70%);
+  background: radial-gradient(ellipse at 50% 45%, #25092f 0%, #120712 55%, #0b0810 100%);
   justify-content: center;
   gap: 20px;
 }
@@ -349,22 +396,39 @@ input::placeholder { color: #7a6b8a; }
 }
 
 /* ─── End screen ───────────────────────────────────────────────────── */
+#screen-ended {
+  background: radial-gradient(120% 65% at 50% 0%, #2a0a18 0%, #15080f 52%, #0b0810 100%);
+}
 .leaderboard-row {
   display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 14px;
   background: var(--glass);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 15px;
   margin-bottom: 8px;
 }
-.lb-rank { font-size: 1.3rem; min-width: 32px; text-align: center; }
-.lb-emoji { font-size: 1.6rem; }
-.lb-name { flex: 1; font-weight: 700; }
-.lb-stats { font-size: 0.82rem; color: #9b89b4; text-align: right; }
-.lb-xp { font-size: 1rem; font-weight: 800; color: #c4b8d8; min-width: 60px; text-align: right; }
-.lb-first { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.1); }
-.lb-second { border-color: rgba(192,192,192,0.4); }
-.lb-third { border-color: rgba(205,127,50,0.4); }
+.lb-rank { font-family:'Bricolage Grotesque',sans-serif; font-size: 1.1rem; font-weight:800; min-width: 28px; text-align: center; }
+.lb-emoji { font-size: 1.6rem; flex:none; }
+.lb-name { flex: 1; font-family:'Bricolage Grotesque',sans-serif; font-weight: 800; font-size:.95rem; }
+.lb-stats { font-family:'Space Grotesk',monospace; font-size: 0.68rem; color: #9b89b4; text-align: right; line-height:1.6; }
+.lb-xp { font-family:'Space Grotesk',monospace; font-size: 0.92rem; font-weight: 800; color: #c9b6ff; min-width: 60px; text-align: right; flex:none; }
+.lb-first  { border-color: #f5b46166; background: linear-gradient(120deg,rgba(245,180,97,.16),rgba(255,90,31,.07)); box-shadow:0 8px 24px -12px rgba(245,180,97,.6); }
+.lb-second { border-color: #cbd5e166; }
+.lb-third  { border-color: #d6915b66; }
+
+/* ─── Per-screen backgrounds ───────────────────────────────────────── */
+#screen-card, #screen-choose {
+  background: radial-gradient(120% 70% at 50% 40%, #2a0a18 0%, #14070e 50%, #0b0810 100%);
+}
+#screen-lobby {
+  background: radial-gradient(120% 75% at 50% 4%, #25092f 0%, #140712 52%, #0b0810 100%);
+}
+#screen-setup {
+  background: radial-gradient(120% 70% at 50% 6%, #2a0a18 0%, #15080f 52%, #0b0810 100%);
+}
+#screen-host, #screen-join, #screen-equipment {
+  background: radial-gradient(ellipse at 50% 10%, #1a0a2a 0%, #0b0810 70%);
+}
 
 /* ─── Misc helpers ─────────────────────────────────────────────────── */
 .spacer { flex: 1; }
@@ -420,16 +484,19 @@ input::placeholder { color: #7a6b8a; }
 .toast.show { opacity: 1; }
 
 /* ─── Level picker ─────────────────────────────────────────────────── */
+#screen-level {
+  background: radial-gradient(120% 75% at 50% 28%, #2a0a18 0%, #14070e 52%, #0b0810 100%);
+}
 .level-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 7px;
   width: 100%; max-width: 480px;
 }
 .level-btn {
   aspect-ratio: 1;
-  border: 2px solid var(--glass-border);
-  border-radius: 12px;
+  border: 1.5px solid var(--glass-border);
+  border-radius: 11px;
   background: var(--glass);
   color: #f0eaf8;
   font-size: 1.2rem;
@@ -438,18 +505,36 @@ input::placeholder { color: #7a6b8a; }
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 2px;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(.4,1.2,.5,1);
   position: relative;
+  user-select: none;
 }
-.level-btn:hover:not(:disabled) {
-  border-color: var(--accent);
-  background: rgba(192,38,211,0.15);
-}
-.level-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.level-btn .lvl-num { font-size: 1.4rem; line-height: 1; }
+.level-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.level-btn .lvl-num { font-family: 'Bricolage Grotesque',sans-serif; font-size: 1.3rem; line-height: 1; }
+.level-btn .lvl-lbl { font-family: 'Space Grotesk',monospace; font-size: 0.44rem; letter-spacing:.04em; text-transform:uppercase; text-align:center; }
 .level-btn .lvl-lock { font-size: 0.7rem; }
-.level-btn.unlocked { border-color: rgba(124,58,237,0.4); }
-.level-btn.current  { border-color: var(--accent); background: rgba(192,38,211,0.2); box-shadow: 0 0 12px rgba(192,38,211,0.3); }
+/* heat-coded level colors */
+.level-btn[data-heat="1"] { --hc:#7c3aed; }
+.level-btn[data-heat="2"] { --hc:#7c3aed; }
+.level-btn[data-heat="3"] { --hc:#c026d3; }
+.level-btn[data-heat="4"] { --hc:#c026d3; }
+.level-btn[data-heat="5"] { --hc:#ff5a1f; }
+.level-btn[data-heat="6"] { --hc:#ff5a1f; }
+.level-btn[data-heat="7"] { --hc:#ff2d55; }
+.level-btn[data-heat="8"] { --hc:#ff2d55; }
+.level-btn[data-heat="9"] { --hc:#ef4444; }
+.level-btn[data-heat="10"] { --hc:#ef4444; }
+.level-btn.unlocked { border-color: color-mix(in srgb, var(--hc) 45%, transparent); background: color-mix(in srgb, var(--hc) 12%, transparent); }
+.level-btn.unlocked .lvl-lbl { color: var(--hc); filter:brightness(1.25); }
+.level-btn.current  { border: 2px solid var(--hc); background: color-mix(in srgb, var(--hc) 24%, transparent); box-shadow: 0 0 16px color-mix(in srgb, var(--hc) 50%, transparent); transform:scale(1.08); }
+.level-btn.unlocked:not(:disabled):hover { transform:scale(1.06); box-shadow: 0 0 12px color-mix(in srgb, var(--hc) 40%, transparent); }
+.heat-legend {
+  display:flex; align-items:center; gap:9px; width:100%; max-width:480px;
+}
+.heat-legend-bar {
+  flex:1; height:4px; border-radius:2px;
+  background:linear-gradient(90deg,#7c3aed,#c026d3,#ff5a1f,#ff2d55,#ef4444);
+}
 
 /* ─── XP / Coins HUD ───────────────────────────────────────────────── */
 #xp-hud {
@@ -488,59 +573,77 @@ input::placeholder { color: #7a6b8a; }
 }
 .slot-dot.used { background: #ef4444; }
 
-/* ─── Level-up rainbow overlay ────────────────────────────────────── */
+/* ─── Level-up overlay (Ember style) ──────────────────────────────── */
 #levelup-overlay {
   position: fixed; inset: 0; z-index: 950;
   display: none;
   align-items: center; justify-content: center;
   pointer-events: none;
   overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, #3a0f22 0%, #15080f 55%, #0b0810 100%);
 }
-#levelup-bar {
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg,
-    #ff0040, #ff6600, #ffcc00, #00dd44, #0099ff, #7700ff, #ff00cc
-  );
-  opacity: 0.88;
-  clip-path: inset(0 100% 0 0);
+#levelup-ray {
+  position: absolute; top: 50%; left: 50%;
+  width: 520px; height: 520px;
+  background: conic-gradient(from 0deg, rgba(255,90,31,.18), transparent 18%, rgba(192,38,211,.16) 36%, transparent 54%, rgba(255,45,85,.16) 72%, transparent 90%);
+  border-radius: 50%;
+  animation: emberRay 14s linear infinite;
+  pointer-events: none;
 }
-#levelup-bar.animating {
-  animation: rainbowReveal 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.levelup-confetti-dot {
+  position: absolute; top: -30px;
+  border-radius: 2px;
+  opacity: 0;
 }
-@keyframes rainbowReveal {
-  0%   { clip-path: inset(0 100% 0 0%); }
-  30%  { clip-path: inset(0 0%   0 0%); }
-  70%  { clip-path: inset(0 0%   0 0%); }
-  100% { clip-path: inset(0 0%   0 100%); }
+#levelup-content {
+  position: relative; z-index: 2;
+  text-align: center; padding: 0 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  animation: emberPop 0.55s ease both;
 }
-#levelup-text {
-  position: relative; z-index: 1;
-  text-align: center;
-  padding: 0 24px;
-  animation: levelTextPop 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+#levelup-tag {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+  color: #ff8a5b;
 }
-@keyframes levelTextPop {
-  0%   { opacity: 0; transform: scale(0.6) translateY(20px); }
-  28%  { opacity: 0; transform: scale(0.6) translateY(20px); }
-  42%  { opacity: 1; transform: scale(1.08) translateY(-4px); }
-  55%  { opacity: 1; transform: scale(1) translateY(0); }
-  70%  { opacity: 1; transform: scale(1) translateY(0); }
-  100% { opacity: 0; transform: scale(0.8) translateY(-16px); }
+#levelup-badge {
+  width: 120px; height: 120px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #f59e0b, #ff5a1f 55%, #c026d3);
+  box-shadow: 0 0 50px -6px rgba(255,90,31,.8), inset 0 2px 0 rgba(255,255,255,.4);
+  animation: badgeFloat 3s ease-in-out infinite;
 }
-.levelup-title {
-  font-size: clamp(1.1rem, 5vw, 1.6rem);
-  font-weight: 900;
-  color: #0d0d14;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-shadow: 0 2px 6px rgba(255,255,255,0.4);
+#levelup-badge-num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 3rem; font-weight: 800; color: #fff;
+  text-shadow: 0 3px 12px rgba(0,0,0,.35);
 }
-.levelup-msg {
-  font-size: clamp(1.2rem, 5vw, 1.8rem);
-  font-weight: 800;
-  color: #0d0d14;
-  margin-top: 10px;
-  text-shadow: 0 2px 6px rgba(255,255,255,0.4);
+#levelup-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.3rem, 5vw, 1.7rem); font-weight: 800; color: #fff; letter-spacing: -.02em;
+}
+#levelup-unlock-name {
+  background: linear-gradient(135deg, #ffb27a, #ff5a1f);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+#levelup-msg {
+  font-size: 0.88rem; line-height: 1.5; color: #b9a8c8; max-width: 260px;
+}
+#levelup-chips {
+  display: flex; gap: 10px; margin-top: 6px;
+}
+.levelup-chip-xp {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 15px; border-radius: 99px;
+  background: rgba(124,58,237,.18); border: 1px solid rgba(124,58,237,.45);
+  font-family: 'Space Grotesk', monospace; font-size: 0.85rem; font-weight: 800; color: #c9b6ff;
+}
+.levelup-chip-coin {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 15px; border-radius: 99px;
+  background: rgba(245,158,11,.16); border: 1px solid rgba(245,158,11,.45);
+  font-family: 'Space Grotesk', monospace; font-size: 0.85rem; font-weight: 800; color: #fcd34d;
+  animation: coinPop 2.2s ease-in-out infinite;
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────────────── */
@@ -550,7 +653,7 @@ input::placeholder { color: #7a6b8a; }
 
 /* ─── Duel screen ──────────────────────────────────────────────────── */
 #screen-duel {
-  background: radial-gradient(ellipse at center, #1a0520 0%, #0d0d14 70%);
+  background: radial-gradient(ellipse at 50% 35%, #2a0a18 0%, #15080f 55%, #0b0810 100%);
   justify-content: center;
   gap: 20px;
 }
@@ -674,14 +777,14 @@ input::placeholder { color: #7a6b8a; }
 /* ─── Age gate overlay ─────────────────────────────────────────────── */
 #age-gate {
   position: fixed; inset: 0; z-index: 1000;
-  background: #0d0d14;
+  background: radial-gradient(130% 80% at 50% 112%, #3a0f22 0%, #15080f 42%, #0b0810 100%);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 32px 24px; text-align: center;
   gap: 16px;
 }
-#age-gate h2 { font-size: 1.5rem; color: #c4b8d8; }
-#age-gate p { max-width: 360px; color: #7a6b8a; }
+#age-gate h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.6rem; color: #fff; }
+#age-gate p { max-width: 320px; color: #b9a8c8; }
 </style>
 </head>
 <body>
@@ -711,33 +814,41 @@ input::placeholder { color: #7a6b8a; }
 <!-- ══════════════════════════════════════════════════════════════════
      SCREEN 1: Landing — Create or Join
 ═══════════════════════════════════════════════════════════════════ -->
-<div id="screen-landing" class="screen active">
+<div id="screen-landing" class="screen active" style="background:radial-gradient(130% 80% at 50% 112%, #3a0f22 0%, #15080f 42%, #0b0810 100%); overflow:hidden;">
+  <!-- ember glow + rising particles -->
+  <div style="position:absolute;bottom:-60px;left:50%;width:300px;height:240px;background:radial-gradient(ellipse at center,rgba(255,90,31,.55),rgba(255,45,85,.18) 45%,transparent 70%);filter:blur(8px);animation:emberGlowF 4.5s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:80px;left:28%;width:4px;height:4px;border-radius:50%;background:#ffb27a;box-shadow:0 0 8px #ff5a1f;animation:rise 5s linear infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:80px;left:62%;width:3px;height:3px;border-radius:50%;background:#ff8a5b;box-shadow:0 0 8px #ff2d55;animation:rise 6.2s linear .8s infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:80px;left:46%;width:5px;height:5px;border-radius:50%;background:#ffd0a8;box-shadow:0 0 10px #ff5a1f;animation:rise 7s linear 1.6s infinite;pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px;margin:0 auto;padding:0 20px;">
   <div style="height:60px"></div>
-  <div style="font-size:3.5rem; text-align:center;">🔥</div>
+  <div style="font-size:3.4rem; text-align:center; filter:drop-shadow(0 6px 22px rgba(255,90,31,.8)); animation:flameSway 3.2s ease-in-out infinite;">🔥</div>
   <div class="gap-sm"></div>
   <h1 class="gradient-text" style="text-align:center">Truth or Dare 2.0</h1>
   <div class="gap-sm"></div>
-  <p class="text-center" style="max-width:320px;margin:0 auto">The advanced, erotic, kink-safe party game. Play together — phones welcome.</p>
+  <p class="text-center" style="max-width:320px;margin:0 auto;color:#b9a8c8;">The advanced, kink-safe party game. Play together — phones welcome.</p>
   <div class="gap-xl"></div>
 
-  <button class="btn btn-primary" onclick="showScreen('screen-host')">🎉 Host a Game</button>
+  <button class="btn btn-primary" style="max-width:420px" onclick="showScreen('screen-host')">🎉 Host a Game</button>
   <div class="gap-sm"></div>
-  <button class="btn btn-secondary" onclick="showScreen('screen-join')">📱 Join a Game</button>
+  <button class="btn btn-secondary" style="max-width:420px" onclick="showScreen('screen-join')">📱 Join a Game</button>
   <div class="gap-sm"></div>
-  <a href="/editor" target="_blank" style="font-size:0.82rem;color:#9b89b4;text-decoration:underline">🃏 Card Editor</a>
+  <a href="/editor" target="_blank" style="font-family:'Space Grotesk',monospace;font-size:0.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ff7fc4;text-decoration:none;">🃏 Card Editor</a>
 
   <!-- Rejoin banner — only visible when a saved session exists -->
-  <div id="rejoin-banner" style="display:none;width:100%;max-width:400px;margin-top:24px">
-    <div class="card" style="text-align:center;border:1px solid var(--accent);padding:16px 20px">
+  <div id="rejoin-banner" style="display:none;width:100%;max-width:420px;margin-top:24px">
+    <div style="text-align:center;border:1px solid rgba(255,90,31,.4);border-radius:16px;padding:16px 20px;background:rgba(255,90,31,.06);">
       <div style="font-size:1.5rem">🔄</div>
-      <div style="font-weight:700;margin:6px 0 4px" id="rejoin-label">Continue in room …</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;margin:6px 0 4px" id="rejoin-label">Continue in room …</div>
       <div style="font-size:0.8rem;color:#9b89b4;margin-bottom:12px" id="rejoin-sublabel">You were disconnected</div>
       <button class="btn btn-primary" style="margin-bottom:8px" onclick="doRejoin()">Rejoin</button>
       <button class="btn btn-secondary" style="font-size:0.8rem;padding:6px 14px" onclick="clearRejoin()">Dismiss</button>
     </div>
   </div>
 
-  <div id="landing-packages" style="width:100%;max-width:400px;margin-top:20px"></div>
+  <div id="landing-packages" style="width:100%;max-width:420px;margin-top:20px"></div>
+  </div><!-- /inner wrapper -->
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
@@ -809,100 +920,113 @@ input::placeholder { color: #7a6b8a; }
 <!-- ══════════════════════════════════════════════════════════════════
      SCREEN 4: Player Setup — Name, Clothing, Prefs, Soft Limits, Limits
 ═══════════════════════════════════════════════════════════════════ -->
-<div id="screen-setup" class="screen">
-  <div class="gap-lg"></div>
-  <h2>Your Profile</h2>
-  <p style="text-align:center; color:#7a6b8a; font-size:0.85rem">Your limits are private — never shown to other players.</p>
-  <div class="gap-lg"></div>
+<div id="screen-setup" class="screen" style="flex-direction:column;padding:0;">
 
-  <!-- Language -->
-  <div class="w-full">
-    <div class="section-label">Language</div>
-    <div class="pill-row" id="setup-language-row">
-      <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 Nederlands</div>
-      <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 English</div>
+  <!-- Tab bar -->
+  <div id="setup-tab-bar" style="display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex:none;background:rgba(0,0,0,.18);">
+    <div class="setup-tab active" data-tab="0" data-accent="#ff5a1f" onclick="switchSetupTab(0)" style="flex:1;display:flex;align-items:center;justify-content:center;padding:13px 0 11px;cursor:pointer;font-size:1.3rem;border-bottom:2.5px solid #ff5a1f;opacity:1;transition:all .2s ease;">👤</div>
+    <div class="setup-tab" data-tab="1" data-accent="#7c3aed" onclick="switchSetupTab(1)" style="flex:1;display:flex;align-items:center;justify-content:center;padding:13px 0 11px;cursor:pointer;font-size:1.3rem;border-bottom:2.5px solid transparent;opacity:0.38;transition:all .2s ease;">👕</div>
+    <div class="setup-tab" data-tab="2" data-accent="#c026d3" onclick="switchSetupTab(2)" style="flex:1;display:flex;align-items:center;justify-content:center;padding:13px 0 11px;cursor:pointer;font-size:1.3rem;border-bottom:2.5px solid transparent;opacity:0.38;transition:all .2s ease;">🍆</div>
+    <div class="setup-tab" data-tab="3" data-accent="#ef4444" onclick="switchSetupTab(3)" style="flex:1;display:flex;align-items:center;justify-content:center;padding:13px 0 11px;cursor:pointer;font-size:1.3rem;border-bottom:2.5px solid transparent;opacity:0.38;transition:all .2s ease;">🛑</div>
+  </div>
+
+  <!-- Tab 0: Profile -->
+  <div id="setup-tab-0" class="setup-tab-panel active" style="display:flex;flex-direction:column;gap:16px;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:16px 22px;">
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:9px;">Pick your avatar</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;" id="avatar-picker"></div>
+    </div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Your name</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:13px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,90,31,.4);">
+        <span id="setup-avatar-preview" style="font-size:1.25rem;flex:none;">🦊</span>
+        <input type="text" id="setup-name" placeholder="How should we call you?" maxlength="20"
+          style="flex:1;background:transparent;border:none;outline:none;color:#fff;font:600 1rem/1 'Instrument Sans',sans-serif;padding:0;"/>
+      </div>
+    </div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Language</div>
+      <div class="pill-row" id="setup-language-row">
+        <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 Nederlands</div>
+        <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 English</div>
+      </div>
     </div>
   </div>
 
-  <!-- Name -->
-  <div class="w-full">
-    <div class="section-label">Your Name</div>
-    <input type="text" id="setup-name" placeholder="How should we call you?" maxlength="20"/>
+  <!-- Tab 1: Clothing -->
+  <div id="setup-tab-1" class="setup-tab-panel" style="display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:16px 22px;">
+    <div id="clothing-list"></div>
+    <button class="btn btn-secondary btn-sm" style="margin-top:10px;align-self:flex-start;" onclick="addClothingItem()">+ Add item</button>
   </div>
 
-  <!-- Clothing -->
-  <div class="w-full">
-    <div class="section-label">What are you wearing? <span style="font-weight:400;color:#7a6b8a">(tap presets or type your own)</span></div>
-    <div class="card" style="padding:16px">
-      <div id="clothing-list"></div>
-      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addClothingItem()">+ Add item</button>
+  <!-- Tab 2: Identity -->
+  <div id="setup-tab-2" class="setup-tab-panel" style="display:none;flex-direction:column;gap:16px;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:16px 22px;">
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Gender</div>
+      <div class="pill-row" id="setup-gender-row" style="flex-wrap:wrap;">
+        <div class="pill-select" data-val="male"              onclick="selectPill('gender','male',this)">Male</div>
+        <div class="pill-select" data-val="female"            onclick="selectPill('gender','female',this)">Female</div>
+        <div class="pill-select" data-val="prefer_not_to_say" onclick="selectPill('gender','prefer_not_to_say',this)">Prefer not to say</div>
+      </div>
+      <input type="text" id="setup-gender-custom" placeholder="Or type your own… (e.g. femboy)" maxlength="40"
+        oninput="onCustomGender(this.value)"
+        style="margin-top:8px;font-size:0.88rem;padding:10px 13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;color:var(--text);width:100%;box-sizing:border-box;"/>
+      <p style="font:500 .66rem/1.3 'Instrument Sans',sans-serif;color:#7a6b8a;margin:6px 0 0;">"Prefer not to say" is never excluded from gendered cards (body-specific cards are gated by your body parts instead). Packs may add custom genders.</p>
+    </div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:4px;">What I have</div>
+      <p style="font:500 .68rem/1.3 'Instrument Sans',sans-serif;color:#7a6b8a;margin:0 0 9px;">Private — used to filter cards.</p>
+      <div class="pill-row" id="setup-genitals-row" style="flex-wrap:wrap;">
+        <div class="pill-select" data-val="penis"   onclick="toggleGenital('penis',this)">🍆 Penis</div>
+        <div class="pill-select" data-val="vagina"  onclick="toggleGenital('vagina',this)">🌸 Vagina</div>
+        <div class="pill-select" data-val="breasts" onclick="toggleGenital('breasts',this)">🫧 Breasts</div>
+        <div class="pill-select" data-val="anus"    onclick="toggleGenital('anus',this)">🍑 Anus</div>
+      </div>
+    </div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Orientation</div>
+      <div class="pill-row" id="setup-orientation-row">
+        <div class="pill-select" data-val="hetero" onclick="selectPill('orientation','hetero',this)">Hetero</div>
+        <div class="pill-select" data-val="bi"     onclick="selectPill('orientation','bi',this)">Bi</div>
+        <div class="pill-select" data-val="gay"    onclick="selectPill('orientation','gay',this)">Gay</div>
+        <div class="pill-select" data-val="other"  onclick="selectPill('orientation','other',this)">Other</div>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:11px;" onclick="document.getElementById('setup-all-combos').click()">
+        <div id="setup-flexible-check" style="width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;transition:all .18s ease;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.18);color:#fff;"></div>
+        <input type="checkbox" id="setup-all-combos" style="display:none;" onchange="updateFlexibleCheck()"/>
+        <span style="font:500 .84rem/1 'Instrument Sans',sans-serif;color:#9b89b4;">I'm flexible — any combination works</span>
+      </label>
     </div>
   </div>
 
-  <!-- Gender / Body type / Orientation -->
-  <div class="w-full">
-    <div class="section-label">Gender</div>
-    <div class="pill-row" id="setup-gender-row">
-      <div class="pill-select" data-val="male"              onclick="selectPill('gender','male',this)">Male</div>
-      <div class="pill-select" data-val="female"            onclick="selectPill('gender','female',this)">Female</div>
-      <div class="pill-select" data-val="prefer_not_to_say" onclick="selectPill('gender','prefer_not_to_say',this)">Prefer not to say</div>
+  <!-- Tab 3: Limits -->
+  <div id="setup-tab-3" class="setup-tab-panel" style="display:none;flex-direction:column;gap:16px;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:16px 22px;">
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#c9b6ff;margin-bottom:4px;">✨ Preferences</div>
+      <p style="font:500 .68rem/1.3 'Instrument Sans',sans-serif;color:#7a6b8a;margin:0 0 8px;">What do you enjoy? Multi-select.</p>
+      <div id="pref-tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
-    <input type="text" id="setup-gender-custom" placeholder="Or type your own… (e.g. femboy)" maxlength="40"
-      oninput="onCustomGender(this.value)"
-      style="margin-top:8px;font-size:0.88rem;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);width:100%;box-sizing:border-box"/>
-    <p style="font-size:0.75rem;color:#7a6b8a;margin-top:4px">Base options are Male / Female / Prefer not to say. "Prefer not to say" is never excluded from gendered cards (body-specific cards are gated by your body parts instead). Packs may add custom genders.</p>
-  </div>
-
-  <div class="w-full">
-    <div class="section-label">What are you comfortable with? <span style="font-weight:400;color:#7a6b8a">(select all that apply — private, used to filter cards)</span></div>
-    <div class="pill-row" id="setup-genitals-row" style="flex-wrap:wrap">
-      <div class="pill-select" data-val="penis"   onclick="toggleGenital('penis',this)">🍆 Penis</div>
-      <div class="pill-select" data-val="vagina"  onclick="toggleGenital('vagina',this)">🌸 Vagina</div>
-      <div class="pill-select" data-val="breasts" onclick="toggleGenital('breasts',this)">🫧 Breasts</div>
-      <div class="pill-select" data-val="anus"    onclick="toggleGenital('anus',this)">🍑 Anus</div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.10em;text-transform:uppercase;color:#fcd34d;margin-bottom:3px;">⚠️ Soft limits</div>
+      <p style="font:500 .68rem/1.3 'Instrument Sans',sans-serif;color:#7a6b8a;margin:0 0 8px;">Tap to mark — shows "Respin ↑" option.</p>
+      <div id="soft-limit-tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
-    <p style="font-size:0.78rem;color:#7a6b8a;margin-top:6px">Cards requiring body parts you haven't selected won't appear.</p>
-  </div>
-
-  <div class="w-full">
-    <div class="section-label">Orientation</div>
-    <div class="pill-row" id="setup-orientation-row">
-      <div class="pill-select" data-val="hetero" onclick="selectPill('orientation','hetero',this)">Hetero</div>
-      <div class="pill-select" data-val="bi"     onclick="selectPill('orientation','bi',this)">Bi</div>
-      <div class="pill-select" data-val="gay"    onclick="selectPill('orientation','gay',this)">Gay</div>
-      <div class="pill-select" data-val="other"  onclick="selectPill('orientation','other',this)">Other</div>
+    <div>
+      <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.10em;text-transform:uppercase;color:#f87171;margin-bottom:3px;">🔒 Hard limits</div>
+      <p style="font:500 .68rem/1.3 'Instrument Sans',sans-serif;color:#7a6b8a;margin:0 0 8px;">Completely blocked — never shown to you.</p>
+      <div id="limit-tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;padding:9px 12px;border-radius:10px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);margin-top:10px;">
+        <span style="font-size:.9rem;flex:none;margin-top:1px;">🔒</span>
+        <span style="font:500 .66rem/1.4 'Instrument Sans',sans-serif;color:#9b89b4;">Your limits are stored locally and never shared with other players or the host.</span>
+      </div>
     </div>
-    <div class="gap-sm"></div>
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;color:#c4b8d8">
-      <input type="checkbox" id="setup-all-combos" style="accent-color:var(--accent2);width:16px;height:16px"/>
-      I'm flexible — any combination works for me
-    </label>
   </div>
 
-  <!-- Preferences -->
-  <div class="w-full">
-    <div class="section-label">Your Preferences <span style="font-weight:400;color:#7a6b8a">(what you enjoy)</span></div>
-    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Tap to select — better card matching.</p>
-    <div class="tag-grid" id="pref-tags"></div>
+  <!-- Save button — always visible -->
+  <div style="padding:10px 22px 18px;flex:none;border-top:1px solid rgba(255,255,255,.06);">
+    <button class="btn btn-primary w-full" onclick="submitSetup()">Save &amp; Go to Lobby →</button>
   </div>
 
-  <!-- Soft Limits -->
-  <div class="w-full">
-    <div class="section-label" style="color:#fcd34d">⚠️ Soft Limits <span style="font-weight:400;color:#7a6b8a">(borderline — you'll get a respin option)</span></div>
-    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">Cards matching these show a "Respin ↑" button — you can skip or do it.</p>
-    <div class="tag-grid" id="soft-limit-tags"></div>
-  </div>
-
-  <!-- Hard Limits -->
-  <div class="w-full">
-    <div class="section-label" style="color:#f87171">🔒 Hard Limits <span style="font-weight:400;color:#7a6b8a">(never shown — private)</span></div>
-    <p style="font-size:0.8rem;color:#7a6b8a;margin-bottom:6px">These are completely blocked. No one else can see this.</p>
-    <div class="tag-grid" id="limit-tags"></div>
-  </div>
-
-  <div class="gap-lg"></div>
-  <button class="btn btn-primary" onclick="submitSetup()">Save & Go to Lobby →</button>
-  <div class="gap"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
@@ -1028,17 +1152,22 @@ input::placeholder { color: #7a6b8a; }
      SCREEN 6: Spin — Bottle spin animation (auto, no button)
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-spin" class="screen" style="justify-content:center; gap:24px;">
-  <h3 id="spin-status" class="gradient-text text-center">Choosing next player...</h3>
+  <div style="text-align:center;">
+    <div class="mono-label" style="color:#ff8a5b;">Whose turn?</div>
+    <h3 id="spin-status" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-top:8px;min-height:1.6em;">Spinning…</h3>
+  </div>
 
   <div class="spin-table" id="spin-table">
     <div class="spin-circle"></div>
+    <div class="spin-circle-inner"></div>
+    <div class="spin-glow"></div>
     <div id="bottle-wrap">
       <svg viewBox="0 0 60 140" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="0" width="16" height="12" rx="3" fill="#c026d3"/>
-        <rect x="24" y="12" width="12" height="28" rx="2" fill="#7c3aed"/>
-        <ellipse cx="30" cy="90" rx="22" ry="38" fill="#7c3aed"/>
-        <ellipse cx="30" cy="90" rx="16" ry="30" fill="#9333ea" opacity="0.5"/>
-        <ellipse cx="22" cy="75" rx="5" ry="14" fill="white" opacity="0.18" transform="rotate(-10 22 75)"/>
+        <rect x="22" y="2" width="16" height="11" rx="3" fill="#ff5a1f"/>
+        <rect x="24" y="13" width="12" height="26" rx="2" fill="#ff8a5b"/>
+        <ellipse cx="30" cy="93" rx="22" ry="40" fill="#c026d3"/>
+        <ellipse cx="30" cy="93" rx="15" ry="30" fill="#ff5a1f" opacity="0.55"/>
+        <ellipse cx="22" cy="76" rx="5" ry="14" fill="#fff" opacity="0.2" transform="rotate(-10 22 76)"/>
       </svg>
     </div>
   </div>
@@ -1058,13 +1187,22 @@ input::placeholder { color: #7a6b8a; }
 
   <!-- Parked dare replay (shows if player has parked dares) -->
   <div id="parked-dare-section" class="w-full" style="display:none">
-    <div class="section-label" style="margin-top:0;color:#fcd34d">🅿️ Parked Dares — Replay now?</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:12px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.35);margin-bottom:8px;">
+      <div style="font-size:1.15rem;">🅿️</div>
+      <div style="flex:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:0.82rem;color:#fcd34d;">Parked dares — replay one now?</div>
+    </div>
     <div id="parked-dare-list"></div>
-    <div class="gap-sm"></div>
-    <p class="text-muted" style="font-size:0.78rem">Or pick a level below for a new dare.</p>
+    <p class="text-muted" style="font-size:0.75rem;margin-top:4px">Or pick a level below for a fresh dare.</p>
   </div>
 
   <div class="level-grid" id="level-grid"></div>
+
+  <!-- heat legend -->
+  <div class="heat-legend">
+    <span class="mono-label" style="color:#9b89b4;">Cooler</span>
+    <div class="heat-legend-bar"></div>
+    <span class="mono-label" style="color:#ff8a5b;">Hotter</span>
+  </div>
 
   <p id="level-waiting-msg" class="text-muted text-center" style="display:none">
     Waiting for <span id="level-waiting-name"></span> to pick a level...
@@ -1270,10 +1408,12 @@ input::placeholder { color: #7a6b8a; }
      SCREEN 11: End — Leaderboard + Play Again
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-ended" class="screen">
+  <div style="position:absolute;top:-30px;left:50%;width:260px;height:180px;background:radial-gradient(ellipse at center,rgba(245,180,97,.3),transparent 70%);filter:blur(8px);animation:emberGlowF 5s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;margin:0 auto;">
   <div class="gap-lg"></div>
-  <h2 class="gradient-text text-center">Game Over! 🏆</h2>
-  <div class="gap-sm"></div>
-  <p class="text-muted text-center">Final scores:</p>
+  <div style="font-size:2.4rem;animation:flameSway 3s ease-in-out infinite;">🏆</div>
+  <h2 class="gradient-text text-center" style="margin-top:8px">Final Standings</h2>
+  <p class="text-muted text-center" id="ended-winner-label">Final scores</p>
   <div class="gap-lg"></div>
 
   <div id="ended-leaderboard" class="w-full"></div>
@@ -1283,6 +1423,7 @@ input::placeholder { color: #7a6b8a; }
     <button class="btn btn-primary" onclick="playAgain()">🔄 Play Again</button>
   </div>
   <div class="gap"></div>
+  </div>
 </div>
 
 <!-- Target picker overlay (sabotage / force_swap) -->
@@ -1295,12 +1436,18 @@ input::placeholder { color: #7a6b8a; }
   </div>
 </div>
 
-<!-- Level-up rainbow overlay -->
+<!-- Level-up Ember overlay -->
 <div id="levelup-overlay">
-  <div id="levelup-bar"></div>
-  <div id="levelup-text">
-    <div class="levelup-title" id="levelup-title"></div>
-    <div class="levelup-msg"   id="levelup-msg"></div>
+  <div id="levelup-ray"></div>
+  <div id="levelup-content">
+    <div id="levelup-tag">Level up!</div>
+    <div id="levelup-badge"><div id="levelup-badge-num">6</div></div>
+    <div id="levelup-title">You unlocked<br/><span id="levelup-unlock-name"></span></div>
+    <div id="levelup-msg"></div>
+    <div id="levelup-chips">
+      <div class="levelup-chip-xp">⚡ <span id="levelup-xp-val">+50 XP</span></div>
+      <div class="levelup-chip-coin">🪙 <span id="levelup-coin-val">+20</span></div>
+    </div>
   </div>
 </div>
 
@@ -1316,7 +1463,7 @@ const TAG_LABELS = {
   kissing: '💋 Kissing', speaking: '🗣️ Speaking', oral: '👅 Oral sex',
   intimate: '🔥 Intimate', explicit: '🌡️ Explicit',
   anal: '🍑 Anal', bondage: '⛓️ Bondage', toy: '🎀 Toy',
-  public: '🌍 Public', exposure: '📸 Exposure',
+  public: '🌍 Public', exposure: '📸 Exposure', extreme: '⚡ Extreme',
 };
 
 let socket = null;
@@ -1337,6 +1484,7 @@ let myGenitals = [];
 let myOrientation = 'bi';
 let myAvailableForAllCombos = false;
 let myLanguage = 'nl';
+let myEmoji = '🦊';
 let LANG_PACK = null;
 
 const CLOTHING_SLOTS = [
@@ -1463,6 +1611,84 @@ function onCustomGender(val) {
   myGender = trimmed || null;
 }
 
+// ─── Setup tab switching ──────────────────────────────────────────────────────
+let mySetupTab = 0;
+let availableTags = [];
+
+function switchSetupTab(n) {
+  mySetupTab = n;
+  document.querySelectorAll('.setup-tab').forEach(t => {
+    const active = +t.dataset.tab === n;
+    t.style.opacity = active ? '1' : '0.38';
+    t.style.borderBottomColor = active ? t.dataset.accent : 'transparent';
+    t.classList.toggle('active', active);
+  });
+  document.querySelectorAll('.setup-tab-panel').forEach(p => {
+    const active = +p.id.replace('setup-tab-','') === n;
+    p.style.display = active ? 'flex' : 'none';
+  });
+}
+
+async function loadAvailableTags() {
+  try {
+    const res = await fetch('/api/tags');
+    const data = await res.json();
+    availableTags = data.tags;
+  } catch(e) {
+    availableTags = Object.keys(TAG_LABELS);
+  }
+}
+
+function renderDynamicTagGrid(containerId, activeSet, activeBg, activeBorder, activeText) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  const tags = availableTags.length ? availableTags : Object.keys(TAG_LABELS);
+  tags.forEach(tag => {
+    const label = TAG_LABELS[tag] || tag;
+    const isActive = activeSet.includes(tag);
+    const btn = document.createElement('div');
+    btn.style.cssText = `padding:8px 12px;border-radius:99px;cursor:pointer;font:600 .76rem/1 'Instrument Sans',sans-serif;transition:all .18s ease;user-select:none;background:${isActive?activeBg:'rgba(255,255,255,.04)'};border:1.5px solid ${isActive?activeBorder:'rgba(255,255,255,.08)'};color:${isActive?activeText:'#9b89b4'};`;
+    btn.textContent = label;
+    btn.onclick = () => {
+      const idx = activeSet.indexOf(tag);
+      if (idx >= 0) activeSet.splice(idx, 1); else activeSet.push(tag);
+      renderDynamicTagGrid(containerId, activeSet, activeBg, activeBorder, activeText);
+    };
+    el.appendChild(btn);
+  });
+}
+
+function updateFlexibleCheck() {
+  const checked = document.getElementById('setup-all-combos').checked;
+  const el = document.getElementById('setup-flexible-check');
+  if (!el) return;
+  el.textContent = checked ? '✓' : '';
+  el.style.background = checked ? 'linear-gradient(135deg,#ff5a1f,#c026d3)' : 'rgba(255,255,255,.06)';
+  el.style.border = checked ? '1.5px solid transparent' : '1.5px solid rgba(255,255,255,.18)';
+}
+
+// ─── Avatar picker ────────────────────────────────────────────────────────────
+const AVATAR_EMOJIS = ['🦊','🐱','🐶','🦁','🐯','🦋','🐝','🦄','🐸','🐙','🦀','🌙','⭐','🍓','🌹'];
+function buildAvatarPicker() {
+  const container = document.getElementById('avatar-picker');
+  if (!container) return;
+  container.innerHTML = '';
+  AVATAR_EMOJIS.forEach(e => {
+    const el = document.createElement('div');
+    el.textContent = e;
+    el.dataset.emoji = e;
+    el.onclick = () => pickAvatar(e);
+    el.style.cssText = `width:46px;height:46px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;transition:all .2s cubic-bezier(.4,1.2,.5,1);user-select:none;background:${e===myEmoji?'linear-gradient(135deg,rgba(255,90,31,.3),rgba(192,38,211,.22))':'rgba(255,255,255,.04)'};border:${e===myEmoji?'2px solid #ff5a1f':'1.5px solid rgba(255,255,255,.08)'};box-shadow:${e===myEmoji?'0 0 16px rgba(255,90,31,.55)':'none'};transform:${e===myEmoji?'scale(1.1)':'scale(1)'};`;
+    container.appendChild(el);
+  });
+}
+function pickAvatar(e) {
+  myEmoji = e;
+  document.getElementById('setup-avatar-preview').textContent = e;
+  buildAvatarPicker();
+}
+
 // ─── Genitals multi-select ────────────────────────────────────────────────────
 function toggleGenital(val, el) {
   const idx = myGenitals.indexOf(val);
@@ -1491,6 +1717,11 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'screen-landing') { renderLandingPackages(); checkRejoinBanner(); }
+  if (id === 'screen-setup') {
+    switchSetupTab(0);
+    buildAvatarPicker();
+    loadAvailableTags().then(() => initSetupScreen());
+  }
 }
 
 // ─── Room Actions ─────────────────────────────────────────────────────────────
@@ -1577,15 +1808,15 @@ function renderLandingPackages() {
     const custom = pkgs.filter(p => !p.builtin);
     if (!custom.length) { el.innerHTML = ''; return; }
     el.innerHTML = `
-      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a6b8a;text-align:center;margin-bottom:10px">Card Packages</div>
+      <div style="font-family:'Space Grotesk',monospace;font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#7a6b8a;text-align:center;margin-bottom:10px">Card Packages</div>
       ${custom.map(p => `
-        <div onclick="toggleLandingPackage('${p.id}')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid ${p.active ? 'var(--accent)' : 'rgba(255,255,255,0.08)'};border-radius:12px;cursor:pointer;margin-bottom:8px;transition:border-color .15s">
+        <div onclick="toggleLandingPackage('${p.id}')" style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;cursor:pointer;margin-bottom:8px;transition:all .15s;background:${p.active ? 'rgba(255,90,31,.08)' : 'rgba(255,255,255,.04)'};border:1px solid ${p.active ? 'rgba(255,90,31,.35)' : 'rgba(255,255,255,.09)'}">
           <div style="flex:1;text-align:left">
-            <div style="font-size:0.88rem;font-weight:600">${p.name}</div>
-            <div style="font-size:0.72rem;color:#7a6b8a">${(p.cards||[]).length} cards</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:0.92rem;font-weight:700;color:${p.active ? '#fff' : '#e8def2'}">${p.name}</div>
+            <div style="font-size:0.74rem;color:#9b89b4">${(p.cards||[]).length} cards</div>
           </div>
-          <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;background:${p.active ? 'var(--accent)' : 'rgba(255,255,255,0.08)'};color:${p.active ? 'white' : '#7a6b8a'};flex-shrink:0">
-            ${p.active ? '✓' : '✗'}
+          <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;flex-shrink:0;background:${p.active ? 'linear-gradient(135deg,#ff5a1f,#c026d3)' : 'rgba(255,255,255,.08)'};color:${p.active ? '#fff' : '#6b5d7a'}">
+            ${p.active ? '✓' : '+'}
           </div>
         </div>
       `).join('')}
@@ -1674,9 +1905,9 @@ function updateConfigUI(state) {
 function initSetupScreen() {
   clothingItems = [];
   renderClothingList();
-  renderTagGrid('pref-tags',        myPrefs,      'pref');
-  renderTagGrid('soft-limit-tags',  mySoftLimits, 'soft');
-  renderTagGrid('limit-tags',       myLimits,     'limit');
+  renderDynamicTagGrid('pref-tags',       myPrefs,      'rgba(124,58,237,.22)', 'rgba(124,58,237,.65)', '#c9b6ff');
+  renderDynamicTagGrid('soft-limit-tags', mySoftLimits, 'rgba(245,158,11,.16)', 'rgba(245,158,11,.6)',  '#fcd34d');
+  renderDynamicTagGrid('limit-tags',      myLimits,     'rgba(248,113,113,.16)','rgba(248,113,113,.6)', '#f87171');
 }
 
 function renderClothingList() {
@@ -1807,13 +2038,14 @@ function submitSetup() {
 
   const clothing = clothingItems
     .filter(c => c.value.trim())
-    .map(c => ({ label: c.label, value: c.value.trim() }));
+    .map(c => ({ key: c.key, label: c.label, value: c.value.trim() }));
 
   myAvailableForAllCombos = document.getElementById('setup-all-combos').checked;
 
   socket.emit('player-setup', {
     code: myRoom,
     name,
+    emoji:               myEmoji,
     clothing,
     preferences:         [...myPrefs],
     limits:              [...myLimits],
@@ -1883,17 +2115,23 @@ function renderLobby(state) {
   document.getElementById('lobby-count').textContent = `(${players.length})`;
 
   const list = document.getElementById('lobby-player-list');
+  // Switch to grid layout for ember style
+  list.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;width:100%;max-width:480px;';
   list.innerHTML = '';
   players.forEach(p => {
+    const isHost  = p.isHost;
+    const isReady = p.ready;
+    const badgeText  = isHost ? 'HOST' : isReady ? 'READY' : '…';
+    const badgeColor = isHost ? '#ff8a5b' : isReady ? '#4ade80' : '#6b5d7a';
+    const borderStyle = isHost
+      ? 'border:1px solid rgba(255,90,31,.35);background:rgba(255,90,31,.10);'
+      : 'border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);';
     const div = document.createElement('div');
-    div.className = 'player-item';
-    const badges = [];
-    if (p.isHost) badges.push('<span class="player-badge host">HOST</span>');
-    if (p.ready)  badges.push('<span class="player-badge ready">READY</span>');
+    div.style.cssText = `flex:1;min-width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;${borderStyle}`;
     div.innerHTML = `
-      <div class="player-emoji">${p.emoji}</div>
-      <div class="player-name">${p.name}</div>
-      ${badges.join('')}
+      <span style="font-size:1.5rem;line-height:1">${p.emoji}</span>
+      <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:0.68rem;color:${isHost?'#fff':'#cbbfd9'};max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</span>
+      <span style="font-family:'Space Grotesk',monospace;font-size:0.52rem;font-weight:700;letter-spacing:.08em;color:${badgeColor}">${badgeText}</span>
     `;
     list.appendChild(div);
   });
@@ -2035,7 +2273,14 @@ function buildSpinScreen(state) {
     table.appendChild(av);
   });
 
-  document.getElementById('spin-status').textContent = 'Choosing next player...';
+  const performer = state.players[state.currentTurn?.performerId];
+  document.getElementById('spin-status').textContent = 'Spinning…';
+  if (performer) {
+    setTimeout(() => {
+      const el = document.getElementById('spin-status');
+      if (el) el.textContent = `${performer.name} — your turn!`;
+    }, 800);
+  }
 
   // Auto-spin animation (server drives the transition to 'choosing')
   if (!spinAnimRunning) {
@@ -2132,14 +2377,17 @@ function buildLevelScreen(state) {
   for (let lvl = 1; lvl <= 10; lvl++) {
     const btn = document.createElement('button');
     btn.className = 'level-btn';
-    const inRange  = lvl >= minLvl && lvl <= maxLvl;
-    const unlocked = inRange && canAccessLevelClient(performer, lvl, freeMode, minLvl);
+    btn.dataset.heat = lvl;
+    const inRange    = lvl >= minLvl && lvl <= maxLvl;
+    const unlocked   = inRange && canAccessLevelClient(performer, lvl, freeMode, minLvl);
     const outOfRange = !inRange;
     btn.disabled = !isMe || !unlocked;
     if (unlocked) btn.classList.add('unlocked');
     if (outOfRange) btn.style.opacity = '0.25';
     if (performer.currentLevel === lvl) btn.classList.add('current');
-    btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lock">${outOfRange ? '⛔' : unlocked ? '' : '🔒'}</span>`;
+    const lockIcon = outOfRange ? '⛔' : unlocked ? '' : '🔒';
+    const shortName = LEVEL_NAMES[lvl] ? LEVEL_NAMES[lvl].split(' ')[0] : '';
+    btn.innerHTML = `<span class="lvl-num">${lvl}</span><span class="lvl-lbl">${lockIcon || shortName}</span>`;
     btn.title = outOfRange
       ? (lvl < minLvl ? `Below start level (${minLvl})` : `Above max level (${maxLvl})`)
       : (LEVEL_NAMES[lvl] || '');
@@ -2716,32 +2964,37 @@ function sendTargetedPowerup(puId, targetId, state) {
 // ─── End Screen ───────────────────────────────────────────────────────────────
 function buildEndScreen(state) {
   const players = Object.values(state.players).sort((a, b) => b.xp - a.xp);
-  const rankEmojis = ['🥇', '🥈', '🥉'];
+  const rankEmojis  = ['🥇', '🥈', '🥉'];
   const rankClasses = ['lb-first', 'lb-second', 'lb-third'];
+  const rankColors  = ['#f5b461', '#cbd5e1', '#d6915b'];
+  const winner = players[0];
+
+  const winnerLabel = document.getElementById('ended-winner-label');
+  if (winnerLabel) winnerLabel.textContent = winner ? `${winner.emoji} ${winner.name} wins the night 🔥` : 'Game over!';
 
   const board = document.getElementById('ended-leaderboard');
   board.innerHTML = '';
 
   players.forEach((p, i) => {
-    const penalty = (p.breakSlots?.parkedDares || []).reduce((s, d) => s + d.xpPenalty, 0);
+    const penalty     = (p.breakSlots?.parkedDares || []).reduce((s, d) => s + d.xpPenalty, 0);
     const parkedCount = (p.breakSlots?.parkedDares || []).length;
+    const rankLabel   = rankEmojis[i] || (i + 1);
+    const rankColor   = rankColors[i] || '#7a6b8a';
 
     const row = document.createElement('div');
     row.className = 'leaderboard-row' + (rankClasses[i] ? ` ${rankClasses[i]}` : '');
     row.innerHTML = `
-      <div class="lb-rank">${rankEmojis[i] || `${i+1}`}</div>
+      <div class="lb-rank" style="color:${rankColor}">${rankLabel}</div>
       <div class="lb-emoji">${p.emoji}</div>
-      <div class="lb-name">${p.name}</div>
-      <div class="lb-stats">
-        🪙 ${p.coins}<br>
-        ${parkedCount > 0 ? `🅿️ ${parkedCount} parked (−${penalty} XP)` : ''}
+      <div style="flex:1;min-width:0">
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-stats">🪙 ${p.coins}${parkedCount > 0 ? ` · 🅿️ ${parkedCount} parked (−${penalty} XP)` : ''}</div>
       </div>
       <div class="lb-xp">⚡ ${p.xp}</div>
     `;
     board.appendChild(row);
   });
 
-  // "Play Again" only visible to host
   document.getElementById('ended-restart-wrap').style.display = amHost ? 'block' : 'none';
 }
 
@@ -2829,22 +3082,41 @@ function checkLevelUp(me) {
 
 function showLevelUpAnimation(newLevel) {
   const entry = LEVELUP_TEXTS[newLevel] || { msg: `Level ${newLevel} unlocked! 🔓` };
-  document.getElementById('levelup-title').textContent = `⬆ Level ${newLevel} Unlocked`;
-  document.getElementById('levelup-msg').textContent   = entry.msg;
+  const levelName = LEVEL_NAMES[newLevel] || `Level ${newLevel}`;
 
+  document.getElementById('levelup-badge-num').textContent = newLevel;
+  document.getElementById('levelup-unlock-name').textContent = levelName;
+  document.getElementById('levelup-msg').textContent = entry.msg;
+
+  // XP/coin chips — rough estimate based on level
+  const bonusXp = newLevel * 5;
+  const bonusCoins = Math.max(10, newLevel * 2);
+  document.getElementById('levelup-xp-val').textContent = `+${bonusXp} XP`;
+  document.getElementById('levelup-coin-val').textContent = `+${bonusCoins}`;
+
+  // Spawn confetti
   const overlay = document.getElementById('levelup-overlay');
-  const bar     = document.getElementById('levelup-bar');
+  overlay.querySelectorAll('.levelup-confetti-dot').forEach(el => el.remove());
+  const cc = ['#ff5a1f','#c026d3','#7c3aed','#f59e0b','#ff2d55','#fcd34d','#19e3ff'];
+  for (let i = 0; i < 22; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'levelup-confetti-dot';
+    dot.style.cssText = `left:${4 + (i * 4.4) % 92}%;width:${i%3===0?9:6}px;height:${i%2===0?12:7}px;border-radius:${i%4===0?'50%':'2px'};background:${cc[i%cc.length]};animation:confettiFall ${(2.6+(i%5)*0.5).toFixed(1)}s linear ${((i%7)*0.34).toFixed(2)}s both;`;
+    overlay.appendChild(dot);
+  }
+
+  // Reset content animation
+  const content = document.getElementById('levelup-content');
+  content.style.animation = 'none';
+  void content.offsetWidth;
+  content.style.animation = 'emberPop 0.55s ease both';
 
   clearTimeout(levelupTimer);
   overlay.style.display = 'flex';
-  bar.classList.remove('animating');
-  void bar.offsetWidth; // force reflow so animation restarts cleanly
-  bar.classList.add('animating');
 
   levelupTimer = setTimeout(() => {
     overlay.style.display = 'none';
-    bar.classList.remove('animating');
-  }, 2900);
+  }, 3400);
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
