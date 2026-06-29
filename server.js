@@ -1124,8 +1124,8 @@ io.on('connection', (socket) => {
     const activity = room.backgroundActivities[idx];
     // Only the performer (or display host) can mark it done
     const isPerformer = socket.id === activity.performerId;
-    const isDisplayHost = room.hostMode === 'display' && socket.id === room.host;
-    if (!isPerformer && !isDisplayHost) return cb && cb({ ok: false, error: 'Not authorized' });
+    const isHost = socket.id === room.host;
+    if (!isPerformer && !isHost) return cb && cb({ ok: false, error: 'Not authorized' });
 
     const performer = room.players[activity.performerId];
     if (performer) {

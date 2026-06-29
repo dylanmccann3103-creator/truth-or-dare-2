@@ -3204,13 +3204,15 @@ function renderPip(state) {
   pip.style.display = 'block';
 
   const lang = (state.players[myId]?.language) || 'nl';
-  const isDisplayHost = state.displayHostId === myId;
+  const amIHost = state.players[myId]?.isHost || false;
 
   pip.innerHTML = activities.map(a => {
     const performer = state.players[a.performerId];
     const target = a.targetId ? state.players[a.targetId] : null;
     const cardText = a.cardText?.[lang] || a.cardText?.nl || a.cardText?.en || '…';
-    const canComplete = (myId === a.performerId) || isDisplayHost;
+    const isMyDare = myId === a.performerId;
+    const canComplete = isMyDare || amIHost;
+    const doneLabel = isMyDare ? '✓ Done' : '⚠ Force resolve';
     return `<div class="pip-activity">
       <div class="pip-activity-header">
         <span class="pip-emoji">${performer?.emoji || '?'}</span>
@@ -3219,7 +3221,7 @@ function renderPip(state) {
         <span class="pip-badge">Lvl ${a.cardLevel}</span>
       </div>
       <div class="pip-dare-text">${cardText.length > 80 ? cardText.slice(0, 77) + '…' : cardText}</div>
-      ${canComplete ? `<button class="pip-done-btn" onclick="completeBackgroundDare('${a.id}')">✓ Done</button>` : ''}
+      ${canComplete ? `<button class="pip-done-btn" onclick="completeBackgroundDare('${a.id}')">${doneLabel}</button>` : ''}
     </div>`;
   }).join('');
 }
