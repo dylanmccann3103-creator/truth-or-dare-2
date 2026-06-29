@@ -380,6 +380,16 @@ input::placeholder { color: #7a6b8a; }
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.6);
 }
+.card-duration-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 6px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: rgba(245,158,11,0.8);
+  margin-top: 8px;
+}
 
 /* ─── Display screen ───────────────────────────────────────────────── */
 #screen-display {
@@ -1258,6 +1268,7 @@ input::placeholder { color: #7a6b8a; }
   <div id="card-reveal" class="card-reveal">
     <div class="card-type-label" id="card-type-label"></div>
     <div class="card-text" id="card-text"></div>
+    <div id="card-duration-badge" class="card-duration-badge" style="display:none">⏱ <span id="card-duration-text"></span></div>
     <div class="card-tags" id="card-tags-display"></div>
   </div>
 
@@ -1392,6 +1403,7 @@ input::placeholder { color: #7a6b8a; }
     </div>
     <div class="card-reveal" id="display-card-reveal">
       <div class="card-text" id="display-card-text"></div>
+      <div id="display-card-duration-badge" class="card-duration-badge" style="display:none">⏱ <span id="display-card-duration-text"></span></div>
     </div>
   </div>
 
@@ -2452,6 +2464,16 @@ function buildCardScreen(state) {
   if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
   if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
 
+  // Duration badge (only when card has estimatedMinutes)
+  const durationBadge = document.getElementById('card-duration-badge');
+  const durationText  = document.getElementById('card-duration-text');
+  if (turn.card.estimatedMinutes) {
+    durationText.textContent = `~${turn.card.estimatedMinutes} min`;
+    durationBadge.style.display = 'inline-flex';
+  } else {
+    durationBadge.style.display = 'none';
+  }
+
   // Tags
   const tagsEl = document.getElementById('card-tags-display');
   tagsEl.innerHTML = '';
@@ -2605,6 +2627,16 @@ function buildDisplayScreen(state) {
     document.getElementById('display-card-reveal').className =
       `card-reveal ${turn.choice || 'dare'}-card`;
     document.getElementById('display-card-text').textContent = text;
+
+    // Duration badge on display screen
+    const dispDurationBadge = document.getElementById('display-card-duration-badge');
+    const dispDurationText  = document.getElementById('display-card-duration-text');
+    if (turn.card && turn.card.estimatedMinutes) {
+      dispDurationText.textContent = `~${turn.card.estimatedMinutes} min`;
+      dispDurationBadge.style.display = 'inline-flex';
+    } else {
+      dispDurationBadge.style.display = 'none';
+    }
 
   } else if (turn.phase === 'duel' || turn.phase === 'duel-forfeit') {
     // Display host sees a built-in duel screen in the display area

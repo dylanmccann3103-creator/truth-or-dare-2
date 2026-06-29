@@ -679,8 +679,9 @@ io.on('connection', (socket) => {
     if (room.currentTurn?.phase !== 'duel') return cb && cb({ ok: false, error: 'Not in duel phase' });
 
     const turn = room.currentTurn;
-    // Prevent a participant from resolving their own duel
-    if (socket.id === turn.performerId || socket.id === turn.targetId) {
+    // Prevent a participant from resolving their own duel (unless they are the host acting as neutral arbiter)
+    const isHost = socket.id === room.host || socket.id === room.displayHostId;
+    if (!isHost && (socket.id === turn.performerId || socket.id === turn.targetId)) {
       return cb && cb({ ok: false, error: 'Duel participants cannot resolve the duel' });
     }
     const actualWinnerId = turn.duelAutoWinnerId || winnerId;
