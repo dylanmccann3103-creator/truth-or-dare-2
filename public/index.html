@@ -1506,6 +1506,97 @@ input::placeholder { color: #7a6b8a; }
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN: Card Editor — host-only custom card management
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-card-editor" class="screen">
+  <div class="editor-screen">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+      <button class="btn" onclick="showScreen('screen-lobby')" style="padding:6px 14px">← Back</button>
+      <h2 style="margin:0; font-size:1.3rem">Card Editor</h2>
+    </div>
+
+    <!-- Form card -->
+    <div class="editor-form-card">
+      <input type="hidden" id="ce-editing-id" value="">
+
+      <!-- Text NL/EN tabs -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex; gap:4px; margin-bottom:8px">
+          <button class="tab-btn active" id="ce-tab-nl" onclick="ceSetTab('nl')">NL</button>
+          <button class="tab-btn" id="ce-tab-en" onclick="ceSetTab('en')">EN</button>
+        </div>
+        <textarea class="editor-textarea" id="ce-text-nl" placeholder="Kaart tekst in het Nederlands..."></textarea>
+        <textarea class="editor-textarea" id="ce-text-en" placeholder="Card text in English..." style="display:none"></textarea>
+      </div>
+
+      <!-- Type -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Type</span>
+        <div class="editor-seg" id="ce-type-seg">
+          <button class="editor-seg-btn active" data-val="dare" onclick="ceSegSelect('ce-type-seg',this)">🔥 Dare</button>
+          <button class="editor-seg-btn" data-val="truth" onclick="ceSegSelect('ce-type-seg',this)">💬 Truth</button>
+        </div>
+      </div>
+
+      <!-- Level -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Level</span>
+        <div class="editor-seg" id="ce-level-seg">
+          <button class="editor-seg-btn active" data-val="1" onclick="ceSegSelect('ce-level-seg',this)">1</button><button class="editor-seg-btn" data-val="2" onclick="ceSegSelect('ce-level-seg',this)">2</button><button class="editor-seg-btn" data-val="3" onclick="ceSegSelect('ce-level-seg',this)">3</button><button class="editor-seg-btn" data-val="4" onclick="ceSegSelect('ce-level-seg',this)">4</button><button class="editor-seg-btn" data-val="5" onclick="ceSegSelect('ce-level-seg',this)">5</button><button class="editor-seg-btn" data-val="6" onclick="ceSegSelect('ce-level-seg',this)">6</button><button class="editor-seg-btn" data-val="7" onclick="ceSegSelect('ce-level-seg',this)">7</button><button class="editor-seg-btn" data-val="8" onclick="ceSegSelect('ce-level-seg',this)">8</button><button class="editor-seg-btn" data-val="9" onclick="ceSegSelect('ce-level-seg',this)">9</button><button class="editor-seg-btn" data-val="10" onclick="ceSegSelect('ce-level-seg',this)">10</button>
+        </div>
+      </div>
+
+      <!-- Difficulty -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Difficulty</span>
+        <div class="editor-seg" id="ce-diff-seg">
+          <button class="editor-seg-btn active" data-val="1" onclick="ceSegSelect('ce-diff-seg',this)">1 ★</button>
+          <button class="editor-seg-btn" data-val="2" onclick="ceSegSelect('ce-diff-seg',this)">2 ★★</button>
+          <button class="editor-seg-btn" data-val="3" onclick="ceSegSelect('ce-diff-seg',this)">3 ★★★</button>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Tags</span>
+        <div class="editor-tag-grid" id="ce-tag-grid"></div>
+      </div>
+
+      <!-- Timer (only for dare) -->
+      <div id="ce-timer-section" style="margin-bottom:14px">
+        <span class="editor-label">Timer</span>
+        <div class="editor-seg" id="ce-timer-mode-seg" style="margin-bottom:12px">
+          <button class="editor-seg-btn active" data-val="" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">None</button>
+          <button class="editor-seg-btn" data-val="duration" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">Hold</button>
+          <button class="editor-seg-btn" data-val="speed" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">Speed</button>
+        </div>
+        <div id="ce-timer-tiers" style="display:none">
+          <div id="ce-tiers-label" style="font-size:0.78rem;opacity:0.5;margin-bottom:8px"></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">1 ★</span><input type="number" id="ce-tier1-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">2 ★★</span><input type="number" id="ce-tier2-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">3 ★★★</span><input type="number" id="ce-tier3-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
+        <button class="btn btn-primary" onclick="ceSubmitCard()" style="flex:1">Save Card</button>
+        <button class="btn" onclick="ceClearForm()" style="opacity:0.6">Clear</button>
+      </div>
+    </div>
+
+    <!-- Custom card list -->
+    <div class="editor-form-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+        <span class="editor-label" style="margin:0">Your Custom Cards</span>
+        <button class="btn" id="ce-save-file-btn" onclick="ceSaveToFile()" style="font-size:0.8rem;padding:5px 12px;display:none">💾 Save permanently</button>
+      </div>
+      <div id="ce-card-list"><div style="opacity:0.4;font-size:0.9rem;text-align:center;padding:20px 0">No custom cards yet</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- Target picker overlay (sabotage / force_swap) -->
 <div id="target-picker-overlay" onclick="closeTargetPicker(event)">
   <div id="target-picker">
@@ -2239,6 +2330,11 @@ function renderLobby(state) {
 // ─── Game State Handler ───────────────────────────────────────────────────────
 function handleRoomState(state) {
   roomState = state;
+
+  // Keep the card editor list in sync whenever customCards change
+  if (document.getElementById('screen-card-editor')?.classList.contains('active')) {
+    ceRenderCardList();
+  }
 
   if (state.phase === 'lobby') {
     myPrevClearedLevels = null; // reset so level-up fires fresh next game
@@ -3284,6 +3380,199 @@ function showLevelUpAnimation(newLevel) {
   levelupTimer = setTimeout(() => {
     overlay.style.display = 'none';
   }, 3400);
+}
+
+// ─── Card Editor ──────────────────────────────────────────────────────────────
+let _ceTags = [];
+
+function showCardEditor() {
+  ceClearForm();
+  ceRenderTagGrid();
+  ceRenderCardList();
+  showScreen('screen-card-editor');
+}
+
+function ceSetTab(lang) {
+  document.getElementById('ce-text-nl').style.display = lang === 'nl' ? '' : 'none';
+  document.getElementById('ce-text-en').style.display = lang === 'en' ? '' : 'none';
+  document.getElementById('ce-tab-nl').classList.toggle('active', lang === 'nl');
+  document.getElementById('ce-tab-en').classList.toggle('active', lang === 'en');
+}
+
+function ceSegSelect(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' .editor-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function ceGetSegVal(groupId) {
+  const active = document.querySelector('#' + groupId + ' .editor-seg-btn.active');
+  return active ? active.dataset.val : '';
+}
+
+function ceUpdateTimerUI() {
+  const mode = ceGetSegVal('ce-timer-mode-seg');
+  const tiersEl = document.getElementById('ce-timer-tiers');
+  const labelEl = document.getElementById('ce-tiers-label');
+  if (!mode) { tiersEl.style.display = 'none'; return; }
+  tiersEl.style.display = '';
+  labelEl.textContent = mode === 'duration'
+    ? 'Award points after holding for X seconds:'
+    : 'Award points if finished within X seconds:';
+}
+
+function ceRenderTagGrid() {
+  const grid = document.getElementById('ce-tag-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const tags = typeof TAGS !== 'undefined' ? TAGS : [];
+  tags.forEach(tag => {
+    const chip = document.createElement('button');
+    chip.className = 'editor-tag-chip' + (_ceTags.includes(tag) ? ' active' : '');
+    chip.textContent = (typeof TAG_LABELS !== 'undefined' && TAG_LABELS[tag]) ? TAG_LABELS[tag] : tag;
+    chip.onclick = () => {
+      if (_ceTags.includes(tag)) _ceTags = _ceTags.filter(t => t !== tag);
+      else _ceTags.push(tag);
+      chip.classList.toggle('active', _ceTags.includes(tag));
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function ceClearForm() {
+  document.getElementById('ce-editing-id').value = '';
+  document.getElementById('ce-text-nl').value = '';
+  document.getElementById('ce-text-en').value = '';
+  _ceTags = [];
+  ceRenderTagGrid();
+  // Reset segs to defaults
+  ['ce-type-seg','ce-level-seg','ce-diff-seg','ce-timer-mode-seg'].forEach(id => {
+    const btns = document.querySelectorAll('#' + id + ' .editor-seg-btn');
+    btns.forEach((b, i) => b.classList.toggle('active', i === 0));
+  });
+  ceUpdateTimerUI();
+  document.getElementById('ce-tier1-sec').value = '';
+  document.getElementById('ce-tier2-sec').value = '';
+  document.getElementById('ce-tier3-sec').value = '';
+}
+
+function ceLoadCardIntoForm(card) {
+  document.getElementById('ce-editing-id').value = card.id;
+  const text = typeof card.text === 'object' ? card.text : { nl: card.text, en: card.text };
+  document.getElementById('ce-text-nl').value = text.nl || '';
+  document.getElementById('ce-text-en').value = text.en || '';
+  _ceTags = Array.isArray(card.tags) ? [...card.tags] : [];
+  ceRenderTagGrid();
+  // Set segs
+  const setSegVal = (groupId, val) => {
+    document.querySelectorAll('#' + groupId + ' .editor-seg-btn').forEach(b => {
+      b.classList.toggle('active', String(b.dataset.val) === String(val));
+    });
+  };
+  setSegVal('ce-type-seg', card.type || 'dare');
+  setSegVal('ce-level-seg', card.level || 1);
+  setSegVal('ce-diff-seg', card.difficulty || 1);
+  setSegVal('ce-timer-mode-seg', card.timerMode || '');
+  ceUpdateTimerUI();
+  if (card.tiers && card.tiers.length === 3) {
+    document.getElementById('ce-tier1-sec').value = card.tiers[0].seconds || '';
+    document.getElementById('ce-tier2-sec').value = card.tiers[1].seconds || '';
+    document.getElementById('ce-tier3-sec').value = card.tiers[2].seconds || '';
+  }
+}
+
+function ceSubmitCard() {
+  const textNl = document.getElementById('ce-text-nl').value.trim();
+  const textEn = document.getElementById('ce-text-en').value.trim();
+  if (!textNl) { toast('Card text (NL) is required', 'danger'); return; }
+
+  const timerMode = ceGetSegVal('ce-timer-mode-seg') || null;
+  let tiers;
+  if (timerMode) {
+    const t1 = parseInt(document.getElementById('ce-tier1-sec').value);
+    const t2 = parseInt(document.getElementById('ce-tier2-sec').value);
+    const t3 = parseInt(document.getElementById('ce-tier3-sec').value);
+    if (!t1 || !t2 || !t3) { toast('Fill in all 3 tier times', 'danger'); return; }
+    if (timerMode === 'duration') {
+      tiers = [{ difficulty: 1, seconds: t1 }, { difficulty: 2, seconds: t2 }, { difficulty: 3, seconds: t3 }];
+    } else {
+      tiers = [{ difficulty: 3, seconds: t1 }, { difficulty: 2, seconds: t2 }, { difficulty: 1, seconds: t3 }];
+    }
+  }
+
+  const card = {
+    type: ceGetSegVal('ce-type-seg') || 'dare',
+    level: parseInt(ceGetSegVal('ce-level-seg')) || 1,
+    difficulty: parseInt(ceGetSegVal('ce-diff-seg')) || 1,
+    text: { nl: textNl, en: textEn || textNl },
+    tags: [..._ceTags],
+    genderRequired: null, orientationMatters: false, targetRequired: false,
+    performerGenitals: null, targetGenitals: null,
+    timerMode, tiers,
+  };
+
+  const editingId = document.getElementById('ce-editing-id').value;
+  if (editingId) {
+    card.id = editingId;
+    socket.emit('edit-custom-card', { code: myRoom, card }, res => {
+      if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+      toast('Card updated', 'success');
+      ceClearForm();
+      ceRenderCardList();
+    });
+  } else {
+    socket.emit('add-custom-card', { code: myRoom, card }, res => {
+      if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+      toast('Card added', 'success');
+      ceClearForm();
+      ceRenderCardList();
+    });
+  }
+}
+
+function ceRenderCardList() {
+  const list = document.getElementById('ce-card-list');
+  const saveBtn = document.getElementById('ce-save-file-btn');
+  if (!list) return;
+  const cards = roomState?.customCards || [];
+  if (!cards.length) {
+    list.innerHTML = '<div style="opacity:0.4;font-size:0.9rem;text-align:center;padding:20px 0">No custom cards yet</div>';
+    if (saveBtn) saveBtn.style.display = 'none';
+    return;
+  }
+  if (saveBtn) saveBtn.style.display = '';
+  list.innerHTML = cards.map(c => {
+    const text = typeof c.text === 'object' ? (c.text.nl || c.text.en) : c.text;
+    const preview = text.length > 60 ? text.slice(0, 60) + '…' : text;
+    return '<div class="custom-card-row">' +
+      '<div style="flex:1"><div style="font-size:0.88rem">' + preview + '</div>' +
+      '<div style="font-size:0.72rem;opacity:0.4;margin-top:3px">Lvl ' + c.level + ' · ' + c.type + ' · ' + (c.timerMode || 'no timer') + '</div></div>' +
+      '<button class="btn" style="font-size:0.75rem;padding:4px 10px" onclick="ceEditCard(\'' + c.id + '\')">Edit</button>' +
+      '<button class="btn" style="font-size:0.75rem;padding:4px 10px;opacity:0.6" onclick="ceDeleteCard(\'' + c.id + '\')">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function ceEditCard(cardId) {
+  const card = (roomState?.customCards || []).find(c => c.id === cardId);
+  if (!card) return;
+  ceLoadCardIntoForm(card);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function ceDeleteCard(cardId) {
+  socket.emit('delete-custom-card', { code: myRoom, cardId }, res => {
+    if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+    toast('Card deleted', 'info');
+    ceRenderCardList();
+  });
+}
+
+function ceSaveToFile() {
+  if (!confirm('Save all custom cards permanently to dares.json on the server? They will be available in all future games.')) return;
+  socket.emit('save-cards-to-file', { code: myRoom }, res => {
+    if (!res || !res.ok) { toast(res?.error || 'Could not save', 'danger'); return; }
+    toast('Saved ' + res.saved + ' card(s) to dares.json', 'success');
+  });
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
