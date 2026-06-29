@@ -807,6 +807,25 @@ input::placeholder { color: #7a6b8a; }
 }
 #age-gate h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.6rem; color: #fff; }
 #age-gate p { max-width: 320px; color: #b9a8c8; }
+
+/* ─── Card Editor ─────────────────────────────────────────────────────────── */
+.editor-screen { padding: 16px; max-width: 600px; margin: 0 auto; }
+.editor-form-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.editor-label { font-size: 0.75rem; font-weight: 700; letter-spacing: .08em; opacity: 0.5; text-transform: uppercase; margin-bottom: 6px; display: block; }
+.editor-textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.95rem; resize: vertical; min-height: 80px; font-family: inherit; box-sizing: border-box; }
+.editor-textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+.editor-seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.editor-seg-btn { padding: 6px 14px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); color: #9b89b4; cursor: pointer; font-weight: 600; font-size: 0.82rem; transition: all .15s; }
+.editor-seg-btn.active { background: rgba(139,92,246,0.25); border-color: #8b5cf6; color: #fff; }
+.editor-tag-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.editor-tag-chip { padding: 5px 11px; border-radius: 99px; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #9b89b4; cursor: pointer; font-size: 0.76rem; font-weight: 600; transition: all .15s; }
+.editor-tag-chip.active { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #f59e0b; }
+.editor-tier-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.editor-tier-row input[type=number] { width: 70px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 7px 10px; color: #fff; font-size: 0.9rem; }
+.custom-card-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.custom-card-row:last-child { border-bottom: none; }
+.tab-btn { padding: 6px 16px; border-radius: 8px 8px 0 0; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; background: rgba(255,255,255,0.05); color: #9b89b4; }
+.tab-btn.active { background: rgba(255,255,255,0.12); color: #fff; }
 </style>
 </head>
 <body>
@@ -1165,7 +1184,7 @@ input::placeholder { color: #7a6b8a; }
   </div>
   <div id="lobby-start-btn-wrap" class="w-full" style="display:none">
     <button class="btn btn-primary" id="lobby-start-btn" onclick="startGame()" disabled>Start Game →</button>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="window.open('/editor','_blank')">🃏 Edit Cards</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="showCardEditor()">🃏 Edit Cards</button>
     <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 players</p>
   </div>
   <div class="gap"></div>

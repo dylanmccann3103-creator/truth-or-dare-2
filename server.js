@@ -11,6 +11,7 @@ const { Server } = require('socket.io');
 const QRCode = require('qrcode');
 const os = require('os');
 const path = require('path');
+const fs   = require('fs');
 
 const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
@@ -816,6 +817,118 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
+  // ─── Custom card management (host-only, lobby phase) ─────────────────────────
+
+  socket.on('add-custom-card', ({ code, card }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+
+    // Validate required fields
+    if (!card || !card.type || !card.text || card.level == null || card.difficulty == null)
+      return cb && cb({ ok: false, error: 'Missing required card fields' });
+    if (!['truth','dare'].includes(card.type))
+      return cb && cb({ ok: false, error: 'Invalid type' });
+    if (card.level < 1 || card.level > 10) return cb && cb({ ok: false, error: 'Invalid level' });
+    if (![1,2,3].includes(card.difficulty)) return cb && cb({ ok: false, error: 'Invalid difficulty' });
+
+    const newCard = {
+      id: 'custom-' + Date.now(),
+      type: card.type,
+      level: Number(card.level),
+      difficulty: Number(card.difficulty),
+      text: typeof card.text === 'object' ? card.text : { nl: card.text, en: card.text },
+      tags: Array.isArray(card.tags) ? card.tags : [],
+      genderRequired: card.genderRequired || null,
+      orientationMatters: card.orientationMatters || false,
+      targetRequired: card.targetRequired || false,
+      performerGenitals: card.performerGenitals || null,
+      targetGenitals: card.targetGenitals || null,
+      timerMode: card.timerMode || null,
+      tiers: Array.isArray(card.tiers) ? card.tiers : undefined,
+    };
+    if (!newCard.timerMode) delete newCard.tiers;
+
+    room.customCards.push(newCard);
+    cb && cb({ ok: true, card: newCard });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('edit-custom-card', ({ code, card }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+    if (!card || !card.id) return cb && cb({ ok: false, error: 'Missing card id' });
+
+    const idx = room.customCards.findIndex(c => c.id === card.id);
+    if (idx === -1) return cb && cb({ ok: false, error: 'Card not found' });
+
+    room.customCards[idx] = {
+      ...room.customCards[idx],
+      type: card.type || room.customCards[idx].type,
+      level: Number(card.level) || room.customCards[idx].level,
+      difficulty: Number(card.difficulty) || room.customCards[idx].difficulty,
+      text: card.text || room.customCards[idx].text,
+      tags: Array.isArray(card.tags) ? card.tags : room.customCards[idx].tags,
+      genderRequired: card.genderRequired !== undefined ? card.genderRequired : room.customCards[idx].genderRequired,
+      orientationMatters: card.orientationMatters !== undefined ? card.orientationMatters : room.customCards[idx].orientationMatters,
+      targetRequired: card.targetRequired !== undefined ? card.targetRequired : room.customCards[idx].targetRequired,
+      timerMode: card.timerMode !== undefined ? card.timerMode : room.customCards[idx].timerMode,
+      tiers: Array.isArray(card.tiers) ? card.tiers : room.customCards[idx].tiers,
+    };
+    if (!room.customCards[idx].timerMode) delete room.customCards[idx].tiers;
+
+    cb && cb({ ok: true, card: room.customCards[idx] });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('delete-custom-card', ({ code, cardId }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+
+    const before = room.customCards.length;
+    room.customCards = room.customCards.filter(c => c.id !== cardId);
+    if (room.customCards.length === before) return cb && cb({ ok: false, error: 'Card not found' });
+
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('save-cards-to-file', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (!room.customCards || room.customCards.length === 0)
+      return cb && cb({ ok: false, error: 'No custom cards to save' });
+
+    const filePath = path.join(__dirname, 'data', 'dares.json');
+
+    try {
+      const existing = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const existingIds = new Set(existing.map(c => c.id));
+      const toAdd = room.customCards.filter(c => !existingIds.has(c.id));
+      if (toAdd.length === 0) return cb && cb({ ok: true, saved: 0 });
+      const updated = [...existing, ...toAdd];
+      fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf8');
+      // Mutate ALL_CARDS so new cards are available in the next game without restart
+      toAdd.forEach(c => ALL_CARDS.push(c));
+      cb && cb({ ok: true, saved: toAdd.length });
+    } catch (e) {
+      cb && cb({ ok: false, error: 'File write failed: ' + e.message });
+    }
+  });
+
   // ─── Duel resolution (host-only) ─────────────────────────────────────────────
   socket.on('resolve-duel', ({ code, winnerId }, cb) => {
     const room = getRoom(code);
@@ -1166,7 +1279,6 @@ app.get('/qr/:code', async (req, res) => {
 app.get('/tags', (req, res) => res.json(ALL_TAGS));
 
 // ─── Language packs ────────────────────────────────────────────────────────────
-const fs = require('fs');
 const LANG_DIR = path.join(__dirname, 'data', 'lang');
 app.get('/lang/:lang.json', (req, res) => {
   const file = path.join(LANG_DIR, `${req.params.lang}.json`);
