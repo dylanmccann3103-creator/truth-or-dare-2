@@ -13,6 +13,14 @@ else
   NODE="node"
 fi
 
+if [ ! -d "node_modules" ]; then
+  echo ""
+  echo " Installing dependencies... (first run only)"
+  echo ""
+  npm install
+  echo ""
+fi
+
 echo ""
 echo " Starting Truth or Dare 2.0..."
 echo ""

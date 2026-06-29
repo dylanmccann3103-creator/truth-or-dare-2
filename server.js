@@ -11,6 +11,7 @@ const { Server } = require('socket.io');
 const QRCode = require('qrcode');
 const os = require('os');
 const path = require('path');
+const fs   = require('fs');
 
 const { cards: ALL_CARDS } = require('./data/dares.json');
 const { selectCard } = require('./lib/selectCard');
@@ -22,7 +23,10 @@ const {
 } = require('./lib/gameHelpers');
 
 function getRoomCards(room) {
-  const cards = room.cardPool || ALL_CARDS;
+  const base = room.cardPool || ALL_CARDS;
+  const cards = (room.customCards && room.customCards.length > 0)
+    ? [...base, ...room.customCards]
+    : base;
   if (!room.equipmentLimits || room.equipmentLimits.length === 0) return cards;
   return cards.filter(c => !c.tags || !c.tags.some(t => room.equipmentLimits.includes(t)));
 }
@@ -85,6 +89,7 @@ function createRoom(hostId, hostMode = 'display') {
     cardPool: null,          // null = use ALL_CARDS; set from host's active packages
     equipmentLimits: [],     // equip_* tags for unavailable equipment — filtered from card pool
     knownGenders: BASE_GENDERS.map(g => ({ ...g })), // base + merged pack genders
+    customCards: [],         // cards added by host during lobby
   };
   return rooms[code];
 }
@@ -253,6 +258,7 @@ function advanceTurn(room) {
     insightType: null,
     duelAutoWinnerId: null,
     forfeit: null,
+    timer: null,
   };
   io.to(room.code).emit('room-state', roomPublicState(room));
 
@@ -281,6 +287,7 @@ function advanceTurn(room) {
       insightType: null,
       duelAutoWinnerId: null,
       forfeit: null,
+      timer: null,
     };
     io.to(room.code).emit('room-state', roomPublicState(room));
   }, 800);
@@ -345,7 +352,52 @@ function roomPublicState(room) {
     minStartLevel: room.minStartLevel,
     enabledPowerups: room.enabledPowerups || [],
     knownGenders: room.knownGenders || [],
+    customCards: room.customCards || [],
   };
+}
+
+// ─── Timer scoring (pure) ─────────────────────────────────────────────────────
+function calcTimerPoints(card, elapsedSeconds) {
+  if (!card.timerMode || !card.tiers || !card.tiers.length) return card.difficulty;
+  if (card.timerMode === 'duration') {
+    let achieved = 0;
+    for (const tier of card.tiers) {
+      if (elapsedSeconds >= tier.seconds) achieved = tier.difficulty;
+    }
+    return achieved;
+  }
+  if (card.timerMode === 'speed') {
+    const sorted = [...card.tiers].sort((a, b) => a.seconds - b.seconds);
+    for (const tier of sorted) {
+      if (elapsedSeconds <= tier.seconds) return tier.difficulty;
+    }
+    return 0;
+  }
+  return card.difficulty;
+}
+
+// ─── Dare completion award (shared by complete-dare + timer resolution) ───────
+function awardDareCompletion(room, turn, achievedDifficulty) {
+  if (achievedDifficulty === 0) return;
+  const performer = room.players[turn.performerId];
+  if (!performer) return;
+
+  const xpBase = turn.card.level * achievedDifficulty;
+  const xpEarned = turn.doubleXp ? xpBase * 2 : xpBase;
+  performer.xp += xpEarned;
+
+  const baseCoins = Math.max(3, turn.card.level * achievedDifficulty);
+  const coinsEarned = coinsByEconomy(baseCoins, room.economyMode);
+  performer.coins += coinsEarned;
+
+  // Track level clearing (mirrors complete-dare handler)
+  const lvl = turn.card.level;
+  performer.daresCompletedPerLevel[lvl] = (performer.daresCompletedPerLevel[lvl] || 0) + 1;
+  if (performer.daresCompletedPerLevel[lvl] >= 3 && !performer.clearedLevels.includes(lvl)) {
+    performer.clearedLevels.push(lvl);
+  }
+
+  console.log(`[xp] ${performer.name} +${xpEarned}xp +${coinsEarned}coins (timed, level ${lvl}, tier ${achievedDifficulty})`);
 }
 
 // ─── Socket.io Events ─────────────────────────────────────────────────────────
@@ -603,6 +655,7 @@ io.on('connection', (socket) => {
     room.currentTurn.softFlagged     = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = rouletteUpgrade;
     room.currentTurn.attribution     = { type: 'solo', performerId: socket.id };
+    room.currentTurn.timer           = (card && card.timerMode) ? { state: 'idle' } : null;
 
     cb && cb({ ok: true, recycled: sel.recycled, softFlagged: sel.softFlagged, rouletteUpgrade });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -675,6 +728,112 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
+  // ─── Timer state machine ──────────────────────────────────────────────────────
+  socket.on('start-timer', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || !turn.timer || turn.timer.state !== 'idle') return cb && cb({ ok: false, error: 'Not ready' });
+    if (socket.id !== turn.performerId && socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Not performer' });
+
+    turn.timer = { state: 'countdown', countdownValue: 3 };
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+
+    setTimeout(() => {
+      if (room.currentTurn !== turn) return;
+      turn.timer.countdownValue = 2;
+      io.to(code).emit('room-state', roomPublicState(room));
+    }, 1000);
+    setTimeout(() => {
+      if (room.currentTurn !== turn) return;
+      turn.timer.countdownValue = 1;
+      io.to(code).emit('room-state', roomPublicState(room));
+    }, 2000);
+    setTimeout(() => {
+      if (room.currentTurn !== turn) return;
+      turn.timer = { state: 'running', startedAt: Date.now() };
+      io.to(code).emit('room-state', roomPublicState(room));
+    }, 3000);
+  });
+
+  socket.on('stop-timer', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || !turn.timer || turn.timer.state !== 'running')
+      return cb && cb({ ok: false, error: 'Timer not running' });
+    if (socket.id !== turn.performerId) return cb && cb({ ok: false, error: 'Not performer' });
+
+    const raw = (Date.now() - turn.timer.startedAt) / 1000;
+    const elapsedSeconds = Math.max(0, raw - 2);
+    const achievedDifficulty = calcTimerPoints(turn.card, elapsedSeconds);
+    turn.timer = { state: 'stopped', elapsedSeconds, achievedDifficulty };
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+
+  socket.on('accept-timer-result', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || !turn.timer || turn.timer.state !== 'stopped')
+      return cb && cb({ ok: false, error: 'No result to accept' });
+    if (socket.id !== turn.performerId) return cb && cb({ ok: false, error: 'Not performer' });
+
+    awardDareCompletion(room, turn, turn.timer.achievedDifficulty);
+    turn.timer.state = 'resolved';
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+    setTimeout(() => advanceTurn(room), 1500);
+  });
+
+  socket.on('dispute-timer-result', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || !turn.timer || turn.timer.state !== 'stopped')
+      return cb && cb({ ok: false, error: 'Nothing to dispute' });
+    if (socket.id !== turn.performerId) return cb && cb({ ok: false, error: 'Not performer' });
+
+    turn.timer.state = 'disputed';
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('quit-timer', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || !turn.timer) return cb && cb({ ok: false, error: 'No timer active' });
+    if (socket.id !== turn.performerId) return cb && cb({ ok: false, error: 'Not performer' });
+
+    turn.timer = { state: 'resolved' };
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+    setTimeout(() => advanceTurn(room), 1500);
+  });
+
+  socket.on('host-award-timer-tier', ({ code, difficulty }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    const turn = room.currentTurn;
+    if (!turn || !turn.card || !turn.card.timerMode)
+      return cb && cb({ ok: false, error: 'Not a timed card' });
+    if (![0, 1, 2, 3].includes(difficulty)) return cb && cb({ ok: false, error: 'Invalid tier' });
+
+    awardDareCompletion(room, turn, difficulty);
+    turn.timer = { state: 'resolved', achievedDifficulty: difficulty };
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+    setTimeout(() => advanceTurn(room), 1500);
+  });
+
+
   // Park a dare — consumes a break slot, no XP awarded
   socket.on('use-break-slot', ({ code }, cb) => {
     const room = getRoom(code);
@@ -741,6 +900,7 @@ io.on('connection', (socket) => {
     room.currentTurn.softFlagged     = false;
     room.currentTurn.rouletteUpgrade = false;
     room.currentTurn.attribution     = { type: 'solo', performerId: socket.id };
+    room.currentTurn.timer           = (card && card.timerMode) ? { state: 'idle' } : null;
 
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -774,6 +934,7 @@ io.on('connection', (socket) => {
     room.currentTurn.recycled    = sel.recycled;
     room.currentTurn.softFlagged = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = false;
+    room.currentTurn.timer       = (card && card.timerMode) ? { state: 'idle' } : null;
 
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -828,6 +989,124 @@ io.on('connection', (socket) => {
     io.to(code).emit('room-state', roomPublicState(room));
   });
 
+  // ─── Custom card management (host-only, lobby phase) ─────────────────────────
+
+  socket.on('add-custom-card', ({ code, card }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+
+    // Validate required fields
+    if (!card || !card.type || !card.text || card.level == null || card.difficulty == null)
+      return cb && cb({ ok: false, error: 'Missing required card fields' });
+    if (!['truth','dare'].includes(card.type))
+      return cb && cb({ ok: false, error: 'Invalid type' });
+    if (card.level < 1 || card.level > 10) return cb && cb({ ok: false, error: 'Invalid level' });
+    if (![1,2,3].includes(card.difficulty)) return cb && cb({ ok: false, error: 'Invalid difficulty' });
+
+    const newCard = {
+      id: 'custom-' + Date.now(),
+      type: card.type,
+      level: Number(card.level),
+      difficulty: Number(card.difficulty),
+      text: typeof card.text === 'object' ? card.text : { nl: card.text, en: card.text },
+      tags: Array.isArray(card.tags) ? card.tags : [],
+      genderRequired: card.genderRequired || null,
+      orientationMatters: card.orientationMatters || false,
+      targetRequired: card.targetRequired || false,
+      performerGenitals: card.performerGenitals || null,
+      targetGenitals: card.targetGenitals || null,
+      timerMode: card.timerMode || null,
+      tiers: Array.isArray(card.tiers) ? card.tiers : undefined,
+    };
+    if (!newCard.timerMode) delete newCard.tiers;
+
+    room.customCards.push(newCard);
+    cb && cb({ ok: true, card: newCard });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('edit-custom-card', ({ code, card }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+    if (!card || !card.id) return cb && cb({ ok: false, error: 'Missing card id' });
+
+    const idx = room.customCards.findIndex(c => c.id === card.id);
+    if (idx === -1) return cb && cb({ ok: false, error: 'Card not found' });
+
+    room.customCards[idx] = {
+      ...room.customCards[idx],
+      type: card.type || room.customCards[idx].type,
+      level: Number(card.level) || room.customCards[idx].level,
+      difficulty: Number(card.difficulty) || room.customCards[idx].difficulty,
+      text: card.text || room.customCards[idx].text,
+      tags: Array.isArray(card.tags) ? card.tags : room.customCards[idx].tags,
+      genderRequired: card.genderRequired !== undefined ? card.genderRequired : room.customCards[idx].genderRequired,
+      orientationMatters: card.orientationMatters !== undefined ? card.orientationMatters : room.customCards[idx].orientationMatters,
+      targetRequired: card.targetRequired !== undefined ? card.targetRequired : room.customCards[idx].targetRequired,
+      timerMode: card.timerMode !== undefined ? card.timerMode : room.customCards[idx].timerMode,
+      tiers: Array.isArray(card.tiers) ? card.tiers : room.customCards[idx].tiers,
+    };
+    if (!room.customCards[idx].timerMode) delete room.customCards[idx].tiers;
+
+    cb && cb({ ok: true, card: room.customCards[idx] });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('delete-custom-card', ({ code, cardId }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only edit cards in lobby' });
+
+    const before = room.customCards.length;
+    room.customCards = room.customCards.filter(c => c.id !== cardId);
+    if (room.customCards.length === before) return cb && cb({ ok: false, error: 'Card not found' });
+
+    cb && cb({ ok: true });
+    io.to(code).emit('room-state', roomPublicState(room));
+  });
+
+  socket.on('save-cards-to-file', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false });
+    if (socket.id !== room.host && socket.id !== room.displayHostId)
+      return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only save cards in lobby' });
+    if (!room.customCards || room.customCards.length === 0)
+      return cb && cb({ ok: false, error: 'No custom cards to save' });
+
+    const filePath = path.join(__dirname, 'data', 'dares.json');
+
+    try {
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      // dares.json has structure { cards: [...] }
+      const existingCards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
+      const existingIds = new Set(existingCards.map(c => c.id));
+      const toAdd = room.customCards.filter(c => !existingIds.has(c.id));
+      if (toAdd.length === 0) return cb && cb({ ok: true, saved: 0 });
+      const updatedCards = [...existingCards, ...toAdd];
+      // Write back preserving the { cards: [...] } structure
+      const output = Array.isArray(parsed) ? updatedCards : { ...parsed, cards: updatedCards };
+      fs.writeFileSync(filePath, JSON.stringify(output, null, 2), 'utf8');
+      // Mutate ALL_CARDS so new cards are available in the next game without restart
+      toAdd.forEach(c => ALL_CARDS.push(c));
+      cb && cb({ ok: true, saved: toAdd.length });
+    } catch (e) {
+      cb && cb({ ok: false, error: 'File write failed: ' + e.message });
+    }
+  });
+
   // ─── Duel resolution (host-only) ─────────────────────────────────────────────
   socket.on('resolve-duel', ({ code, winnerId }, cb) => {
     const room = getRoom(code);
@@ -839,8 +1118,9 @@ io.on('connection', (socket) => {
     if (room.currentTurn?.phase !== 'duel') return cb && cb({ ok: false, error: 'Not in duel phase' });
 
     const turn = room.currentTurn;
-    // Prevent a participant from resolving their own duel
-    if (socket.id === turn.performerId || socket.id === turn.targetId) {
+    // Prevent a participant from resolving their own duel (unless they are the host acting as neutral arbiter)
+    const isHost = socket.id === room.host || socket.id === room.displayHostId;
+    if (!isHost && (socket.id === turn.performerId || socket.id === turn.targetId)) {
       return cb && cb({ ok: false, error: 'Duel participants cannot resolve the duel' });
     }
     const actualWinnerId = turn.duelAutoWinnerId || winnerId;
@@ -1180,7 +1460,6 @@ app.get('/qr/:code', async (req, res) => {
 app.get('/tags', (req, res) => res.json(ALL_TAGS));
 
 // ─── Language packs ────────────────────────────────────────────────────────────
-const fs = require('fs');
 const LANG_DIR = path.join(__dirname, 'data', 'lang');
 app.get('/lang/:lang.json', (req, res) => {
   const file = path.join(LANG_DIR, `${req.params.lang}.json`);

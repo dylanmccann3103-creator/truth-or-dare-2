@@ -1592,7 +1592,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d045",
@@ -1650,6 +1656,7 @@
       "type": "dare",
       "level": 7,
       "difficulty": 3,
+      "estimatedMinutes": 20,
       "text": "Wikkel je partner strak in folie van borst tot dijen, laat alleen bepaalde gebieden vrij. Schuif een vibrerend speeltje tussen hun benen en neem volledige controle — breng ze op de rand tot ze smeken. Jij blijft de baas totdat je anders zegt.",
       "tags": [
         "bondage",
@@ -1660,7 +1667,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d049",
@@ -1693,7 +1706,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d051",
@@ -1766,6 +1785,7 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
+      "estimatedMinutes": 15,
       "text": "Bind de polsen en enkels van je partner aan het bed of een stoel. Prikkel elk stukje met veren, ijs en zachte aanrakingen — nog geen penetratie. Elke keer dat ze smeken, pauzeer je volledig 30 seconden.",
       "tags": [
         "bondage",
@@ -1776,7 +1796,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d056",
@@ -1817,6 +1843,7 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
+      "estimatedMinutes": 20,
       "text": "Laat je partner 10 minuten de dominante rol spelen: volg elke instructie die ze geven. Wissel dan — de rollen keren volledig om. Bespreek welke het meest natuurlijk aanvoelde.",
       "tags": [
         "intimate",
@@ -1894,7 +1921,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d063",
@@ -1940,6 +1973,7 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
+      "estimatedMinutes": 15,
       "text": "Beperk je partner volledig — polsen en enkels vastgemaakt. Prikkel zonder ze te laten klaarkomen. Laat ze je minstens 5 keer smeken — elke keer explicieter dan de vorige — voordat je ze toestaat te klaarkomen.",
       "tags": [
         "bondage",
@@ -1991,6 +2025,7 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
+      "estimatedMinutes": 10,
       "text": "Markeer lichaamszone's op je partner met een stift (borst, dijen, rug). Wijs een regel toe aan elke zone: tikken, kussen, ijs of op de rand brengen. Kies elke 2 minuten een nieuwe zone voor 10 minuten totaal.",
       "tags": [
         "bondage",
@@ -2035,7 +2070,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d071",
@@ -2076,6 +2117,7 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
+      "estimatedMinutes": 10,
       "text": "Volledige bondage-sessie: beperk je partner volledig — polsen, enkels, geblinddoekt — en prikkel elk stukje met kussen, likken, ijs, licht bijten en een speeltje. Ze mogen geen geluid maken. Elk geluid levert een straf naar jouw keuze op. Duurt 10 volle minuten.",
       "tags": [
         "bondage",
@@ -2093,6 +2135,7 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
+      "estimatedMinutes": 20,
       "text": "Intense dom/sub-sessie: de onderdanige partner is volledig beperkt en moet elke opdracht direct opvolgen. De dominant verkent elke overeengekomen grens met orale seks, edging, speeltjes, tikken en was — niets buiten harde limits.",
       "tags": [
         "bondage",
@@ -2162,6 +2205,7 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
+      "estimatedMinutes": 20,
       "text": "Uitgebreide edging-marathon: wissel af tussen orale seks, handen en speeltjes bij je partner — breng ze naar de absolute rand zonder ze te laten klaarkomen. Doe dit minstens 5 keer. Ze mogen alleen klaarkomen als je expliciet toestemming geeft.",
       "tags": [
         "oral",
@@ -2415,6 +2459,7 @@
       "type": "dare",
       "level": 7,
       "difficulty": 3,
+      "estimatedMinutes": 15,
       "text": "Bind haar polsen en enkels aan het bed. Gebruik veren, ijs en je lippen op elk stukje — blijf plagen. Elke keer dat ze smeekt zonder 'alsjeblieft' te zeggen, pauzeer je 30 seconden.",
       "tags": [
         "bondage",
@@ -2706,6 +2751,7 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
+      "estimatedMinutes": 15,
       "text": "Beperk haar, houd haar benen open en prikkel haar zonder haar te laten klaarkomen. Laat haar je minstens 5 keer smeken — elke keer iets explicieter dan daarvoor — voordat je haar toestaat te klaarkomen.",
       "tags": [
         "bondage",
@@ -2725,6 +2771,7 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
+      "estimatedMinutes": 10,
       "text": "Volledige bondage-sessie met haar: beperk haar volledig — polsen, enkels, geblinddoekt. Prikkel elk stukje met kussen, likken, ijs, speeltjes en licht bijten. Ze mag geen geluid maken. Elk geluid levert een straf op. Duurt 10 minuten, breng haar dan volledig tot een klaarkoming.",
       "tags": [
         "bondage",
@@ -3483,6 +3530,7 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
+      "estimatedMinutes": 20,
       "text": "Bind je partner in een Shibari-stijl touwharnas, laat ze blootgesteld en hulpeloos achter. Prikkel ze meedogenloos — ze moeten om vrijlating smeken. Geen klaarkoming zonder toestemming. Blinddoek en speeltjes optioneel.",
       "tags": [
         "bondage",

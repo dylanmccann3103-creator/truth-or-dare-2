@@ -380,6 +380,16 @@ input::placeholder { color: #7a6b8a; }
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.6);
 }
+.card-duration-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 6px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: rgba(245,158,11,0.8);
+  margin-top: 8px;
+}
 
 /* ─── Display screen ───────────────────────────────────────────────── */
 #screen-display {
@@ -774,6 +784,18 @@ input::placeholder { color: #7a6b8a; }
   background: rgba(124,58,237,0.25); border-color: var(--accent2); color: #fff;
 }
 
+/* ─── Timer UI ─────────────────────────────────────────────────────────────── */
+.timer-section { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:16px; width:100%; }
+.timer-countdown-num { font-size:120px; font-weight:900; font-family:monospace; line-height:1;
+  background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.timer-elapsed { font-size:48px; font-weight:700; font-family:monospace; color:#f59e0b; }
+.timer-result-box { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15);
+  border-radius:12px; padding:16px 24px; text-align:center; width:100%; }
+.timer-tier-btns { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.timer-tier-btn { padding:8px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.07); color:#fff; cursor:pointer; font-weight:600; font-size:0.9rem; }
+.timer-tier-btn:hover { background:rgba(255,255,255,0.15); }
+
 /* ─── Age gate overlay ─────────────────────────────────────────────── */
 #age-gate {
   position: fixed; inset: 0; z-index: 1000;
@@ -785,6 +807,25 @@ input::placeholder { color: #7a6b8a; }
 }
 #age-gate h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.6rem; color: #fff; }
 #age-gate p { max-width: 320px; color: #b9a8c8; }
+
+/* ─── Card Editor ─────────────────────────────────────────────────────────── */
+.editor-screen { padding: 16px; max-width: 600px; margin: 0 auto; }
+.editor-form-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.editor-label { font-size: 0.75rem; font-weight: 700; letter-spacing: .08em; opacity: 0.5; text-transform: uppercase; margin-bottom: 6px; display: block; }
+.editor-textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.95rem; resize: vertical; min-height: 80px; font-family: inherit; box-sizing: border-box; }
+.editor-textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+.editor-seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.editor-seg-btn { padding: 6px 14px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); color: #9b89b4; cursor: pointer; font-weight: 600; font-size: 0.82rem; transition: all .15s; }
+.editor-seg-btn.active { background: rgba(139,92,246,0.25); border-color: #8b5cf6; color: #fff; }
+.editor-tag-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.editor-tag-chip { padding: 5px 11px; border-radius: 99px; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #9b89b4; cursor: pointer; font-size: 0.76rem; font-weight: 600; transition: all .15s; }
+.editor-tag-chip.active { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #f59e0b; }
+.editor-tier-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.editor-tier-row input[type=number] { width: 70px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 7px 10px; color: #fff; font-size: 0.9rem; }
+.custom-card-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.custom-card-row:last-child { border-bottom: none; }
+.tab-btn { padding: 6px 16px; border-radius: 8px 8px 0 0; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; background: rgba(255,255,255,0.05); color: #9b89b4; }
+.tab-btn.active { background: rgba(255,255,255,0.12); color: #fff; }
 </style>
 </head>
 <body>
@@ -1142,7 +1183,7 @@ input::placeholder { color: #7a6b8a; }
   </div>
   <div id="lobby-start-btn-wrap" class="w-full" style="display:none">
     <button class="btn btn-primary" id="lobby-start-btn" onclick="startGame()" disabled>Start Game →</button>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="window.open('/editor','_blank')">🃏 Edit Cards</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="showCardEditor()">🃏 Edit Cards</button>
     <p class="text-muted text-center" style="margin-top:8px;font-size:0.8rem">Need at least 2 players</p>
   </div>
   <div class="gap"></div>
@@ -1257,6 +1298,7 @@ input::placeholder { color: #7a6b8a; }
   <div id="card-reveal" class="card-reveal">
     <div class="card-type-label" id="card-type-label"></div>
     <div class="card-text" id="card-text"></div>
+    <div id="card-duration-badge" class="card-duration-badge" style="display:none">⏱ <span id="card-duration-text"></span></div>
     <div class="card-tags" id="card-tags-display"></div>
   </div>
 
@@ -1264,6 +1306,42 @@ input::placeholder { color: #7a6b8a; }
   <div id="card-clothing-ref" class="card" style="display:none; max-width:480px">
     <div class="section-label" style="margin-top:0">🧥 Their Wardrobe</div>
     <div id="card-clothing-list" style="font-size:0.9rem; color:#c4b8d8; line-height:1.8"></div>
+  </div>
+
+  <!-- Timer section (only shown for timed cards) -->
+  <div id="timer-section" class="timer-section" style="display:none">
+    <div id="timer-countdown-wrap" style="display:none; text-align:center">
+      <div class="timer-countdown-num" id="timer-countdown-num"></div>
+      <div style="opacity:0.6; margin-top:8px">Get ready…</div>
+    </div>
+    <div id="timer-running-wrap" style="display:none; text-align:center; width:100%">
+      <div class="timer-elapsed" id="timer-elapsed-display">0:00</div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:12px">
+        <button class="btn btn-primary" onclick="stopTimer()" id="timer-stop-btn">&#9632; Stop</button>
+        <button class="btn" style="opacity:0.6" onclick="quitTimer()" id="timer-quit-btn">Give up</button>
+      </div>
+    </div>
+    <div id="timer-result-wrap" style="display:none; width:100%">
+      <div class="timer-result-box">
+        <div id="timer-result-time" style="font-size:1.4rem; font-weight:700; font-family:monospace"></div>
+        <div id="timer-result-tier" style="margin-top:4px; opacity:0.8"></div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:12px">
+        <button class="btn btn-primary" onclick="acceptTimerResult()" id="timer-accept-btn">&#10003; Accept</button>
+        <button class="btn" onclick="disputeTimerResult()" id="timer-dispute-btn" style="opacity:0.7">&#9872; Dispute</button>
+      </div>
+    </div>
+    <div id="timer-waiting-wrap" style="display:none; opacity:0.6">Waiting for host…</div>
+    <button id="timer-start-btn" class="btn btn-primary" onclick="startTimer()" style="display:none; width:100%">&#9654; Start Timer</button>
+    <div id="timer-host-controls" style="display:none; width:100%">
+      <div style="font-size:0.75rem; opacity:0.5; text-align:center; margin-bottom:8px">Host override</div>
+      <div class="timer-tier-btns">
+        <button class="timer-tier-btn" onclick="hostAwardTier(0)">&#10007; Fail</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(1)">1 &#9733;</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(2)">2 &#9733;&#9733;</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(3)">3 &#9733;&#9733;&#9733;</button>
+      </div>
+    </div>
   </div>
 
   <!-- Action buttons (performer only) -->
@@ -1391,6 +1469,7 @@ input::placeholder { color: #7a6b8a; }
     </div>
     <div class="card-reveal" id="display-card-reveal">
       <div class="card-text" id="display-card-text"></div>
+      <div id="display-card-duration-badge" class="card-duration-badge" style="display:none">⏱ <span id="display-card-duration-text"></span></div>
     </div>
   </div>
 
@@ -1423,6 +1502,97 @@ input::placeholder { color: #7a6b8a; }
     <button class="btn btn-primary" onclick="playAgain()">🔄 Play Again</button>
   </div>
   <div class="gap"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN: Card Editor — host-only custom card management
+═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-card-editor" class="screen">
+  <div class="editor-screen">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+      <button class="btn" onclick="showScreen('screen-lobby')" style="padding:6px 14px">← Back</button>
+      <h2 style="margin:0; font-size:1.3rem">Card Editor</h2>
+    </div>
+
+    <!-- Form card -->
+    <div class="editor-form-card">
+      <input type="hidden" id="ce-editing-id" value="">
+
+      <!-- Text NL/EN tabs -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex; gap:4px; margin-bottom:8px">
+          <button class="tab-btn active" id="ce-tab-nl" onclick="ceSetTab('nl')">NL</button>
+          <button class="tab-btn" id="ce-tab-en" onclick="ceSetTab('en')">EN</button>
+        </div>
+        <textarea class="editor-textarea" id="ce-text-nl" placeholder="Kaart tekst in het Nederlands..."></textarea>
+        <textarea class="editor-textarea" id="ce-text-en" placeholder="Card text in English..." style="display:none"></textarea>
+      </div>
+
+      <!-- Type -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Type</span>
+        <div class="editor-seg" id="ce-type-seg">
+          <button class="editor-seg-btn active" data-val="dare" onclick="ceSegSelect('ce-type-seg',this)">🔥 Dare</button>
+          <button class="editor-seg-btn" data-val="truth" onclick="ceSegSelect('ce-type-seg',this)">💬 Truth</button>
+        </div>
+      </div>
+
+      <!-- Level -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Level</span>
+        <div class="editor-seg" id="ce-level-seg">
+          <button class="editor-seg-btn active" data-val="1" onclick="ceSegSelect('ce-level-seg',this)">1</button><button class="editor-seg-btn" data-val="2" onclick="ceSegSelect('ce-level-seg',this)">2</button><button class="editor-seg-btn" data-val="3" onclick="ceSegSelect('ce-level-seg',this)">3</button><button class="editor-seg-btn" data-val="4" onclick="ceSegSelect('ce-level-seg',this)">4</button><button class="editor-seg-btn" data-val="5" onclick="ceSegSelect('ce-level-seg',this)">5</button><button class="editor-seg-btn" data-val="6" onclick="ceSegSelect('ce-level-seg',this)">6</button><button class="editor-seg-btn" data-val="7" onclick="ceSegSelect('ce-level-seg',this)">7</button><button class="editor-seg-btn" data-val="8" onclick="ceSegSelect('ce-level-seg',this)">8</button><button class="editor-seg-btn" data-val="9" onclick="ceSegSelect('ce-level-seg',this)">9</button><button class="editor-seg-btn" data-val="10" onclick="ceSegSelect('ce-level-seg',this)">10</button>
+        </div>
+      </div>
+
+      <!-- Difficulty -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Difficulty</span>
+        <div class="editor-seg" id="ce-diff-seg">
+          <button class="editor-seg-btn active" data-val="1" onclick="ceSegSelect('ce-diff-seg',this)">1 ★</button>
+          <button class="editor-seg-btn" data-val="2" onclick="ceSegSelect('ce-diff-seg',this)">2 ★★</button>
+          <button class="editor-seg-btn" data-val="3" onclick="ceSegSelect('ce-diff-seg',this)">3 ★★★</button>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div style="margin-bottom:14px">
+        <span class="editor-label">Tags</span>
+        <div class="editor-tag-grid" id="ce-tag-grid"></div>
+      </div>
+
+      <!-- Timer (only for dare) -->
+      <div id="ce-timer-section" style="margin-bottom:14px">
+        <span class="editor-label">Timer</span>
+        <div class="editor-seg" id="ce-timer-mode-seg" style="margin-bottom:12px">
+          <button class="editor-seg-btn active" data-val="" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">None</button>
+          <button class="editor-seg-btn" data-val="duration" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">Hold</button>
+          <button class="editor-seg-btn" data-val="speed" onclick="ceSegSelect('ce-timer-mode-seg',this);ceUpdateTimerUI()">Speed</button>
+        </div>
+        <div id="ce-timer-tiers" style="display:none">
+          <div id="ce-tiers-label" style="font-size:0.78rem;opacity:0.5;margin-bottom:8px"></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">1 ★</span><input type="number" id="ce-tier1-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">2 ★★</span><input type="number" id="ce-tier2-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+          <div class="editor-tier-row"><span style="min-width:48px;font-size:0.85rem">3 ★★★</span><input type="number" id="ce-tier3-sec" min="1" placeholder="sec"> <span style="opacity:0.5;font-size:0.8rem">seconds</span></div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
+        <button class="btn btn-primary" onclick="ceSubmitCard()" style="flex:1">Save Card</button>
+        <button class="btn" onclick="ceClearForm()" style="opacity:0.6">Clear</button>
+      </div>
+    </div>
+
+    <!-- Custom card list -->
+    <div class="editor-form-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+        <span class="editor-label" style="margin:0">Your Custom Cards</span>
+        <button class="btn" id="ce-save-file-btn" onclick="ceSaveToFile()" style="font-size:0.8rem;padding:5px 12px;display:none">💾 Save permanently</button>
+      </div>
+      <div id="ce-card-list"><div style="opacity:0.4;font-size:0.9rem;text-align:center;padding:20px 0">No custom cards yet</div></div>
+    </div>
   </div>
 </div>
 
@@ -2160,6 +2330,11 @@ function renderLobby(state) {
 function handleRoomState(state) {
   roomState = state;
 
+  // Keep the card editor list in sync whenever customCards change
+  if (document.getElementById('screen-card-editor')?.classList.contains('active')) {
+    ceRenderCardList();
+  }
+
   if (state.phase === 'lobby') {
     myPrevClearedLevels = null; // reset so level-up fires fresh next game
     myLevelChosen = false;      // reset so first turn of new game shows level picker
@@ -2458,6 +2633,16 @@ function buildCardScreen(state) {
   if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
   if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
 
+  // Duration badge (only when card has estimatedMinutes)
+  const durationBadge = document.getElementById('card-duration-badge');
+  const durationText  = document.getElementById('card-duration-text');
+  if (turn.card.estimatedMinutes) {
+    durationText.textContent = `~${turn.card.estimatedMinutes} min`;
+    durationBadge.style.display = 'inline-flex';
+  } else {
+    durationBadge.style.display = 'none';
+  }
+
   // Tags
   const tagsEl = document.getElementById('card-tags-display');
   tagsEl.innerHTML = '';
@@ -2510,12 +2695,14 @@ function buildCardScreen(state) {
   const isPerformer = performer.id === myId;
   const actionWrap  = document.getElementById('card-action-wrap');
   actionWrap.style.display = isPerformer ? 'block' : 'none';
+  const isHostOrDisplayCard = amHost || state.displayHostId === myId;
+  renderTimer(turn, isPerformer, isHostOrDisplayCard);
 
   if (isPerformer) {
-    // Done button — always visible (truths and dares both need it to advance the turn)
+    // Done button — visible for non-timed cards; hidden for timed cards (renderTimer already hid it above)
     const doneBtn = document.getElementById('card-done-btn');
     doneBtn.disabled = false;
-    doneBtn.style.display = 'flex';
+    if (!turn.card.timerMode) doneBtn.style.display = 'flex';
     doneBtn.textContent = turn.choice === 'truth'
       ? '✓ Done — I answered it'
       : '✓ Done — I completed it';
@@ -2591,8 +2778,76 @@ function forceNextTurn() {
   socket.emit('next-turn', { code: myRoom }, () => {});
 }
 
+// ─── Timer UI ─────────────────────────────────────────────────────────────────
+let _timerInterval = null;
+let _displayTimerInterval = null;
+
+function startTimer()  { socket.emit('start-timer',         { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function stopTimer()   { socket.emit('stop-timer',          { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function quitTimer()   { socket.emit('quit-timer',          { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function acceptTimerResult()  { socket.emit('accept-timer-result',  { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function disputeTimerResult() { socket.emit('dispute-timer-result', { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function hostAwardTier(d) { socket.emit('host-award-timer-tier', { code: myRoom, difficulty: d }, r => r && !r.ok && toast(r.error,'danger')); }
+
+function formatTimerSeconds(s) {
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function renderTimer(turn, iAmPerformer, isHostOrDisplay) {
+  clearInterval(_timerInterval);
+  const sec = document.getElementById('timer-section');
+  if (!turn || !turn.card || !turn.card.timerMode) { if (sec) sec.style.display = 'none'; return; }
+
+  sec.style.display = 'flex';
+  const t = turn.timer || { state: 'idle' };
+
+  // hide the normal done button for performer on timed cards
+  const doneBtn = document.getElementById('card-done-btn');
+  if (doneBtn && iAmPerformer) doneBtn.style.display = 'none';
+
+  // hide/show sub-sections
+  const show = id => { const el = document.getElementById(id); if(el) el.style.display = ''; };
+  const hide = id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; };
+
+  hide('timer-countdown-wrap'); hide('timer-running-wrap'); hide('timer-result-wrap');
+  hide('timer-waiting-wrap'); hide('timer-start-btn'); hide('timer-host-controls');
+
+  if (t.state === 'idle') {
+    if (iAmPerformer) show('timer-start-btn');
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'countdown') {
+    show('timer-countdown-wrap');
+    document.getElementById('timer-countdown-num').textContent = t.countdownValue || '';
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'running') {
+    if (iAmPerformer) {
+      show('timer-running-wrap');
+      const startedAt = t.startedAt;
+      _timerInterval = setInterval(() => {
+        const el = document.getElementById('timer-elapsed-display');
+        if (el) el.textContent = formatTimerSeconds((Date.now() - startedAt) / 1000);
+      }, 100);
+    }
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'stopped') {
+    if (iAmPerformer) {
+      show('timer-result-wrap');
+      document.getElementById('timer-result-time').textContent = formatTimerSeconds(t.elapsedSeconds || 0);
+      const d = t.achievedDifficulty || 0;
+      document.getElementById('timer-result-tier').textContent = d === 0 ? 'No points earned' : d + ' ' + '★'.repeat(d) + ' tier';
+    }
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'disputed') {
+    if (iAmPerformer) show('timer-waiting-wrap');
+    if (isHostOrDisplay) show('timer-host-controls');
+  }
+  // resolved: nothing extra to show, turn will advance
+}
+
 // ─── Display Screen (non-active / display host) ───────────────────────────────
 function buildDisplayScreen(state) {
+  clearInterval(_displayTimerInterval);
   const turn = state.currentTurn;
   if (!turn) return;
 
@@ -2637,6 +2892,46 @@ function buildDisplayScreen(state) {
     document.getElementById('display-card-reveal').className =
       `card-reveal ${turn.choice || 'dare'}-card`;
     document.getElementById('display-card-text').textContent = text;
+
+    // Duration badge on display screen
+    const dispDurationBadge = document.getElementById('display-card-duration-badge');
+    const dispDurationText  = document.getElementById('display-card-duration-text');
+    if (turn.card && turn.card.estimatedMinutes) {
+      dispDurationText.textContent = `~${turn.card.estimatedMinutes} min`;
+      dispDurationBadge.style.display = 'inline-flex';
+    } else {
+      dispDurationBadge.style.display = 'none';
+    }
+
+    // Timer display on display/TV screen for timed cards
+    if (turn.card && turn.card.timerMode) {
+      const t = turn.timer || { state: 'idle' };
+      let dispTimerEl = document.getElementById('display-timer-section');
+      if (!dispTimerEl) {
+        dispTimerEl = document.createElement('div');
+        dispTimerEl.id = 'display-timer-section';
+        dispTimerEl.style.cssText = 'text-align:center;margin-top:16px;width:100%';
+        cardDiv.appendChild(dispTimerEl);
+      }
+      if (t.state === 'countdown') {
+        dispTimerEl.innerHTML = `<div class="timer-countdown-num">${t.countdownValue || ''}</div><div style="opacity:0.6;margin-top:8px">Get ready…</div>`;
+      } else if (t.state === 'running') {
+        dispTimerEl.innerHTML = `<div class="timer-elapsed" id="display-timer-elapsed">0:00</div>`;
+        const startedAt = t.startedAt;
+        _displayTimerInterval = setInterval(() => {
+          const el = document.getElementById('display-timer-elapsed');
+          if (el) el.textContent = formatTimerSeconds((Date.now() - startedAt) / 1000);
+        }, 100);
+      } else if (t.state === 'stopped' || t.state === 'disputed') {
+        const d = t.achievedDifficulty || 0;
+        dispTimerEl.innerHTML = `<div class="timer-elapsed">${formatTimerSeconds(t.elapsedSeconds || 0)}</div><div style="opacity:0.7;margin-top:8px">${d === 0 ? 'No points earned' : d + ' ' + '★'.repeat(d) + ' tier'}</div>`;
+      } else {
+        dispTimerEl.innerHTML = '';
+      }
+    } else {
+      const dispTimerEl = document.getElementById('display-timer-section');
+      if (dispTimerEl) dispTimerEl.remove();
+    }
 
   } else if (turn.phase === 'duel' || turn.phase === 'duel-forfeit') {
     // Display host sees a built-in duel screen in the display area
@@ -3117,6 +3412,199 @@ function showLevelUpAnimation(newLevel) {
   levelupTimer = setTimeout(() => {
     overlay.style.display = 'none';
   }, 3400);
+}
+
+// ─── Card Editor ──────────────────────────────────────────────────────────────
+let _ceTags = [];
+
+function showCardEditor() {
+  ceClearForm();
+  ceRenderTagGrid();
+  ceRenderCardList();
+  showScreen('screen-card-editor');
+}
+
+function ceSetTab(lang) {
+  document.getElementById('ce-text-nl').style.display = lang === 'nl' ? '' : 'none';
+  document.getElementById('ce-text-en').style.display = lang === 'en' ? '' : 'none';
+  document.getElementById('ce-tab-nl').classList.toggle('active', lang === 'nl');
+  document.getElementById('ce-tab-en').classList.toggle('active', lang === 'en');
+}
+
+function ceSegSelect(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' .editor-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function ceGetSegVal(groupId) {
+  const active = document.querySelector('#' + groupId + ' .editor-seg-btn.active');
+  return active ? active.dataset.val : '';
+}
+
+function ceUpdateTimerUI() {
+  const mode = ceGetSegVal('ce-timer-mode-seg');
+  const tiersEl = document.getElementById('ce-timer-tiers');
+  const labelEl = document.getElementById('ce-tiers-label');
+  if (!mode) { tiersEl.style.display = 'none'; return; }
+  tiersEl.style.display = '';
+  labelEl.textContent = mode === 'duration'
+    ? 'Award points after holding for X seconds:'
+    : 'Award points if finished within X seconds:';
+}
+
+function ceRenderTagGrid() {
+  const grid = document.getElementById('ce-tag-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const tags = typeof TAGS !== 'undefined' ? TAGS : [];
+  tags.forEach(tag => {
+    const chip = document.createElement('button');
+    chip.className = 'editor-tag-chip' + (_ceTags.includes(tag) ? ' active' : '');
+    chip.textContent = (typeof TAG_LABELS !== 'undefined' && TAG_LABELS[tag]) ? TAG_LABELS[tag] : tag;
+    chip.onclick = () => {
+      if (_ceTags.includes(tag)) _ceTags = _ceTags.filter(t => t !== tag);
+      else _ceTags.push(tag);
+      chip.classList.toggle('active', _ceTags.includes(tag));
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function ceClearForm() {
+  document.getElementById('ce-editing-id').value = '';
+  document.getElementById('ce-text-nl').value = '';
+  document.getElementById('ce-text-en').value = '';
+  _ceTags = [];
+  ceRenderTagGrid();
+  // Reset segs to defaults
+  ['ce-type-seg','ce-level-seg','ce-diff-seg','ce-timer-mode-seg'].forEach(id => {
+    const btns = document.querySelectorAll('#' + id + ' .editor-seg-btn');
+    btns.forEach((b, i) => b.classList.toggle('active', i === 0));
+  });
+  ceUpdateTimerUI();
+  document.getElementById('ce-tier1-sec').value = '';
+  document.getElementById('ce-tier2-sec').value = '';
+  document.getElementById('ce-tier3-sec').value = '';
+}
+
+function ceLoadCardIntoForm(card) {
+  document.getElementById('ce-editing-id').value = card.id;
+  const text = typeof card.text === 'object' ? card.text : { nl: card.text, en: card.text };
+  document.getElementById('ce-text-nl').value = text.nl || '';
+  document.getElementById('ce-text-en').value = text.en || '';
+  _ceTags = Array.isArray(card.tags) ? [...card.tags] : [];
+  ceRenderTagGrid();
+  // Set segs
+  const setSegVal = (groupId, val) => {
+    document.querySelectorAll('#' + groupId + ' .editor-seg-btn').forEach(b => {
+      b.classList.toggle('active', String(b.dataset.val) === String(val));
+    });
+  };
+  setSegVal('ce-type-seg', card.type || 'dare');
+  setSegVal('ce-level-seg', card.level || 1);
+  setSegVal('ce-diff-seg', card.difficulty || 1);
+  setSegVal('ce-timer-mode-seg', card.timerMode || '');
+  ceUpdateTimerUI();
+  if (card.tiers && card.tiers.length === 3) {
+    document.getElementById('ce-tier1-sec').value = card.tiers[0].seconds || '';
+    document.getElementById('ce-tier2-sec').value = card.tiers[1].seconds || '';
+    document.getElementById('ce-tier3-sec').value = card.tiers[2].seconds || '';
+  }
+}
+
+function ceSubmitCard() {
+  const textNl = document.getElementById('ce-text-nl').value.trim();
+  const textEn = document.getElementById('ce-text-en').value.trim();
+  if (!textNl) { toast('Card text (NL) is required', 'danger'); return; }
+
+  const timerMode = ceGetSegVal('ce-timer-mode-seg') || null;
+  let tiers;
+  if (timerMode) {
+    const t1 = parseInt(document.getElementById('ce-tier1-sec').value);
+    const t2 = parseInt(document.getElementById('ce-tier2-sec').value);
+    const t3 = parseInt(document.getElementById('ce-tier3-sec').value);
+    if (!t1 || !t2 || !t3) { toast('Fill in all 3 tier times', 'danger'); return; }
+    if (timerMode === 'duration') {
+      tiers = [{ difficulty: 1, seconds: t1 }, { difficulty: 2, seconds: t2 }, { difficulty: 3, seconds: t3 }];
+    } else {
+      tiers = [{ difficulty: 3, seconds: t1 }, { difficulty: 2, seconds: t2 }, { difficulty: 1, seconds: t3 }];
+    }
+  }
+
+  const card = {
+    type: ceGetSegVal('ce-type-seg') || 'dare',
+    level: parseInt(ceGetSegVal('ce-level-seg')) || 1,
+    difficulty: parseInt(ceGetSegVal('ce-diff-seg')) || 1,
+    text: { nl: textNl, en: textEn || textNl },
+    tags: [..._ceTags],
+    genderRequired: null, orientationMatters: false, targetRequired: false,
+    performerGenitals: null, targetGenitals: null,
+    timerMode, tiers,
+  };
+
+  const editingId = document.getElementById('ce-editing-id').value;
+  if (editingId) {
+    card.id = editingId;
+    socket.emit('edit-custom-card', { code: myRoom, card }, res => {
+      if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+      toast('Card updated', 'success');
+      ceClearForm();
+      ceRenderCardList();
+    });
+  } else {
+    socket.emit('add-custom-card', { code: myRoom, card }, res => {
+      if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+      toast('Card added', 'success');
+      ceClearForm();
+      ceRenderCardList();
+    });
+  }
+}
+
+function ceRenderCardList() {
+  const list = document.getElementById('ce-card-list');
+  const saveBtn = document.getElementById('ce-save-file-btn');
+  if (!list) return;
+  const cards = roomState?.customCards || [];
+  if (!cards.length) {
+    list.innerHTML = '<div style="opacity:0.4;font-size:0.9rem;text-align:center;padding:20px 0">No custom cards yet</div>';
+    if (saveBtn) saveBtn.style.display = 'none';
+    return;
+  }
+  if (saveBtn) saveBtn.style.display = '';
+  list.innerHTML = cards.map(c => {
+    const text = typeof c.text === 'object' ? (c.text.nl || c.text.en) : c.text;
+    const preview = text.length > 60 ? text.slice(0, 60) + '…' : text;
+    return '<div class="custom-card-row">' +
+      '<div style="flex:1"><div style="font-size:0.88rem">' + preview + '</div>' +
+      '<div style="font-size:0.72rem;opacity:0.4;margin-top:3px">Lvl ' + c.level + ' · ' + c.type + ' · ' + (c.timerMode || 'no timer') + '</div></div>' +
+      '<button class="btn" style="font-size:0.75rem;padding:4px 10px" onclick="ceEditCard(\'' + c.id + '\')">Edit</button>' +
+      '<button class="btn" style="font-size:0.75rem;padding:4px 10px;opacity:0.6" onclick="ceDeleteCard(\'' + c.id + '\')">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function ceEditCard(cardId) {
+  const card = (roomState?.customCards || []).find(c => c.id === cardId);
+  if (!card) return;
+  ceLoadCardIntoForm(card);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function ceDeleteCard(cardId) {
+  socket.emit('delete-custom-card', { code: myRoom, cardId }, res => {
+    if (!res || !res.ok) { toast(res?.error || 'Error', 'danger'); return; }
+    toast('Card deleted', 'info');
+    ceRenderCardList();
+  });
+}
+
+function ceSaveToFile() {
+  if (!confirm('Save all custom cards permanently to dares.json on the server? They will be available in all future games.')) return;
+  socket.emit('save-cards-to-file', { code: myRoom }, res => {
+    if (!res || !res.ok) { toast(res?.error || 'Could not save', 'danger'); return; }
+    toast('Saved ' + res.saved + ' card(s) to dares.json', 'success');
+  });
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
