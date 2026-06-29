@@ -909,18 +909,24 @@ io.on('connection', (socket) => {
     if (!room) return cb && cb({ ok: false });
     if (socket.id !== room.host && socket.id !== room.displayHostId)
       return cb && cb({ ok: false, error: 'Host only' });
+    if (room.phase !== 'lobby')
+      return cb && cb({ ok: false, error: 'Can only save cards in lobby' });
     if (!room.customCards || room.customCards.length === 0)
       return cb && cb({ ok: false, error: 'No custom cards to save' });
 
     const filePath = path.join(__dirname, 'data', 'dares.json');
 
     try {
-      const existing = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      const existingIds = new Set(existing.map(c => c.id));
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      // dares.json has structure { cards: [...] }
+      const existingCards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
+      const existingIds = new Set(existingCards.map(c => c.id));
       const toAdd = room.customCards.filter(c => !existingIds.has(c.id));
       if (toAdd.length === 0) return cb && cb({ ok: true, saved: 0 });
-      const updated = [...existing, ...toAdd];
-      fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf8');
+      const updatedCards = [...existingCards, ...toAdd];
+      // Write back preserving the { cards: [...] } structure
+      const output = Array.isArray(parsed) ? updatedCards : { ...parsed, cards: updatedCards };
+      fs.writeFileSync(filePath, JSON.stringify(output, null, 2), 'utf8');
       // Mutate ALL_CARDS so new cards are available in the next game without restart
       toAdd.forEach(c => ALL_CARDS.push(c));
       cb && cb({ ok: true, saved: toAdd.length });
