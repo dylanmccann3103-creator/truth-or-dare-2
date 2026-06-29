@@ -1477,6 +1477,10 @@ input::placeholder { color: #7a6b8a; }
 
   <!-- End game / Next turn controls (host only in display mode) -->
   <div id="display-host-controls" style="display:none;width:100%;max-width:480px">
+    <!-- Continue: only shown during 'showing' phase, moves dare to background -->
+    <div id="display-continue-wrap" style="display:none;margin-bottom:8px">
+      <button class="btn btn-secondary btn-sm" id="display-continue-btn" onclick="continueDare()">▶ Continue — taking too long</button>
+    </div>
     <button class="btn btn-secondary btn-sm" style="margin-bottom:8px" onclick="forceNextTurn()">⏭ Skip Turn (emergency)</button>
     <button class="btn btn-danger btn-sm" onclick="endGame()">🏁 End Game</button>
   </div>
@@ -2347,11 +2351,14 @@ function handleRoomState(state) {
     buildEndScreen(state);
     showScreen('screen-ended');
     document.getElementById('xp-hud').classList.remove('visible');
+    const pip = document.getElementById('pip-overlay');
+    if (pip) pip.style.display = 'none';
     return;
   }
 
   if (state.phase === 'game') {
     const turn = state.currentTurn;
+    renderPip(state);
     if (!turn) return;
 
     const isDisplayHost = state.displayHostId === myId;
@@ -2417,6 +2424,10 @@ function handleRoomState(state) {
       } else {
         toast(`🚨 ${state.players[turn.performerId]?.name || 'A player'} ran out of break slots!`, 'danger');
       }
+      buildDisplayScreen(state);
+      showScreen('screen-display');
+
+    } else if (turn.phase === 'waiting-for-occupied') {
       buildDisplayScreen(state);
       showScreen('screen-display');
     }
@@ -2722,6 +2733,7 @@ function buildCardScreen(state) {
         `(${slotsLeft} slot${slotsLeft !== 1 ? 's' : ''} left)`;
       document.getElementById('card-park-btn').disabled = slotsLeft <= 0;
     }
+
   }
 
   // End game button (host only)
@@ -2857,7 +2869,17 @@ function buildDisplayScreen(state) {
   const cardDiv     = document.getElementById('display-card-view');
   const hostControls = document.getElementById('display-host-controls');
 
-  hostControls.style.display = (amHost || isDisplayHost) ? 'block' : 'none';
+  const isHost = amHost || isDisplayHost;
+  hostControls.style.display = isHost ? 'block' : 'none';
+
+  // Continue button only makes sense while a dare is actively being shown
+  const continueWrap = document.getElementById('display-continue-wrap');
+  if (continueWrap) {
+    const showContinue = isHost && turn.phase === 'showing' && turn.choice === 'dare';
+    continueWrap.style.display = showContinue ? 'block' : 'none';
+    const continueBtn = document.getElementById('display-continue-btn');
+    if (continueBtn) continueBtn.disabled = false;
+  }
 
   if (turn.phase === 'spinning' || turn.phase === 'choosing') {
     waitingDiv.style.display = 'block';
@@ -2996,6 +3018,13 @@ function buildDisplayScreen(state) {
       const existingForfeitBtn = document.getElementById('display-forfeit-btn');
       if (existingForfeitBtn) existingForfeitBtn.remove();
     }
+
+  } else if (turn.phase === 'waiting-for-occupied') {
+    waitingDiv.style.display = 'block';
+    cardDiv.style.display    = 'none';
+    document.getElementById('display-player-emoji').textContent = '⏳';
+    document.getElementById('display-player-name').textContent  = 'Everyone busy…';
+    document.getElementById('display-status-text').textContent  = 'Waiting for background dares to finish.';
   }
 }
 
@@ -3618,6 +3647,182 @@ function toast(msg, type = 'info') {
   clearTimeout(el._t);
   el._t = setTimeout(() => el.classList.remove('show'), 2800);
 }
+
+// ─── Background / Continue ────────────────────────────────────────────────────
+
+function continueDare() {
+  const btn = document.getElementById('card-continue-btn');
+  btn.disabled = true;
+  socket.emit('continue-dare', { code: myRoom }, (res) => {
+    if (!res || !res.ok) {
+      btn.disabled = false;
+      toast(res?.error || 'Cannot continue', 'danger');
+      return;
+    }
+    toast('Dare moved to background ▶', 'info');
+  });
+}
+
+function completeBackgroundDare(activityId) {
+  socket.emit('complete-background-dare', { code: myRoom, activityId }, (res) => {
+    if (!res || !res.ok) {
+      toast(res?.error || 'Error', 'danger');
+      return;
+    }
+    toast(`+${res.xpEarned} XP — background dare done! 🎉`, 'success');
+    renderPip(roomState);
+  });
+}
+
+let pipExpanded = false;
+
+function renderPip(state) {
+  if (!state) return;
+  const activities = state.backgroundActivities || [];
+  const pip = document.getElementById('pip-overlay');
+  if (!pip) return;
+
+  if (activities.length === 0) {
+    pip.style.display = 'none';
+    pipExpanded = false;
+    pip.classList.remove('pip-expanded');
+    return;
+  }
+
+  pip.style.display = 'block';
+
+  const lang = (state.players[myId]?.language) || 'nl';
+  const amIHost = state.players[myId]?.isHost || false;
+
+  pip.innerHTML = activities.map(a => {
+    const performer = state.players[a.performerId];
+    const target = a.targetId ? state.players[a.targetId] : null;
+    const cardText = a.cardText?.[lang] || a.cardText?.nl || a.cardText?.en || '…';
+    const isMyDare = myId === a.performerId;
+    const canComplete = isMyDare || amIHost;
+    const doneLabel = isMyDare ? '✓ Done' : '⚠ Force resolve';
+    return `<div class="pip-activity">
+      <div class="pip-activity-header">
+        <span class="pip-emoji">${performer?.emoji || '?'}</span>
+        <span class="pip-name">${performer?.name || '?'}</span>
+        ${target ? `<span class="pip-vs">+</span><span class="pip-emoji">${target.emoji || '?'}</span>` : ''}
+        <span class="pip-badge">Lvl ${a.cardLevel}</span>
+      </div>
+      <div class="pip-dare-text">${cardText.length > 80 ? cardText.slice(0, 77) + '…' : cardText}</div>
+      ${canComplete ? `<button class="pip-done-btn" onclick="completeBackgroundDare('${a.id}')">${doneLabel}</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function togglePip() {
+  pipExpanded = !pipExpanded;
+  const pip = document.getElementById('pip-overlay');
+  if (pip) pip.classList.toggle('pip-expanded', pipExpanded);
+}
 </script>
+
+<!-- PiP overlay: background dare tracker -->
+<div id="pip-overlay" style="display:none" onclick="togglePip()">
+  <div id="pip-header">
+    <span id="pip-title">⏳ Background</span>
+    <span id="pip-toggle-hint">tap to expand</span>
+  </div>
+</div>
+
+<style>
+#pip-overlay {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
+  background: rgba(20,20,30,0.92);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  max-width: 220px;
+  min-width: 160px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: max-width 0.25s ease, max-height 0.25s ease, min-width 0.25s ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+#pip-overlay.pip-expanded {
+  max-width: 340px;
+  min-width: 280px;
+  cursor: default;
+}
+#pip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+#pip-toggle-hint {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 400;
+}
+.pip-activity {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  pointer-events: none;
+}
+.pip-activity:last-child { border-bottom: none; }
+.pip-activity-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.pip-emoji { font-size: 1rem; }
+.pip-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+.pip-vs { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
+.pip-badge {
+  margin-left: auto;
+  font-size: 0.6rem;
+  background: rgba(245,158,11,0.2);
+  color: #f59e0b;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.pip-dare-text {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.4;
+  display: none;
+}
+#pip-overlay.pip-expanded .pip-dare-text { display: block; }
+.pip-done-btn {
+  margin-top: 8px;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: all;
+  display: none;
+}
+#pip-overlay.pip-expanded .pip-done-btn { display: block; }
+#pip-overlay:not(.pip-expanded) #pip-toggle-hint { display: inline; }
+#pip-overlay.pip-expanded #pip-toggle-hint { display: none; }
+</style>
 </body>
 </html>
