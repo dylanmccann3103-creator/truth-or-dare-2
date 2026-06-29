@@ -1879,11 +1879,14 @@ async function loadLangPack(lang) {
   } catch { LANG_PACK = null; }
 }
 
-function cardText(card) {
+function cardText(card, mp, sp) {
   if (!card) return '';
   const t = card.text;
-  const raw = (t && typeof t === 'object') ? (t[myLanguage] || t.nl || t.en || '') : (t || '');
-  return (LANG_PACK && LANG_PACK[card.id]) ? LANG_PACK[card.id] : raw;
+  let raw = (t && typeof t === 'object') ? (t[myLanguage] || t.nl || t.en || '') : (t || '');
+  if (LANG_PACK && LANG_PACK[card.id]) raw = LANG_PACK[card.id];
+  if (mp) raw = raw.replaceAll('{{mp}}', mp);
+  if (sp) raw = raw.replaceAll('{{sp}}', sp);
+  return raw;
 }
 
 // ─── Screen Navigation ────────────────────────────────────────────────────────
@@ -2541,7 +2544,7 @@ function buildLevelScreen(state) {
     parkedSection.style.display = 'block';
     parkedList.innerHTML = '';
     parked.forEach(d => {
-      const text = cardText(d);
+      const text = cardText(d, performer?.name);
       const btn = document.createElement('button');
       btn.className = 'btn btn-soft btn-sm';
       btn.style.cssText = 'width:100%;max-width:none;text-align:left;margin-bottom:6px;white-space:normal;height:auto;padding:10px 14px;';
@@ -2639,7 +2642,7 @@ function buildCardScreen(state) {
   document.getElementById('card-type-label').style.color =
     turn.choice === 'truth' ? '#60a5fa' : '#f472b6';
 
-  document.getElementById('card-text').textContent = cardText(turn.card);
+  document.getElementById('card-text').textContent = cardText(turn.card, performer?.name, state.players[turn.targetId]?.name);
 
   if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
   if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
@@ -2902,7 +2905,7 @@ function buildDisplayScreen(state) {
     cardDiv.style.display    = 'block';
 
     const performer = state.players[turn.performerId];
-    const text = cardText(turn.card);
+    const text = cardText(turn.card, performer?.name, state.players[turn.targetId]?.name);
 
     document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
     document.getElementById('display-card-performer-name').textContent  = performer?.name || '';
@@ -2963,7 +2966,7 @@ function buildDisplayScreen(state) {
     const performer = state.players[turn.performerId];
     const target    = state.players[turn.targetId];
     const card      = turn.phase === 'duel' ? turn.card : turn.forfeit?.card;
-    const text  = cardText(card);
+    const text  = cardText(card, performer?.name, target?.name);
     const label = turn.phase === 'duel' ? '⚔️ DUEL' : '⚔️ FORFEIT';
 
     document.getElementById('display-card-performer-emoji').textContent = performer?.emoji || '';
@@ -3046,7 +3049,7 @@ function buildDuelScreen(state, isForfeit) {
     document.getElementById('duel-target-emoji').textContent    = target?.emoji    || '🎲';
     document.getElementById('duel-target-name').textContent     = target?.name     || '';
 
-    document.getElementById('duel-card-text').textContent = cardText(turn.card);
+    document.getElementById('duel-card-text').textContent = cardText(turn.card, performer?.name, target?.name);
 
     document.getElementById('duel-forfeit-wrap').style.display = 'none';
 
@@ -3085,7 +3088,7 @@ function buildDuelScreen(state, isForfeit) {
     const forfeitWrap = document.getElementById('duel-forfeit-wrap');
     forfeitWrap.style.display = 'block';
 
-    document.getElementById('duel-forfeit-text').textContent = cardText(forfeit?.card);
+    document.getElementById('duel-forfeit-text').textContent = cardText(forfeit?.card, performer?.name, target?.name);
 
     const doneBtnForfeit = document.getElementById('duel-forfeit-done-btn');
     doneBtnForfeit.style.display = (iAmLoser || isHostOrDisplay) ? 'inline-flex' : 'none';
