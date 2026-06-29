@@ -85,6 +85,7 @@ function createRoom(hostId, hostMode = 'display') {
     cardPool: null,          // null = use ALL_CARDS; set from host's active packages
     equipmentLimits: [],     // equip_* tags for unavailable equipment — filtered from card pool
     knownGenders: BASE_GENDERS.map(g => ({ ...g })), // base + merged pack genders
+    backgroundActivities: [],          // active background dares (continue-dare)
   };
   return rooms[code];
 }
@@ -227,7 +228,7 @@ function maxUnlockedLevel(player, room) {
 // ─── Game helpers ─────────────────────────────────────────────────────────────
 
 function pickTarget(room, performerId, excludeId = null) {
-  let others = room.turnOrder.filter(id => id !== performerId && room.players[id] && room.players[id].connected !== false);
+  let others = room.turnOrder.filter(id => id !== performerId && room.players[id] && room.players[id].connected !== false && !room.players[id].occupied);
   if (excludeId) others = others.filter(id => id !== excludeId);
   if (others.length === 0) return (excludeId ? null : performerId);
 
@@ -261,11 +262,16 @@ function advanceTurn(room) {
     if (!rooms[room.code] || room.phase !== 'game') return;
     if (room.turnOrder.length === 0) return;
     // Safety: if all players are disconnected, wait — don't spin forever
-    const connectedPlayers = room.turnOrder.filter(id => room.players[id] && room.players[id].connected !== false);
-    if (connectedPlayers.length === 0) return;
+    const connectedPlayers = room.turnOrder.filter(id => room.players[id] && room.players[id].connected !== false && !room.players[id].occupied);
+    if (connectedPlayers.length === 0) {
+      // All remaining players are occupied — park and wait for one to finish
+      room.currentTurn = { ...room.currentTurn, phase: 'waiting-for-occupied' };
+      io.to(room.code).emit('room-state', roomPublicState(room));
+      return;
+    }
     const performerId = room.turnOrder[room.currentTurnIndex % room.turnOrder.length];
-    if (!room.players[performerId] || room.players[performerId].connected === false) {
-      // Player gone or disconnected — skip ahead
+    if (!room.players[performerId] || room.players[performerId].connected === false || room.players[performerId].occupied) {
+      // Player gone, disconnected, or occupied — skip ahead
       advanceTurn(room);
       return;
     }
@@ -324,6 +330,14 @@ function roomPublicState(room) {
       orientation: p.orientation,
       availableForAllCombos: p.availableForAllCombos,
       connected: p.connected !== false,
+      occupied: p.occupied || false,
+      backgroundDare: p.backgroundDare ? {
+        cardId: p.backgroundDare.card?.id,
+        text: p.backgroundDare.card?.text,
+        level: p.backgroundDare.card?.level,
+        targetId: p.backgroundDare.targetId || null,
+        activityId: p.backgroundDare.activityId,
+      } : null,
       // limits: NEVER sent
     };
   }
@@ -345,6 +359,14 @@ function roomPublicState(room) {
     minStartLevel: room.minStartLevel,
     enabledPowerups: room.enabledPowerups || [],
     knownGenders: room.knownGenders || [],
+    backgroundActivities: (room.backgroundActivities || []).map(a => ({
+      id: a.id,
+      performerId: a.performerId,
+      targetId: a.targetId || null,
+      cardText: a.card?.text,
+      cardLevel: a.card?.level,
+      cardType: a.card?.type,
+    })),
   };
 }
 
@@ -398,6 +420,8 @@ io.on('connection', (socket) => {
       daresCompletedPerLevel: {},
       usedCardIds: new Set(),         // per-player, PRIVATE
       breakSlots: { total: 3, used: 0, parkedDares: [] },
+      occupied: false,
+      backgroundDare: null,
       immunity: 0,
       activePowerups: [],
       gender: gender || null,
@@ -803,6 +827,8 @@ io.on('connection', (socket) => {
     if (!room) return cb && cb({ ok: false });
     if (room.host !== socket.id) return cb && cb({ ok: false, error: 'Only host can restart' });
 
+    room.backgroundActivities = [];
+
     for (const player of Object.values(room.players)) {
       player.xp = 0;
       player.coins = 0;
@@ -811,6 +837,8 @@ io.on('connection', (socket) => {
       player.daresCompletedPerLevel = {};
       player.usedCardIds = new Set();
       player.breakSlots = { total: 3, used: 0, parkedDares: [] };
+      player.occupied = false;
+      player.backgroundDare = null;
       player.immunity = 0;
       player.activePowerups = [];
       player.ready = false;
@@ -1046,6 +1074,97 @@ io.on('connection', (socket) => {
     }
 
     cb && cb({ ok: false, error: 'Unhandled powerup' });
+  });
+
+  // Continue: move dare to background, game advances with remaining players
+  socket.on('continue-dare', ({ code }, cb) => {
+    const room = getRoom(code);
+    if (!room || room.phase !== 'game') return cb && cb({ ok: false });
+    const turn = room.currentTurn;
+    if (!turn || turn.phase !== 'showing') return cb && cb({ ok: false, error: 'Wrong phase' });
+
+    const isPerformer = socket.id === turn.performerId;
+    const isDisplayHost = room.hostMode === 'display' && socket.id === room.host;
+    if (!isPerformer && !isDisplayHost) return cb && cb({ ok: false, error: 'Not authorized' });
+
+    const performer = room.players[turn.performerId];
+    if (!performer) return cb && cb({ ok: false });
+
+    const activityId = `bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const activity = {
+      id: activityId,
+      performerId: turn.performerId,
+      targetId: turn.targetId || null,
+      card: turn.card,
+      attribution: turn.attribution,
+      doubleXp: turn.doubleXp || false,
+    };
+    room.backgroundActivities.push(activity);
+
+    performer.occupied = true;
+    performer.backgroundDare = { card: turn.card, targetId: turn.targetId || null, activityId };
+
+    // Mark target occupied too for duo/target-required cards
+    if (turn.targetId && room.players[turn.targetId] && turn.card?.targetRequired) {
+      const target = room.players[turn.targetId];
+      target.occupied = true;
+      target.backgroundDare = { card: turn.card, targetId: turn.targetId, activityId };
+    }
+
+    cb && cb({ ok: true, activityId });
+    advanceTurn(room);
+  });
+
+  // Complete a background dare — awards XP/coins and frees the occupied player(s)
+  socket.on('complete-background-dare', ({ code, activityId }, cb) => {
+    const room = getRoom(code);
+    if (!room || room.phase !== 'game') return cb && cb({ ok: false });
+
+    const idx = (room.backgroundActivities || []).findIndex(a => a.id === activityId);
+    if (idx === -1) return cb && cb({ ok: false, error: 'Activity not found' });
+
+    const activity = room.backgroundActivities[idx];
+    // Only the performer (or display host) can mark it done
+    const isPerformer = socket.id === activity.performerId;
+    const isDisplayHost = room.hostMode === 'display' && socket.id === room.host;
+    if (!isPerformer && !isDisplayHost) return cb && cb({ ok: false, error: 'Not authorized' });
+
+    const performer = room.players[activity.performerId];
+    if (performer) {
+      const { xpEarned, coinRecipients } = calcRewards(
+        activity.card, activity.attribution, room.economyMode, activity.doubleXp
+      );
+      performer.xp += xpEarned;
+      for (const { id, coins } of coinRecipients) {
+        if (room.players[id]) room.players[id].coins += coins;
+      }
+      const lvl = activity.card.level;
+      performer.daresCompletedPerLevel[lvl] = (performer.daresCompletedPerLevel[lvl] || 0) + 1;
+      if (performer.daresCompletedPerLevel[lvl] >= 3 && !performer.clearedLevels.includes(lvl)) {
+        performer.clearedLevels.push(lvl);
+      }
+      performer.occupied = false;
+      performer.backgroundDare = null;
+      cb && cb({ ok: true, xpEarned });
+    }
+
+    // Free target if they were co-occupied
+    if (activity.targetId && room.players[activity.targetId]) {
+      const target = room.players[activity.targetId];
+      if (target.backgroundDare?.activityId === activityId) {
+        target.occupied = false;
+        target.backgroundDare = null;
+      }
+    }
+
+    room.backgroundActivities.splice(idx, 1);
+
+    // If the game was waiting for an occupied player to free up, resume now
+    const wasWaiting = room.currentTurn?.phase === 'waiting-for-occupied';
+    io.to(room.code).emit('room-state', roomPublicState(room));
+    if (wasWaiting) {
+      advanceTurn(room);
+    }
   });
 
   // Emergency host-only turn advance (stuck state recovery)
