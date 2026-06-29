@@ -3,7 +3,12 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { selectCard } = require('../lib/selectCard');
-const { calcRewards, applyImmunity, POWERUP_COSTS } = require('../lib/gameHelpers');
+const {
+  calcRewards, applyImmunity, POWERUP_COSTS,
+  GENITAL_VOCAB, GENDER_WILDCARD, mergeGenders,
+  clothingCategory, stillOnItems, autoPickableItems, pickClothingItem,
+  isClothingRemovalCard, clothingTokenKind, renderTokens, selectTarget,
+} = require('../lib/gameHelpers');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -151,11 +156,12 @@ test('target genital mismatch blocks card', () => {
   assert.equal(result, null, 'Target lacking required genital should block card');
 });
 
-test('mouth and anus are valid genital options', () => {
-  const cards = [card({ id: 'c1', performerGenitals: ['mouth'], tags: [], level: 3 })];
-  const performer = player({ genitals: ['mouth', 'vagina'] });
+test('breasts and anus are valid genital options (no "mouth" — oral is a tag)', () => {
+  const cards = [card({ id: 'c1', performerGenitals: ['breasts'], tags: [], level: 3 })];
+  const performer = player({ genitals: ['breasts', 'vagina'] });
   const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
-  assert.notEqual(result, null, 'Mouth should work as a valid genital filter value');
+  assert.notEqual(result, null, 'breasts should work as a valid genital filter value');
+  assert.ok(!GENITAL_VOCAB.includes('mouth'), 'mouth must NOT be part of the genital vocabulary');
 });
 
 // ─── Test 9: Type filter — truth request never returns a dare ─────────────────
@@ -338,4 +344,195 @@ test('resolve-duel uses passedWinnerId when duelAutoWinnerId is null', () => {
   const turn = { duelAutoWinnerId: null };
   const resolved = resolveWinnerId(turn, 'other_player_id');
   assert.equal(resolved, 'other_player_id', 'Should use passedWinnerId when no auto-win is set');
+});
+
+// ─── Gender: prefer_not_to_say matches any genderRequired ─────────────────────
+test('prefer_not_to_say gender matches a gendered card without availableForAllCombos', () => {
+  const cards = [card({ id: 'c1', genderRequired: ['female'], tags: [], level: 3 })];
+  const performer = player({ gender: GENDER_WILDCARD, availableForAllCombos: false });
+  const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
+  assert.ok(result, 'prefer_not_to_say should match any genderRequired card');
+});
+
+test('a different concrete gender is still blocked by genderRequired', () => {
+  const cards = [card({ id: 'c1', genderRequired: ['female'], tags: [], level: 3 })];
+  const male = player({ gender: 'male', availableForAllCombos: false });
+  const { card: result } = selectCard(cards, 'dare', male, null, 3, emptySet);
+  assert.equal(result, null, 'male performer should not get a female-only card');
+});
+
+test('custom (pack) gender matches a card requiring that custom gender — no hardcoding', () => {
+  const cards = [card({ id: 'c1', genderRequired: ['femboy'], tags: [], level: 3 })];
+  const performer = player({ gender: 'femboy', availableForAllCombos: false });
+  const { card: result } = selectCard(cards, 'dare', performer, null, 3, emptySet);
+  assert.ok(result, 'filter must match arbitrary gender strings, not just male/female');
+});
+
+test('mergeGenders adds pack genders and de-dupes by id', () => {
+  const base = [{ id: 'male', label: 'Male' }, { id: 'female', label: 'Female' }];
+  const merged = mergeGenders(base, [{ id: 'female', label: 'Dup' }, { id: 'femboy', label: 'Femboy' }]);
+  assert.equal(merged.length, 3, 'duplicate ids are not added twice');
+  assert.ok(merged.some(g => g.id === 'femboy'), 'new pack gender is merged in');
+  assert.equal(merged.find(g => g.id === 'female').label, 'Female', 'existing gender keeps its original label');
+});
+
+// ─── Candidate-target array model ─────────────────────────────────────────────
+test('targetRequired card passes when AT LEAST ONE candidate is valid', () => {
+  const cards = [card({ id: 'c1', targetRequired: true, tags: ['feet'], level: 3 })];
+  const performer = player({ id: 'pa' });
+  const blocked = player({ id: 'b', limits: ['feet'] });   // would block on feet
+  const okCand  = player({ id: 'o', limits: [] });
+  const { card: result, validTargets } = selectCard(cards, 'dare', performer, [blocked, okCand], 3, emptySet);
+  assert.ok(result, 'card eligible because one candidate is valid');
+  assert.deepEqual(validTargets.map(t => t.id), ['o'], 'only the non-limited candidate is valid');
+});
+
+test('targetRequired card is ineligible when NO candidate is valid', () => {
+  const cards = [card({ id: 'c1', targetRequired: true, tags: ['feet'], level: 3 })];
+  const performer = player({ id: 'pa' });
+  const blocked1 = player({ id: 'b1', limits: ['feet'] });
+  const blocked2 = player({ id: 'b2', limits: ['feet'] });
+  const { card: result } = selectCard(cards, 'dare', performer, [blocked1, blocked2], 3, emptySet);
+  assert.equal(result, null, 'no valid candidate target → card not served');
+});
+
+test('target genitals filter applied across candidate pool', () => {
+  const cards = [card({ id: 'c1', targetRequired: true, targetGenitals: ['penis'], tags: [], level: 3 })];
+  const performer = player({ id: 'pa' });
+  const noPenis = player({ id: 'n', genitals: ['vagina'] });
+  const hasPenis = player({ id: 'p', genitals: ['penis'] });
+  const { validTargets } = selectCard(cards, 'dare', performer, [noPenis, hasPenis], 3, emptySet);
+  assert.deepEqual(validTargets.map(t => t.id), ['p'], 'only the candidate with the required genital is valid');
+});
+
+// ─── selectTarget: limits- and preference-aware weighted draw ─────────────────
+test('selectTarget returns the only valid target', () => {
+  const only = player({ id: 'only' });
+  assert.equal(selectTarget([only], card()).id, 'only');
+});
+
+test('selectTarget biases toward a preference match (rng forced low picks weighted)', () => {
+  const liker   = player({ id: 'liker', preferences: ['intimate'] }); // weight 3
+  const neutral = player({ id: 'neutral' });                          // weight 2
+  const c = card({ tags: ['intimate'] });
+  // rng=0 → first slice; liker is listed first and out-weights neutral regardless
+  assert.equal(selectTarget([liker, neutral], c, () => 0).id, 'liker');
+});
+
+test('selectTarget down-weights a soft-limit target vs a neutral one', () => {
+  const soft    = player({ id: 'soft', softLimits: ['intimate'] }); // weight 1
+  const neutral = player({ id: 'neutral' });                        // weight 2
+  const c = card({ tags: ['intimate'] });
+  // total weight 3; rng just past soft's slice (1/3) should land on neutral
+  assert.equal(selectTarget([soft, neutral], c, () => 0.5).id, 'neutral');
+});
+
+// ─── Clothing: category mapping ───────────────────────────────────────────────
+test('clothingCategory maps slot keys to categories', () => {
+  assert.equal(clothingCategory({ key: 'head_hat', value: 'hat' }), 'headwear');
+  assert.equal(clothingCategory({ key: 'neck_scarf', value: 'scarf' }), 'scarf');
+  assert.equal(clothingCategory({ key: 'body_t-shirt', value: 't-shirt' }), 'upper');
+  assert.equal(clothingCategory({ key: 'jacket_hoodie', value: 'hoodie' }), 'upper');
+  assert.equal(clothingCategory({ key: 'legs_pants', value: 'pants' }), 'pants');
+  assert.equal(clothingCategory({ key: 'underwear_boxers', value: 'boxers' }), 'underwear');
+  assert.equal(clothingCategory({ key: 'foot_left_socks', value: 'socks' }), 'socks');
+  assert.equal(clothingCategory({ key: 'extra_123', value: 'lace bra' }), 'underwear', 'free-text fallback');
+});
+
+// ─── Clothing: still-on / auto-pickable (underwear auto only at level >= 6) ────
+const wardrobe = () => ([
+  { key: 'head_hat',         value: 'hat',    removed: false },
+  { key: 'body_t-shirt',     value: 't-shirt', removed: false },
+  { key: 'underwear_boxers', value: 'boxers', removed: false },
+]);
+
+test('stillOnItems excludes removed garments', () => {
+  const items = [{ key: 'head_hat', removed: false }, { key: 'legs_pants', removed: true }];
+  assert.deepEqual(stillOnItems(items).map(i => i.key), ['head_hat']);
+});
+
+test('autoPickableItems excludes underwear below level 6', () => {
+  const elig = autoPickableItems(wardrobe(), 5);
+  assert.ok(!elig.some(i => i.key === 'underwear_boxers'), 'system cannot auto-pick underwear below level 6');
+  assert.ok(elig.some(i => i.key === 'head_hat'), 'non-underwear is still auto-pickable');
+});
+
+test('autoPickableItems includes underwear at level 6+', () => {
+  assert.ok(autoPickableItems(wardrobe(), 6).some(i => i.key === 'underwear_boxers'), 'underwear auto-pickable at level 6');
+});
+
+// ─── Clothing: selectCard serving (old leveling kept) ─────────────────────────
+test('player-choice clothing card serves at low level as long as something is still on', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })]; // no {{c}} → player-choice
+  const performer = player({ clothingItems: [{ key: 'legs_pants', value: 'jeans', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
+  assert.ok(result, 'old leveling kept: a level-4 player-choice strip card still serves');
+});
+
+test('player-choice card can target underwear even below level 6 (player’s own choice)', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })];
+  const performer = player({ clothingItems: [{ key: 'underwear_boxers', value: 'boxers', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
+  assert.ok(result, 'player-choice may remove underwear at any level');
+});
+
+test('{{c}} auto card filtered below level 6 when only underwear remains', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 5, difficulty: 2, text: 'take off your {{c}}' })];
+  const performer = player({ clothingItems: [{ key: 'underwear_boxers', value: 'boxers', removed: false }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 5, emptySet);
+  assert.equal(result, null, 'system cannot auto-force underwear below level 6');
+});
+
+test('{{c}} auto card serves below level 6 when a non-underwear item is available', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 5, difficulty: 2, text: 'take off your {{c}}' })];
+  const performer = player({ clothingItems: [
+    { key: 'head_hat', value: 'hat', removed: false },
+    { key: 'underwear_boxers', value: 'boxers', removed: false },
+  ] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 5, emptySet);
+  assert.ok(result, 'auto-pick can take the hat (non-underwear) below level 6');
+});
+
+test('clothing card filtered when performer is fully undressed', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 7, difficulty: 2 })];
+  const performer = player({ clothingItems: [{ key: 'head_hat', value: 'hat', removed: true }] });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 7, emptySet);
+  assert.equal(result, null, 'nothing left to remove → not served');
+});
+
+test('strip-streak guardrail: clothing card filtered after 2 strips in a row', () => {
+  const cards = [card({ id: 'c1', tags: ['clothing'], level: 4, difficulty: 2 })];
+  const performer = player({
+    clothingItems: [{ key: 'legs_pants', value: 'jeans', removed: false }],
+    clothingStreak: 2,
+  });
+  const { card: result } = selectCard(cards, 'dare', performer, [], 4, emptySet);
+  assert.equal(result, null, 'after 2 strips in a row the next draw must be non-clothing');
+});
+
+// ─── Tokens ───────────────────────────────────────────────────────────────────
+test('clothingTokenKind detects {{ct}} over {{c}}', () => {
+  assert.equal(clothingTokenKind({ text: 'remove {{c}}', tags: ['clothing'] }), 'c');
+  assert.equal(clothingTokenKind({ text: 'take off {{ct}}', tags: ['clothing'] }), 'ct');
+  assert.equal(clothingTokenKind({ text: 'no token', tags: ['clothing'] }), null);
+});
+
+test('isClothingRemovalCard keys off the clothing tag', () => {
+  assert.equal(isClothingRemovalCard({ tags: ['clothing'] }), true);
+  assert.equal(isClothingRemovalCard({ tags: ['intimate'] }), false);
+});
+
+test('renderTokens substitutes PA/PB/c/ct in a string and an {nl,en} object', () => {
+  const out = renderTokens('{{PA}} removes {{PB}}’s {{ct}} and own {{c}}', {
+    paName: 'Ann', pbName: 'Bo', cLabel: 'hat', ctLabel: 'scarf',
+  });
+  assert.equal(out, 'Ann removes Bo’s scarf and own hat');
+  const obj = renderTokens({ nl: '{{PA}} kust {{PB}}', en: '{{PA}} kisses {{PB}}' }, { paName: 'Ann', pbName: 'Bo' });
+  assert.deepEqual(obj, { nl: 'Ann kust Bo', en: 'Ann kisses Bo' });
+});
+
+test('pickClothingItem returns null on empty list and an item otherwise', () => {
+  assert.equal(pickClothingItem([]), null);
+  const items = [{ key: 'head_hat', value: 'hat', removed: false }];
+  assert.equal(pickClothingItem(items, () => 0).key, 'head_hat');
 });
