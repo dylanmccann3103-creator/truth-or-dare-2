@@ -1083,9 +1083,7 @@ io.on('connection', (socket) => {
     const turn = room.currentTurn;
     if (!turn || turn.phase !== 'showing') return cb && cb({ ok: false, error: 'Wrong phase' });
 
-    const isPerformer = socket.id === turn.performerId;
-    const isDisplayHost = room.hostMode === 'display' && socket.id === room.host;
-    if (!isPerformer && !isDisplayHost) return cb && cb({ ok: false, error: 'Not authorized' });
+    if (room.host !== socket.id) return cb && cb({ ok: false, error: 'Host only' });
 
     const performer = room.players[turn.performerId];
     if (!performer) return cb && cb({ ok: false });

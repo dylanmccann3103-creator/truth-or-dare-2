@@ -1282,12 +1282,6 @@ input::placeholder { color: #7a6b8a; }
       <p class="text-muted text-center" style="font-size:0.75rem;margin-top:4px">Save for a later turn. You have a limited number of slots.</p>
     </div>
 
-    <!-- Continue: sends dare to background, game moves on -->
-    <div style="margin-top:8px" id="card-continue-wrap">
-      <button class="btn btn-secondary" onclick="continueDare()" id="card-continue-btn">▶ Continue — takes too long</button>
-      <p class="text-muted text-center" style="font-size:0.75rem;margin-top:4px">Game moves on. You finish this in the background.</p>
-    </div>
-
     <p class="text-muted text-center" style="margin-top:8px;font-size:0.78rem">Tap Done when you finish the dare.</p>
   </div>
 
@@ -1404,6 +1398,10 @@ input::placeholder { color: #7a6b8a; }
 
   <!-- End game / Next turn controls (host only in display mode) -->
   <div id="display-host-controls" style="display:none;width:100%;max-width:480px">
+    <!-- Continue: only shown during 'showing' phase, moves dare to background -->
+    <div id="display-continue-wrap" style="display:none;margin-bottom:8px">
+      <button class="btn btn-secondary btn-sm" id="display-continue-btn" onclick="continueDare()">▶ Continue — taking too long</button>
+    </div>
     <button class="btn btn-secondary btn-sm" style="margin-bottom:8px" onclick="forceNextTurn()">⏭ Skip Turn (emergency)</button>
     <button class="btn btn-danger btn-sm" onclick="endGame()">🏁 End Game</button>
   </div>
@@ -2549,12 +2547,6 @@ function buildCardScreen(state) {
       document.getElementById('card-park-btn').disabled = slotsLeft <= 0;
     }
 
-    // Continue button (dares only — moves dare to background)
-    const continueWrap = document.getElementById('card-continue-wrap');
-    if (continueWrap) {
-      continueWrap.style.display = turn.choice === 'dare' ? 'block' : 'none';
-      document.getElementById('card-continue-btn').disabled = false;
-    }
   }
 
   // End game button (host only)
@@ -2622,7 +2614,17 @@ function buildDisplayScreen(state) {
   const cardDiv     = document.getElementById('display-card-view');
   const hostControls = document.getElementById('display-host-controls');
 
-  hostControls.style.display = (amHost || isDisplayHost) ? 'block' : 'none';
+  const isHost = amHost || isDisplayHost;
+  hostControls.style.display = isHost ? 'block' : 'none';
+
+  // Continue button only makes sense while a dare is actively being shown
+  const continueWrap = document.getElementById('display-continue-wrap');
+  if (continueWrap) {
+    const showContinue = isHost && turn.phase === 'showing' && turn.choice === 'dare';
+    continueWrap.style.display = showContinue ? 'block' : 'none';
+    const continueBtn = document.getElementById('display-continue-btn');
+    if (continueBtn) continueBtn.disabled = false;
+  }
 
   if (turn.phase === 'spinning' || turn.phase === 'choosing') {
     waitingDiv.style.display = 'block';
