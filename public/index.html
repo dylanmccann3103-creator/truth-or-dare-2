@@ -784,6 +784,18 @@ input::placeholder { color: #7a6b8a; }
   background: rgba(124,58,237,0.25); border-color: var(--accent2); color: #fff;
 }
 
+/* ─── Timer UI ─────────────────────────────────────────────────────────────── */
+.timer-section { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:16px; width:100%; }
+.timer-countdown-num { font-size:120px; font-weight:900; font-family:monospace; line-height:1;
+  background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.timer-elapsed { font-size:48px; font-weight:700; font-family:monospace; color:#f59e0b; }
+.timer-result-box { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15);
+  border-radius:12px; padding:16px 24px; text-align:center; width:100%; }
+.timer-tier-btns { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.timer-tier-btn { padding:8px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.07); color:#fff; cursor:pointer; font-weight:600; font-size:0.9rem; }
+.timer-tier-btn:hover { background:rgba(255,255,255,0.15); }
+
 /* ─── Age gate overlay ─────────────────────────────────────────────── */
 #age-gate {
   position: fixed; inset: 0; z-index: 1000;
@@ -1276,6 +1288,42 @@ input::placeholder { color: #7a6b8a; }
   <div id="card-clothing-ref" class="card" style="display:none; max-width:480px">
     <div class="section-label" style="margin-top:0">🧥 Their Wardrobe</div>
     <div id="card-clothing-list" style="font-size:0.9rem; color:#c4b8d8; line-height:1.8"></div>
+  </div>
+
+  <!-- Timer section (only shown for timed cards) -->
+  <div id="timer-section" class="timer-section" style="display:none">
+    <div id="timer-countdown-wrap" style="display:none; text-align:center">
+      <div class="timer-countdown-num" id="timer-countdown-num"></div>
+      <div style="opacity:0.6; margin-top:8px">Get ready…</div>
+    </div>
+    <div id="timer-running-wrap" style="display:none; text-align:center; width:100%">
+      <div class="timer-elapsed" id="timer-elapsed-display">0:00</div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:12px">
+        <button class="btn btn-primary" onclick="stopTimer()" id="timer-stop-btn">&#9632; Stop</button>
+        <button class="btn" style="opacity:0.6" onclick="quitTimer()" id="timer-quit-btn">Give up</button>
+      </div>
+    </div>
+    <div id="timer-result-wrap" style="display:none; width:100%">
+      <div class="timer-result-box">
+        <div id="timer-result-time" style="font-size:1.4rem; font-weight:700; font-family:monospace"></div>
+        <div id="timer-result-tier" style="margin-top:4px; opacity:0.8"></div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:12px">
+        <button class="btn btn-primary" onclick="acceptTimerResult()" id="timer-accept-btn">&#10003; Accept</button>
+        <button class="btn" onclick="disputeTimerResult()" id="timer-dispute-btn" style="opacity:0.7">&#9872; Dispute</button>
+      </div>
+    </div>
+    <div id="timer-waiting-wrap" style="display:none; opacity:0.6">Waiting for host…</div>
+    <button id="timer-start-btn" class="btn btn-primary" onclick="startTimer()" style="display:none; width:100%">&#9654; Start Timer</button>
+    <div id="timer-host-controls" style="display:none; width:100%">
+      <div style="font-size:0.75rem; opacity:0.5; text-align:center; margin-bottom:8px">Host override</div>
+      <div class="timer-tier-btns">
+        <button class="timer-tier-btn" onclick="hostAwardTier(0)">&#10007; Fail</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(1)">1 &#9733;</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(2)">2 &#9733;&#9733;</button>
+        <button class="timer-tier-btn" onclick="hostAwardTier(3)">3 &#9733;&#9733;&#9733;</button>
+      </div>
+    </div>
   </div>
 
   <!-- Action buttons (performer only) -->
@@ -2500,12 +2548,14 @@ function buildCardScreen(state) {
   const isPerformer = performer.id === myId;
   const actionWrap  = document.getElementById('card-action-wrap');
   actionWrap.style.display = isPerformer ? 'block' : 'none';
+  const isHostOrDisplayCard = amHost || state.displayHostId === myId;
+  renderTimer(turn, isPerformer, isHostOrDisplayCard);
 
   if (isPerformer) {
-    // Done button — always visible (truths and dares both need it to advance the turn)
+    // Done button — visible for non-timed cards; hidden for timed cards (renderTimer already hid it above)
     const doneBtn = document.getElementById('card-done-btn');
     doneBtn.disabled = false;
-    doneBtn.style.display = 'flex';
+    if (!turn.card.timerMode) doneBtn.style.display = 'flex';
     doneBtn.textContent = turn.choice === 'truth'
       ? '✓ Done — I answered it'
       : '✓ Done — I completed it';
@@ -2581,8 +2631,76 @@ function forceNextTurn() {
   socket.emit('next-turn', { code: myRoom }, () => {});
 }
 
+// ─── Timer UI ─────────────────────────────────────────────────────────────────
+let _timerInterval = null;
+let _displayTimerInterval = null;
+
+function startTimer()  { socket.emit('start-timer',         { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function stopTimer()   { socket.emit('stop-timer',          { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function quitTimer()   { socket.emit('quit-timer',          { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function acceptTimerResult()  { socket.emit('accept-timer-result',  { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function disputeTimerResult() { socket.emit('dispute-timer-result', { code: myRoom }, r => r && !r.ok && toast(r.error,'danger')); }
+function hostAwardTier(d) { socket.emit('host-award-timer-tier', { code: myRoom, difficulty: d }, r => r && !r.ok && toast(r.error,'danger')); }
+
+function formatTimerSeconds(s) {
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function renderTimer(turn, iAmPerformer, isHostOrDisplay) {
+  clearInterval(_timerInterval);
+  const sec = document.getElementById('timer-section');
+  if (!turn || !turn.card || !turn.card.timerMode) { if (sec) sec.style.display = 'none'; return; }
+
+  sec.style.display = 'flex';
+  const t = turn.timer || { state: 'idle' };
+
+  // hide the normal done button for performer on timed cards
+  const doneBtn = document.getElementById('card-done-btn');
+  if (doneBtn && iAmPerformer) doneBtn.style.display = 'none';
+
+  // hide/show sub-sections
+  const show = id => { const el = document.getElementById(id); if(el) el.style.display = ''; };
+  const hide = id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; };
+
+  hide('timer-countdown-wrap'); hide('timer-running-wrap'); hide('timer-result-wrap');
+  hide('timer-waiting-wrap'); hide('timer-start-btn'); hide('timer-host-controls');
+
+  if (t.state === 'idle') {
+    if (iAmPerformer) show('timer-start-btn');
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'countdown') {
+    show('timer-countdown-wrap');
+    document.getElementById('timer-countdown-num').textContent = t.countdownValue || '';
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'running') {
+    if (iAmPerformer) {
+      show('timer-running-wrap');
+      const startedAt = t.startedAt;
+      _timerInterval = setInterval(() => {
+        const el = document.getElementById('timer-elapsed-display');
+        if (el) el.textContent = formatTimerSeconds((Date.now() - startedAt) / 1000);
+      }, 100);
+    }
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'stopped') {
+    if (iAmPerformer) {
+      show('timer-result-wrap');
+      document.getElementById('timer-result-time').textContent = formatTimerSeconds(t.elapsedSeconds || 0);
+      const d = t.achievedDifficulty || 0;
+      document.getElementById('timer-result-tier').textContent = d === 0 ? 'No points earned' : d + ' ' + '★'.repeat(d) + ' tier';
+    }
+    if (isHostOrDisplay) show('timer-host-controls');
+  } else if (t.state === 'disputed') {
+    if (iAmPerformer) show('timer-waiting-wrap');
+    if (isHostOrDisplay) show('timer-host-controls');
+  }
+  // resolved: nothing extra to show, turn will advance
+}
+
 // ─── Display Screen (non-active / display host) ───────────────────────────────
 function buildDisplayScreen(state) {
+  clearInterval(_displayTimerInterval);
   const turn = state.currentTurn;
   if (!turn) return;
 
@@ -2636,6 +2754,36 @@ function buildDisplayScreen(state) {
       dispDurationBadge.style.display = 'inline-flex';
     } else {
       dispDurationBadge.style.display = 'none';
+    }
+
+    // Timer display on display/TV screen for timed cards
+    if (turn.card && turn.card.timerMode) {
+      const t = turn.timer || { state: 'idle' };
+      let dispTimerEl = document.getElementById('display-timer-section');
+      if (!dispTimerEl) {
+        dispTimerEl = document.createElement('div');
+        dispTimerEl.id = 'display-timer-section';
+        dispTimerEl.style.cssText = 'text-align:center;margin-top:16px;width:100%';
+        cardDiv.appendChild(dispTimerEl);
+      }
+      if (t.state === 'countdown') {
+        dispTimerEl.innerHTML = `<div class="timer-countdown-num">${t.countdownValue || ''}</div><div style="opacity:0.6;margin-top:8px">Get ready…</div>`;
+      } else if (t.state === 'running') {
+        dispTimerEl.innerHTML = `<div class="timer-elapsed" id="display-timer-elapsed">0:00</div>`;
+        const startedAt = t.startedAt;
+        _displayTimerInterval = setInterval(() => {
+          const el = document.getElementById('display-timer-elapsed');
+          if (el) el.textContent = formatTimerSeconds((Date.now() - startedAt) / 1000);
+        }, 100);
+      } else if (t.state === 'stopped' || t.state === 'disputed') {
+        const d = t.achievedDifficulty || 0;
+        dispTimerEl.innerHTML = `<div class="timer-elapsed">${formatTimerSeconds(t.elapsedSeconds || 0)}</div><div style="opacity:0.7;margin-top:8px">${d === 0 ? 'No points earned' : d + ' ' + '★'.repeat(d) + ' tier'}</div>`;
+      } else {
+        dispTimerEl.innerHTML = '';
+      }
+    } else {
+      const dispTimerEl = document.getElementById('display-timer-section');
+      if (dispTimerEl) dispTimerEl.remove();
     }
 
   } else if (turn.phase === 'duel' || turn.phase === 'duel-forfeit') {

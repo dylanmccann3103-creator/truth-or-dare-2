@@ -1592,7 +1592,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d045",
@@ -1661,7 +1667,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d049",
@@ -1694,7 +1706,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d051",
@@ -1778,7 +1796,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "duration",
+      "tiers": [
+        { "difficulty": 1, "seconds": 60 },
+        { "difficulty": 2, "seconds": 120 },
+        { "difficulty": 3, "seconds": 180 }
+      ]
     },
     {
       "id": "d056",
@@ -1897,7 +1921,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d063",
@@ -2036,7 +2066,13 @@
       "orientationMatters": false,
       "targetRequired": true,
       "performerGenitals": null,
-      "targetGenitals": null
+      "targetGenitals": null,
+      "timerMode": "speed",
+      "tiers": [
+        { "difficulty": 3, "seconds": 120 },
+        { "difficulty": 2, "seconds": 240 },
+        { "difficulty": 1, "seconds": 360 }
+      ]
     },
     {
       "id": "d071",
