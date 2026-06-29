@@ -17,7 +17,10 @@ const { selectCard } = require('./lib/selectCard');
 const { coinsByEconomy, calcRewards, applyImmunity, POWERUP_COSTS } = require('./lib/gameHelpers');
 
 function getRoomCards(room) {
-  const cards = room.cardPool || ALL_CARDS;
+  const base = room.cardPool || ALL_CARDS;
+  const cards = (room.customCards && room.customCards.length > 0)
+    ? [...base, ...room.customCards]
+    : base;
   if (!room.equipmentLimits || room.equipmentLimits.length === 0) return cards;
   return cards.filter(c => !c.tags || !c.tags.some(t => room.equipmentLimits.includes(t)));
 }
@@ -79,6 +82,7 @@ function createRoom(hostId, hostMode = 'display') {
     activeEvent: null,
     cardPool: null,          // null = use ALL_CARDS; set from host's active packages
     equipmentLimits: [],     // equip_* tags for unavailable equipment — filtered from card pool
+    customCards: [],         // cards added by host during lobby
   };
   return rooms[code];
 }
@@ -232,6 +236,7 @@ function roomPublicState(room) {
     levelMode: room.levelMode ?? 'locked',
     minStartLevel: room.minStartLevel,
     enabledPowerups: room.enabledPowerups || [],
+    customCards: room.customCards || [],
   };
 }
 
