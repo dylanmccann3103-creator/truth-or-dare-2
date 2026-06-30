@@ -1687,7 +1687,9 @@ window.addEventListener('DOMContentLoaded', () => {
   checkRejoinBanner();
   const params = new URLSearchParams(location.search);
   const roomParam = params.get('room');
-  if (roomParam) {
+  if (location.pathname === '/host') {
+    showScreen('screen-host');
+  } else if (roomParam) {
     document.getElementById('join-code-input').value = roomParam.toUpperCase();
     showScreen('screen-join');
   }

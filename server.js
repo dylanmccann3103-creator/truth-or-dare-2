@@ -393,6 +393,12 @@ function awardDareCompletion(room, turn, achievedDifficulty) {
   const coinsEarned = coinsByEconomy(baseCoins, room.economyMode);
   performer.coins += coinsEarned;
 
+  // Duo/target-required timed cards: target also earns coins (full amount each)
+  if (turn.card.targetRequired && turn.targetId && turn.targetId !== turn.performerId) {
+    const target = room.players[turn.targetId];
+    if (target) target.coins += coinsEarned;
+  }
+
   // Track level clearing (mirrors complete-dare handler)
   const lvl = turn.card.level;
   performer.daresCompletedPerLevel[lvl] = (performer.daresCompletedPerLevel[lvl] || 0) + 1;
@@ -432,13 +438,17 @@ io.on('connection', (socket) => {
   socket.on('player-setup', ({ code, name, emoji, clothing, preferences, limits, limits_soft, gender, genitals, orientation, availableForAllCombos, language }, cb) => {
     const room = getRoom(code);
     if (!room) return cb({ ok: false, error: 'Room not found' });
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) return cb({ ok: false, error: 'Name is required' });
+    const nameTaken = Object.values(room.players).some(p => p.id !== socket.id && p.name === trimmedName);
+    if (nameTaken) return cb({ ok: false, error: 'Name already taken — choose a different name' });
     const token = generateToken();
     const emojiIdx = Object.keys(room.players).length % EMOJIS.length;
     const chosenEmoji = (emoji && EMOJIS.includes(emoji)) ? emoji : EMOJIS[emojiIdx];
     room.players[socket.id] = {
       id: socket.id,
       token,
-      name,
+      name: trimmedName,
       emoji: chosenEmoji,
       clothingItems: normalizeClothing(clothing),
       clothingStreak: 0,              // consecutive completed strip cards (pacing guardrail)
@@ -660,7 +670,7 @@ io.on('connection', (socket) => {
     room.currentTurn.softFlagged     = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = rouletteUpgrade;
     room.currentTurn.attribution     = { type: 'solo', performerId: socket.id };
-    room.currentTurn.timer           = (card && card.timerMode) ? { state: 'idle' } : null;
+    room.currentTurn.timer           = (served && served.timerMode) ? { state: 'idle' } : null;
 
     cb && cb({ ok: true, recycled: sel.recycled, softFlagged: sel.softFlagged, rouletteUpgrade });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -935,11 +945,12 @@ io.on('connection', (socket) => {
 
     if (sel.card) performer.usedCardIds.add(sel.card.id);
 
-    room.currentTurn.card        = sel.card ? prepareServedCard(room, room.currentTurn, performer, sel) : null;
+    const respinServed = sel.card ? prepareServedCard(room, room.currentTurn, performer, sel) : null;
+    room.currentTurn.card        = respinServed;
     room.currentTurn.recycled    = sel.recycled;
     room.currentTurn.softFlagged = sel.softFlagged;
     room.currentTurn.rouletteUpgrade = false;
-    room.currentTurn.timer       = (card && card.timerMode) ? { state: 'idle' } : null;
+    room.currentTurn.timer       = (respinServed && respinServed.timerMode) ? { state: 'idle' } : null;
 
     cb && cb({ ok: true });
     io.to(code).emit('room-state', roomPublicState(room));
@@ -1293,15 +1304,15 @@ io.on('connection', (socket) => {
     if (powerupId === 'insight') {
       if (turn?.performerId !== socket.id) return cb && cb({ ok: false, error: 'Not your turn' });
       if (turn?.phase !== 'choosing') return cb && cb({ ok: false, error: 'Insight only works during choosing phase' });
-      // Trial draw to reveal dare type
-      const trialTarget = (turn.targetId && turn.targetId !== socket.id) ? room.players[turn.targetId] : null;
-      const trialDuel = (trialTarget && Math.random() < 0.25)
-        ? selectCard(getRoomCards(room), 'duel', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' })
+      // Trial draw to reveal dare type — use full candidate pool (same as pick-truth-dare)
+      const trialCandidates = connectedCandidates(room, socket.id);
+      const trialDuel = (trialCandidates.length > 0 && Math.random() < 0.25)
+        ? selectCard(getRoomCards(room), 'duel', player, trialCandidates, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' })
         : { card: null };
       if (trialDuel.card) {
         turn.insightType = 'duel';
       } else {
-        const trialDare = selectCard(getRoomCards(room), 'dare', player, trialTarget, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' });
+        const trialDare = selectCard(getRoomCards(room), 'dare', player, trialCandidates, player.currentLevel || 1, player.usedCardIds, { rouletteMode: 'off' });
         turn.insightType = trialDare.card ? 'dare' : 'truth';
       }
       turn.insightRevealed = true;
@@ -1328,6 +1339,14 @@ io.on('connection', (socket) => {
         return cb && cb({ ok: false, error: 'Auto-win only usable during a duel' });
       }
       turn.duelAutoWinnerId = socket.id;
+      player.activePowerups.splice(idx, 1);
+      cb && cb({ ok: true });
+      io.to(code).emit('room-state', roomPublicState(room));
+      return;
+    }
+
+    if (powerupId === 'cooldown_reset') {
+      player.usedCardIds = new Set();
       player.activePowerups.splice(idx, 1);
       cb && cb({ ok: true });
       io.to(code).emit('room-state', roomPublicState(room));
@@ -1533,7 +1552,7 @@ function sendNoCache(file) {
 }
 app.get('/',        sendNoCache('index.html'));
 app.get('/editor',  sendNoCache('editor.html'));
-app.get('/host',    sendNoCache('host.html'));
+app.get('/host',    sendNoCache('index.html'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
