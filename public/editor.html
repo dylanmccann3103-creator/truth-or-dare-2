@@ -120,6 +120,14 @@ header h1 { font-size: 1.05rem; background: linear-gradient(135deg,#9333ea,#c026
 
 /* Tag suggestions datalist */
 datalist option { background: var(--surface2); color: var(--text); }
+
+/* Language tabs */
+.lang-tab { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; }
+.lang-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+.lang-tab .lrm { opacity: .6; font-size: 0.7rem; cursor: pointer; line-height: 1; }
+.lang-tab .lrm:hover { opacity: 1; color: #f87171; }
+.add-lang-item { padding: 6px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
+.add-lang-item:hover { background: rgba(255,255,255,0.06); }
 </style>
 </head>
 <body>
@@ -218,13 +226,15 @@ datalist option { background: var(--surface2); color: var(--text); }
       </div>
 
       <div class="fld">
-        <div class="flbl">Text — English</div>
-        <textarea class="ftxt" id="ed-en" placeholder="English text…"></textarea>
-      </div>
-
-      <div class="fld">
-        <div class="flbl">Text — Dutch</div>
-        <textarea class="ftxt" id="ed-nl" placeholder="Nederlandse tekst…"></textarea>
+        <div class="flbl" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Text</span>
+          <div style="position:relative;display:inline-block">
+            <button class="btn btn-s btn-sm" id="add-lang-btn" onclick="toggleAddLangMenu(event)" style="padding:3px 9px;font-size:0.75rem">+ Language</button>
+            <div id="add-lang-menu" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1a1528;border:1px solid rgba(255,255,255,0.08);border-radius:10px;z-index:100;min-width:160px;padding:4px 0;box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>
+          </div>
+        </div>
+        <div id="lang-tabs" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
+        <textarea class="ftxt" id="ed-lang-text" placeholder="Card text…" oninput="onLangTextInput()"></textarea>
       </div>
 
       <div class="fld">
@@ -338,12 +348,19 @@ datalist option { background: var(--surface2); color: var(--text); }
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KEY        = 'tod2_packages';
 const BUILTIN_ID = '__builtin__';
+const SUPPORTED_LANGUAGES = {
+  en: '🇬🇧 English', nl: '🇳🇱 Dutch',   es: '🇪🇸 Spanish',
+  fr: '🇫🇷 French',  de: '🇩🇪 German',  it: '🇮🇹 Italian',
+  pt: '🇵🇹 Portuguese', ja: '🇯🇵 Japanese', ko: '🇰🇷 Korean', zh: '🇨🇳 Chinese',
+};
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let pkgs      = [];    // [{ id, name, active, builtin, cards[] }]
 let typeFilter = 'all';
 let editing   = null;  // { card (merged with _pkgId/_builtin), pkgId }
 let edGenders  = [];   // working copy
+let edTexts    = {};   // { langCode: string }
+let edActiveLang = 'en';
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function init() {
@@ -565,7 +582,7 @@ function renderBrowser() {
       <span class="badge b-lvl">L${c.level}</span>
       <span class="badge b-${c.type}">${c.type}</span>
       <div class="ddots">${dots}</div>
-      <div class="card-preview">${h((c.text?.en||'').slice(0,90))}</div>
+      <div class="card-preview">${h((typeof c.text==='object' ? (c.text.en||c.text.nl||Object.values(c.text)[0]||'') : (c.text||'')).slice(0,90))}</div>
       <div class="tag-pills">${tags}</div>
       ${custom}`;
     tbl.appendChild(row);
@@ -647,11 +664,14 @@ function openEditor(card, pkgId) {
   setPill('ed-level', String(card.level || 1));
   setPill('ed-diff',  String(card.difficulty || 2));
 
-  // Support both old {en,nl} object and new plain string (Dutch default)
-  const textEn = card.text?.en ?? (typeof card.text === 'string' ? card.text : '');
-  const textNl = card.text?.nl ?? (typeof card.text === 'string' ? card.text : '');
-  document.getElementById('ed-en').value = textEn;
-  document.getElementById('ed-nl').value = textNl;
+  if (card.text && typeof card.text === 'object') {
+    edTexts = { ...card.text };
+  } else {
+    edTexts = { nl: typeof card.text === 'string' ? card.text : '' };
+  }
+  edActiveLang = Object.keys(edTexts)[0] || 'en';
+  if (!(edActiveLang in edTexts)) edTexts[edActiveLang] = '';
+  renderLangTabs(ro);
 
   renderTags(card.tags || [], ro);
 
@@ -678,7 +698,8 @@ function openEditor(card, pkgId) {
   document.getElementById('ed-avail').checked  = !!card.availableForAllCombos;
 
   // Disable all inputs for built-in cards
-  ['ed-en','ed-nl'].forEach(id => document.getElementById(id).disabled = ro);
+  document.getElementById('ed-lang-text').disabled = ro;
+  document.getElementById('add-lang-btn').disabled = ro;
   ['ed-orient','ed-target','ed-avail'].forEach(id => document.getElementById(id).disabled = ro);
   if (ro) {
     ['ed-type','ed-level','ed-diff'].forEach(id =>
@@ -750,6 +771,77 @@ function removeTag(tag) {
   renderTags(currentTags().filter(t=>t!==tag), false);
 }
 
+function renderLangTabs(ro) {
+  const wrap = document.getElementById('lang-tabs');
+  wrap.innerHTML = '';
+  const codes = Object.keys(edTexts);
+  for (const code of codes) {
+    const label = SUPPORTED_LANGUAGES[code] || code.toUpperCase();
+    const isActive = code === edActiveLang;
+    const canDel = !ro && codes.length > 1;
+    const tab = document.createElement('div');
+    tab.className = 'lang-tab' + (isActive ? ' active' : '');
+    tab.innerHTML = `<span onclick="switchLangTab('${code}')" style="cursor:pointer">${label}</span>`
+      + (canDel ? `<span class="lrm" onclick="removeLangTab('${code}')">✕</span>` : '');
+    wrap.appendChild(tab);
+  }
+  const textarea = document.getElementById('ed-lang-text');
+  textarea.value = edTexts[edActiveLang] || '';
+  textarea.placeholder = (SUPPORTED_LANGUAGES[edActiveLang] || edActiveLang) + ' text…';
+  updateAddLangMenu();
+}
+
+function syncActiveLangText() {
+  edTexts[edActiveLang] = document.getElementById('ed-lang-text').value;
+}
+
+function onLangTextInput() {
+  edTexts[edActiveLang] = document.getElementById('ed-lang-text').value;
+}
+
+function switchLangTab(code) {
+  syncActiveLangText();
+  edActiveLang = code;
+  renderLangTabs(!!editing?.card?._builtin);
+}
+
+function removeLangTab(code) {
+  if (Object.keys(edTexts).length <= 1) return;
+  syncActiveLangText();
+  delete edTexts[code];
+  if (edActiveLang === code) edActiveLang = Object.keys(edTexts)[0];
+  renderLangTabs(!!editing?.card?._builtin);
+}
+
+function toggleAddLangMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('add-lang-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateAddLangMenu() {
+  const menu = document.getElementById('add-lang-menu');
+  const existing = new Set(Object.keys(edTexts));
+  const available = Object.entries(SUPPORTED_LANGUAGES).filter(([k]) => !existing.has(k));
+  menu.innerHTML = available.length
+    ? available.map(([code, label]) => `<div class="add-lang-item" onclick="addLangTab('${code}')">${label}</div>`).join('')
+    : `<div class="add-lang-item" style="color:var(--muted)">All languages added</div>`;
+}
+
+function addLangTab(code) {
+  syncActiveLangText();
+  if (!(code in edTexts)) edTexts[code] = '';
+  edActiveLang = code;
+  document.getElementById('add-lang-menu').style.display = 'none';
+  renderLangTabs(!!editing?.card?._builtin);
+  document.getElementById('ed-lang-text').focus();
+}
+
+document.addEventListener('click', () => {
+  const menu = document.getElementById('add-lang-menu');
+  if (menu) menu.style.display = 'none';
+});
+
 function closeEditor() {
   editing = null;
   document.getElementById('ed-panel').classList.remove('open');
@@ -762,16 +854,16 @@ function saveCard() {
   const pkg   = pkgs.find(p => p.id === pkgId);
   if (!pkg) { toast('Package not found', 'danger'); return; }
 
-  const en = document.getElementById('ed-en').value.trim();
-  const nl = document.getElementById('ed-nl').value.trim();
-  if (!en && !nl) { toast('At least one language text is required', 'danger'); return; }
+  syncActiveLangText();
+  const textObj = Object.fromEntries(Object.entries(edTexts).filter(([,v]) => v.trim()));
+  if (!Object.keys(textObj).length) { toast('At least one language text is required', 'danger'); return; }
 
   const card = {
     id:                   editing.card.id,
     type:                 getPill('ed-type') || 'dare',
     level:                parseInt(getPill('ed-level')) || 1,
     difficulty:           parseInt(getPill('ed-diff'))  || 2,
-    text:                 { en: en || nl, nl: nl || en },
+    text:                 textObj,
     tags:                 currentTags(),
     genderRequired:       edGenders.length ? [...edGenders] : null,
     performerGenitals:    edPerformerGenitals.length ? [...edPerformerGenitals] : null,
@@ -812,7 +904,7 @@ function newCard() {
   const card = {
     id: 'custom_' + Date.now(),
     type: 'dare', level: 1, difficulty: 2,
-    text: { en: '', nl: '' }, tags: [],
+    text: { en: '' }, tags: [],
     genderRequired: null, performerGenitals: null, targetGenitals: null,
     orientationMatters: false, targetRequired: false, availableForAllCombos: false,
     _pkgId: pkg.id, _pkgName: pkg.name, _builtin: false,

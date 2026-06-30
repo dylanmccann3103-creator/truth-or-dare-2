@@ -987,9 +987,17 @@ input::placeholder { color: #7a6b8a; }
     </div>
     <div>
       <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Language</div>
-      <div class="pill-row" id="setup-language-row">
+      <div class="pill-row" id="setup-language-row" style="flex-wrap:wrap">
         <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 Nederlands</div>
         <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 English</div>
+        <div class="pill-select"        data-val="es" onclick="selectPill('language','es',this)">🇪🇸 Español</div>
+        <div class="pill-select"        data-val="fr" onclick="selectPill('language','fr',this)">🇫🇷 Français</div>
+        <div class="pill-select"        data-val="de" onclick="selectPill('language','de',this)">🇩🇪 Deutsch</div>
+        <div class="pill-select"        data-val="it" onclick="selectPill('language','it',this)">🇮🇹 Italiano</div>
+        <div class="pill-select"        data-val="pt" onclick="selectPill('language','pt',this)">🇵🇹 Português</div>
+        <div class="pill-select"        data-val="ja" onclick="selectPill('language','ja',this)">🇯🇵 日本語</div>
+        <div class="pill-select"        data-val="ko" onclick="selectPill('language','ko',this)">🇰🇷 한국어</div>
+        <div class="pill-select"        data-val="zh" onclick="selectPill('language','zh',this)">🇨🇳 中文</div>
       </div>
     </div>
   </div>
@@ -1884,7 +1892,10 @@ async function loadLangPack(lang) {
 function cardText(card, mp, sp) {
   if (!card) return '';
   const t = card.text;
-  let raw = (t && typeof t === 'object') ? (t[myLanguage] || t.nl || t.en || '') : (t || '');
+  let raw = '';
+  if (t && typeof t === 'object') {
+    raw = t[myLanguage] || t.en || t.nl || Object.values(t).find(v => v) || '';
+  } else { raw = t || ''; }
   if (LANG_PACK && LANG_PACK[card.id]) raw = LANG_PACK[card.id];
   if (mp) raw = raw.replaceAll('{{mp}}', mp);
   if (sp) raw = raw.replaceAll('{{sp}}', sp);
@@ -3702,7 +3713,8 @@ function renderPip(state) {
   pip.innerHTML = activities.map(a => {
     const performer = state.players[a.performerId];
     const target = a.targetId ? state.players[a.targetId] : null;
-    const cardText = a.cardText?.[lang] || a.cardText?.nl || a.cardText?.en || '…';
+    const _ct = a.cardText;
+    const cardText = (typeof _ct === 'object' && _ct ? (_ct[lang] || _ct.en || _ct.nl || Object.values(_ct).find(v=>v) || '') : (_ct || '')) || '…';
     const isMyDare = myId === a.performerId;
     const canComplete = isMyDare || amIHost;
     const doneLabel = isMyDare ? '✓ Done' : '⚠ Force resolve';
