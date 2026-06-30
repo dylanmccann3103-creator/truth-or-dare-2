@@ -1628,6 +1628,20 @@ input::placeholder { color: #7a6b8a; }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- Level-10 Extreme warning modal -->
+<div id="modal-extreme" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#1a0d26;border:2px solid #ef4444;border-radius:20px;max-width:380px;width:100%;padding:28px 24px;text-align:center;">
+    <div style="font-size:2.4rem;margin-bottom:8px">⚠️</div>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.35rem;color:#ef4444;margin-bottom:10px;letter-spacing:.02em">EXTREME — Level 10</div>
+    <p style="color:#c9b8e0;font-size:.9rem;line-height:1.55;margin-bottom:20px">This card is at the most intense level. Only content that falls within everyone's agreed limits will be shown — but it <em>will</em> be explicit. Proceed only if all players have consented to Level 10.</p>
+    <label style="display:flex;align-items:center;gap:8px;justify-content:center;font-size:.82rem;color:#9b89b4;margin-bottom:20px;cursor:pointer;">
+      <input type="checkbox" id="extreme-no-warn" style="width:16px;height:16px;accent-color:#ef4444;"> Don't warn me again this session
+    </label>
+    <button class="btn btn-danger" style="width:100%;margin-bottom:10px" onclick="confirmExtreme()">Show the card</button>
+    <button class="btn btn-secondary" style="width:100%;font-size:.85rem" onclick="cancelExtreme()">Go back</button>
+  </div>
+</div>
+
 <script>
 // ─── State ────────────────────────────────────────────────────────────────────
 const TAGS = ['general','flirty','clothing','body','physical','feet','kissing','speaking','oral','intimate','explicit','anal','bondage','toy','public','exposure'];
@@ -1740,12 +1754,31 @@ function connectSocket() {
   socket = io();
   socket.on('connect', () => {
     myId = socket.id;
-    // Auto-rejoin if we have a saved session and were in a room
+    // Auto-rejoin: attempt silently on every fresh connect if a session token exists
+    const raw = localStorage.getItem('tod2_session');
+    if (raw) {
+      try {
+        const { code, token } = JSON.parse(raw);
+        if (code && token) {
+          socket.emit('rejoin-room', { code, token }, (res) => {
+            if (res.ok) {
+              myRoom = code;
+              amHost = false;
+              document.getElementById('rejoin-banner').style.display = 'none';
+              toast(`Welcome back, ${res.name}!`, 'success');
+              // handleRoomState fires automatically via room-state broadcast
+            }
+          });
+          return; // skip the old myRoom-scoped rejoin below
+        }
+      } catch (_) { localStorage.removeItem('tod2_session'); }
+    }
+    // Reconnect during an active session (socket dropped mid-game, myRoom still set)
     if (myRoom) {
-      const raw = localStorage.getItem('tod2_session');
-      if (raw) {
+      const raw2 = localStorage.getItem('tod2_session');
+      if (raw2) {
         try {
-          const { code, token } = JSON.parse(raw);
+          const { code, token } = JSON.parse(raw2);
           if (code === myRoom && token) {
             socket.emit('rejoin-room', { code, token }, (res) => {
               if (res.ok) toast(`Reconnected as ${res.name}`, 'success');
@@ -2592,7 +2625,7 @@ function canAccessLevelClient(player, level, freeMode, minLvl) {
   if (freeMode) return true;
   if (level <= 1) return true;
   const prev = level - 1;
-  const xpThreshold = 3 * level * (level - 1);
+  const xpThreshold = level * 6;
   return player.xp >= xpThreshold && (player.clearedLevels || []).includes(prev);
 }
 
@@ -2646,8 +2679,13 @@ function buildCardScreen(state) {
 
   document.getElementById('card-text').textContent = cardText(turn.card, performer?.name, state.players[turn.targetId]?.name);
 
-  if (turn.card.level === 10) toast('⚠️ EXTREME level!', 'danger');
-  if (turn.recycled)          toast("Pool recycled — feel free to improvise!", 'info');
+  if (turn.card.level === 10 && !sessionStorage.getItem('extreme_confirmed')) {
+    // Block interaction until the player confirms they want to see this card
+    document.getElementById('card-reveal').style.visibility = 'hidden';
+    const modal = document.getElementById('modal-extreme');
+    modal.style.display = 'flex';
+  }
+  if (turn.recycled) toast("Pool recycled — feel free to improvise!", 'info');
 
   // Duration badge (only when card has estimatedMinutes)
   const durationBadge = document.getElementById('card-duration-badge');
@@ -3642,6 +3680,19 @@ function ceSaveToFile() {
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
+function confirmExtreme() {
+  if (document.getElementById('extreme-no-warn').checked) {
+    sessionStorage.setItem('extreme_confirmed', '1');
+  }
+  document.getElementById('modal-extreme').style.display = 'none';
+  document.getElementById('card-reveal').style.visibility = '';
+}
+
+function cancelExtreme() {
+  // Card already selected server-side — "cancel" just confirms so the turn can proceed
+  confirmExtreme();
+}
+
 function toast(msg, type = 'info') {
   const el = document.getElementById('toast');
   el.textContent = msg;

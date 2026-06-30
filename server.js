@@ -389,8 +389,7 @@ function awardDareCompletion(room, turn, achievedDifficulty) {
   const xpEarned = turn.doubleXp ? xpBase * 2 : xpBase;
   performer.xp += xpEarned;
 
-  const baseCoins = Math.max(3, turn.card.level * achievedDifficulty);
-  const coinsEarned = coinsByEconomy(baseCoins, room.economyMode);
+  const coinsEarned = Math.max(3, coinsByEconomy(turn.card.level * achievedDifficulty, room.economyMode));
   performer.coins += coinsEarned;
 
   // Duo/target-required timed cards: target also earns coins (full amount each)
@@ -883,7 +882,8 @@ io.on('connection', (socket) => {
 
     const slotsRemaining = performer.breakSlots.total - performer.breakSlots.used;
     cb && cb({ ok: true, slotsRemaining });
-    advanceTurn(room);
+    io.to(socket.id).emit('toast', { msg: `🅿️ Dare parked — ${slotsRemaining} slot${slotsRemaining !== 1 ? 's' : ''} left` });
+    setTimeout(() => advanceTurn(room), 1800);
   });
 
   // Replay a previously parked dare (on own turn, choosing phase)
@@ -1131,16 +1131,23 @@ io.on('connection', (socket) => {
   socket.on('resolve-duel', ({ code, winnerId }, cb) => {
     const room = getRoom(code);
     if (!room) return cb && cb({ ok: false });
-    if (room.host !== socket.id && room.displayHostId !== socket.id) {
+
+    const hostConnected = (room.host && room.players[room.host]?.connected) ||
+                          (room.displayHostId && room.players[room.displayHostId]?.connected);
+    const callerIsHost  = socket.id === room.host || socket.id === room.displayHostId;
+
+    // Allow any connected player to resolve if the host is absent (disconnected)
+    if (!callerIsHost && hostConnected) {
       return cb && cb({ ok: false, error: 'Host only' });
     }
+
     if (room.phase !== 'game') return cb && cb({ ok: false, error: 'Not in game' });
     if (room.currentTurn?.phase !== 'duel') return cb && cb({ ok: false, error: 'Not in duel phase' });
 
     const turn = room.currentTurn;
     // Prevent a participant from resolving their own duel (unless they are the host acting as neutral arbiter)
-    const isHost = socket.id === room.host || socket.id === room.displayHostId;
-    if (!isHost && (socket.id === turn.performerId || socket.id === turn.targetId)) {
+    const isHost = callerIsHost;
+    if (!isHost && hostConnected && (socket.id === turn.performerId || socket.id === turn.targetId)) {
       return cb && cb({ ok: false, error: 'Duel participants cannot resolve the duel' });
     }
     const actualWinnerId = turn.duelAutoWinnerId || winnerId;

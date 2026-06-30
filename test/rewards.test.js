@@ -26,8 +26,7 @@ test('coinsByEconomy: unknown or missing mode falls back to schaars (×1)', () =
   assert.equal(coinsByEconomy(6, 'random_string'), 6);
 });
 
-test('coinsByEconomy: coin floor of 3 is still scaled by economy mode', () => {
-  // level=1, diff=1 → base=3 (floor). Economy must still scale it.
+test('coinsByEconomy: floor=3 input is still scaled (coinsByEconomy itself just multiplies)', () => {
   assert.equal(coinsByEconomy(3, 'gemiddeld'),   6);
   assert.equal(coinsByEconomy(3, 'overvloedig'), 12);
 });
@@ -56,24 +55,30 @@ test('calcRewards solo: performer is the only coin recipient', () => {
   const { coinRecipients } = calcRewards(c, { type: 'solo', performerId: 'alice' }, 'schaars');
   assert.equal(coinRecipients.length, 1);
   assert.equal(coinRecipients[0].id, 'alice');
-  assert.equal(coinRecipients[0].coins, 6); // max(3, 3×2)=6, ×1
+  assert.equal(coinRecipients[0].coins, 6); // max(3, 3×2×1)=6
 });
 
 test('calcRewards solo: gemiddeld doubles coin payout', () => {
   const c = { level: 3, difficulty: 2 };
   const { coinRecipients } = calcRewards(c, { type: 'solo', performerId: 'alice' }, 'gemiddeld');
-  assert.equal(coinRecipients[0].coins, 12); // 6 × 2
+  assert.equal(coinRecipients[0].coins, 12); // max(3, 3×2×2)=12
 });
 
 test('calcRewards solo: overvloedig quadruples coin payout', () => {
   const c = { level: 3, difficulty: 2 };
   const { coinRecipients } = calcRewards(c, { type: 'solo', performerId: 'alice' }, 'overvloedig');
-  assert.equal(coinRecipients[0].coins, 24); // 6 × 4
+  assert.equal(coinRecipients[0].coins, 24); // max(3, 3×2×4)=24
 });
 
-test('calcRewards solo: coin floor ensures minimum 3 coins for low-value cards', () => {
-  const c = { level: 1, difficulty: 1 }; // 1×1=1 → floor = 3
+test('calcRewards solo: coin floor of 3 applied after economy — low-value card schaars', () => {
+  const c = { level: 1, difficulty: 1 }; // 1×1×1=1 → floor kicks in → 3
   const { coinRecipients } = calcRewards(c, { type: 'solo', performerId: 'p1' }, 'schaars');
+  assert.equal(coinRecipients[0].coins, 3);
+});
+
+test('calcRewards solo: coin floor of 3 applied after economy — low-value card gemiddeld', () => {
+  const c = { level: 1, difficulty: 1 }; // 1×1×2=2 → floor kicks in → 3
+  const { coinRecipients } = calcRewards(c, { type: 'solo', performerId: 'p1' }, 'gemiddeld');
   assert.equal(coinRecipients[0].coins, 3);
 });
 
@@ -87,7 +92,7 @@ test('calcRewards duel: coins go to winner, not performer', () => {
   assert.equal(xpEarned, 8, 'XP = 4×2 = 8 (performer tracks this separately)');
   assert.equal(coinRecipients.length, 1);
   assert.equal(coinRecipients[0].id, 'winner', 'coins go to winner');
-  assert.equal(coinRecipients[0].coins, 8); // max(3, 4×2)=8, ×1
+  assert.equal(coinRecipients[0].coins, 8); // max(3, 4×2×1)=8
 });
 
 test('calcRewards duel: performer winning their own duel receives the coins', () => {

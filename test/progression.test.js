@@ -44,20 +44,19 @@ test('canAccessLevel: levels at or below minLevel are accessible with no progres
 
 // ─── canAccessLevel: XP thresholds ───────────────────────────────────────────
 //
-// Formula: xpThreshold(N) = 3 * N * (N - 1)
-// This is the cumulative XP from 3 dares per prior level at median difficulty.
-//   level 2  → 3×2×1 =  6 XP  +  cleared [1]
-//   level 3  → 3×3×2 = 18 XP  +  cleared [2]
-//   level 4  → 3×4×3 = 36 XP  +  cleared [3]
-//   level 5  → 3×5×4 = 60 XP  +  cleared [4]
-//   level 10 → 3×10×9 = 270 XP + cleared [9]
+// Formula: xpThreshold(N) = N * 6  (linear, per CLAUDE.md §7.2)
+//   level 2  →  2×6 = 12 XP  +  cleared [1]
+//   level 3  →  3×6 = 18 XP  +  cleared [2]
+//   level 4  →  4×6 = 24 XP  +  cleared [3]
+//   level 5  →  5×6 = 30 XP  +  cleared [4]
+//   level 10 → 10×6 = 60 XP  +  cleared [9]
 
-test('canAccessLevel: level 2 requires 6 XP + cleared level 1', () => {
+test('canAccessLevel: level 2 requires 12 XP + cleared level 1', () => {
   const r = room();
-  assert.equal(canAccessLevel(player({ xp: 5,  clearedLevels: [1] }), 2, r), false, '1 XP short');
-  assert.equal(canAccessLevel(player({ xp: 6,  clearedLevels: [] }),  2, r), false, 'XP met but level 1 not cleared');
-  assert.equal(canAccessLevel(player({ xp: 6,  clearedLevels: [1] }), 2, r), true,  'exact threshold');
-  assert.equal(canAccessLevel(player({ xp: 10, clearedLevels: [1] }), 2, r), true,  'above threshold');
+  assert.equal(canAccessLevel(player({ xp: 11, clearedLevels: [1] }), 2, r), false, '1 XP short');
+  assert.equal(canAccessLevel(player({ xp: 12, clearedLevels: [] }),  2, r), false, 'XP met but level 1 not cleared');
+  assert.equal(canAccessLevel(player({ xp: 12, clearedLevels: [1] }), 2, r), true,  'exact threshold');
+  assert.equal(canAccessLevel(player({ xp: 20, clearedLevels: [1] }), 2, r), true,  'above threshold');
 });
 
 test('canAccessLevel: level 3 requires 18 XP + cleared level 2', () => {
@@ -67,16 +66,16 @@ test('canAccessLevel: level 3 requires 18 XP + cleared level 2', () => {
   assert.equal(canAccessLevel(player({ xp: 18, clearedLevels: [1,2] }), 3, r), true,  'exact threshold');
 });
 
-test('canAccessLevel: level 4 requires 36 XP + cleared level 3', () => {
+test('canAccessLevel: level 4 requires 24 XP + cleared level 3', () => {
   const r = room();
-  assert.equal(canAccessLevel(player({ xp: 36, clearedLevels: [1,2,3] }), 4, r), true);
-  assert.equal(canAccessLevel(player({ xp: 35, clearedLevels: [1,2,3] }), 4, r), false);
+  assert.equal(canAccessLevel(player({ xp: 24, clearedLevels: [1,2,3] }), 4, r), true);
+  assert.equal(canAccessLevel(player({ xp: 23, clearedLevels: [1,2,3] }), 4, r), false);
 });
 
-test('canAccessLevel: level 5 requires 60 XP + cleared level 4', () => {
+test('canAccessLevel: level 5 requires 30 XP + cleared level 4', () => {
   const r = room();
-  assert.equal(canAccessLevel(player({ xp: 60, clearedLevels: [1,2,3,4] }), 5, r), true);
-  assert.equal(canAccessLevel(player({ xp: 59, clearedLevels: [1,2,3,4] }), 5, r), false);
+  assert.equal(canAccessLevel(player({ xp: 30, clearedLevels: [1,2,3,4] }), 5, r), true);
+  assert.equal(canAccessLevel(player({ xp: 29, clearedLevels: [1,2,3,4] }), 5, r), false);
 });
 
 test('canAccessLevel: clearedLevels must include the immediately prior level', () => {
@@ -86,10 +85,10 @@ test('canAccessLevel: clearedLevels must include the immediately prior level', (
   assert.equal(canAccessLevel(p, 3, room()), false, 'missing level 2 in clearedLevels blocks level 3');
 });
 
-test('canAccessLevel: level 10 requires 270 XP + cleared level 9', () => {
+test('canAccessLevel: level 10 requires 60 XP + cleared level 9', () => {
   const r = room();
-  assert.equal(canAccessLevel(player({ xp: 270, clearedLevels: [1,2,3,4,5,6,7,8,9] }), 10, r), true);
-  assert.equal(canAccessLevel(player({ xp: 269, clearedLevels: [1,2,3,4,5,6,7,8,9] }), 10, r), false);
+  assert.equal(canAccessLevel(player({ xp: 60, clearedLevels: [1,2,3,4,5,6,7,8,9] }), 10, r), true);
+  assert.equal(canAccessLevel(player({ xp: 59, clearedLevels: [1,2,3,4,5,6,7,8,9] }), 10, r), false);
 });
 
 // ─── maxUnlockedLevel ─────────────────────────────────────────────────────────
@@ -99,12 +98,12 @@ test('maxUnlockedLevel: fresh player with no XP returns 1 (minLevel)', () => {
 });
 
 test('maxUnlockedLevel: returns 2 when level-2 requirements are met', () => {
-  const p = player({ xp: 6, clearedLevels: [1] });
+  const p = player({ xp: 12, clearedLevels: [1] });
   assert.equal(maxUnlockedLevel(p, room()), 2);
 });
 
 test('maxUnlockedLevel: returns 3 when level-3 requirements are met', () => {
-  const p = player({ xp: 18, clearedLevels: [1, 2] });
+  const p = player({ xp: 18, clearedLevels: [1, 2] }); // 3×6=18
   assert.equal(maxUnlockedLevel(p, room()), 3);
 });
 
