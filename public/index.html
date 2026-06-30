@@ -988,16 +988,20 @@ input::placeholder { color: #7a6b8a; }
     <div>
       <div style="font:700 .68rem/1 'Space Grotesk',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9b89b4;margin-bottom:8px;">Language</div>
       <div class="pill-row" id="setup-language-row" style="flex-wrap:wrap">
-        <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 Nederlands</div>
-        <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 English</div>
-        <div class="pill-select"        data-val="es" onclick="selectPill('language','es',this)">🇪🇸 Español</div>
-        <div class="pill-select"        data-val="fr" onclick="selectPill('language','fr',this)">🇫🇷 Français</div>
-        <div class="pill-select"        data-val="de" onclick="selectPill('language','de',this)">🇩🇪 Deutsch</div>
-        <div class="pill-select"        data-val="it" onclick="selectPill('language','it',this)">🇮🇹 Italiano</div>
-        <div class="pill-select"        data-val="pt" onclick="selectPill('language','pt',this)">🇵🇹 Português</div>
-        <div class="pill-select"        data-val="ja" onclick="selectPill('language','ja',this)">🇯🇵 日本語</div>
-        <div class="pill-select"        data-val="ko" onclick="selectPill('language','ko',this)">🇰🇷 한국어</div>
-        <div class="pill-select"        data-val="zh" onclick="selectPill('language','zh',this)">🇨🇳 中文</div>
+        <div class="pill-select active" data-val="nl" onclick="selectPill('language','nl',this)">🇳🇱 NL</div>
+        <div class="pill-select"        data-val="en" onclick="selectPill('language','en',this)">🇬🇧 EN</div>
+        <div class="pill-select"        data-val="es" onclick="selectPill('language','es',this)">🇪🇸 ES</div>
+        <div class="pill-select"        data-val="fr" onclick="selectPill('language','fr',this)">🇫🇷 FR</div>
+        <div class="pill-select"        data-val="de" onclick="selectPill('language','de',this)">🇩🇪 DE</div>
+        <div class="pill-select"        data-val="pt" onclick="selectPill('language','pt',this)">🇵🇹 PT</div>
+        <div class="pill-select"        data-val="__other__" id="lang-other-pill" onclick="toggleLangOther(this)">Other…</div>
+      </div>
+      <div id="lang-other-wrap" style="display:none;margin-top:6px">
+        <input id="lang-other-input" list="lang-datalist"
+          style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:6px 12px;font-size:0.85rem;width:100%;outline:none"
+          placeholder="Type language name or code (e.g. Japanese, ar, zh)…"
+          oninput="onLangOtherInput(this.value)" autocomplete="off">
+        <datalist id="lang-datalist"></datalist>
       </div>
     </div>
   </div>
@@ -1878,6 +1882,68 @@ function toggleGenital(val, el) {
   const idx = myGenitals.indexOf(val);
   if (idx === -1) { myGenitals.push(val); el.classList.add('active'); }
   else { myGenitals.splice(idx, 1); el.classList.remove('active'); }
+}
+
+// ─── Language selector helpers ────────────────────────────────────────────────
+const ALL_LANGUAGES = {
+  en:'English',nl:'Dutch',es:'Spanish',fr:'French',de:'German',it:'Italian',
+  pt:'Portuguese',ja:'Japanese',ko:'Korean',zh:'Chinese',ar:'Arabic',
+  ru:'Russian',hi:'Hindi',bn:'Bengali',tr:'Turkish',pl:'Polish',
+  uk:'Ukrainian',ro:'Romanian',cs:'Czech',hu:'Hungarian',sv:'Swedish',
+  da:'Danish',fi:'Finnish',nb:'Norwegian',el:'Greek',he:'Hebrew',
+  th:'Thai',vi:'Vietnamese',id:'Indonesian',ms:'Malay',fa:'Persian',
+  ur:'Urdu',sw:'Swahili',af:'Afrikaans',ca:'Catalan',hr:'Croatian',
+  sk:'Slovak',sl:'Slovenian',lt:'Lithuanian',lv:'Latvian',et:'Estonian',
+  bg:'Bulgarian',sr:'Serbian',sq:'Albanian',hy:'Armenian',ka:'Georgian',
+  az:'Azerbaijani',kk:'Kazakh',uz:'Uzbek',mn:'Mongolian',ne:'Nepali',
+  tl:'Filipino',gu:'Gujarati',mr:'Marathi',pa:'Punjabi',ta:'Tamil',
+  te:'Telugu',kn:'Kannada',ml:'Malayalam',gl:'Galician',eu:'Basque',
+  cy:'Welsh',ga:'Irish',mt:'Maltese',is:'Icelandic',eo:'Esperanto',
+};
+
+function populateLangDatalist() {
+  const dl = document.getElementById('lang-datalist');
+  if (!dl) return;
+  dl.innerHTML = Object.entries(ALL_LANGUAGES)
+    .map(([code, name]) => `<option value="${name} (${code})">`)
+    .join('');
+}
+
+function toggleLangOther(el) {
+  const wrap = document.getElementById('lang-other-wrap');
+  const isOpen = wrap.style.display !== 'none';
+  if (isOpen) {
+    wrap.style.display = 'none';
+    el.classList.remove('active');
+    // restore previous valid selection or default to nl
+    if (!myLanguage || myLanguage === '__other__') {
+      myLanguage = 'nl';
+      document.querySelector('#setup-language-row [data-val="nl"]')?.classList.add('active');
+    }
+    return;
+  }
+  document.querySelectorAll('#setup-language-row .pill-select').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  wrap.style.display = 'block';
+  populateLangDatalist();
+  document.getElementById('lang-other-input').focus();
+}
+
+function onLangOtherInput(val) {
+  // Accept "Name (code)" format from datalist, or raw code/name
+  const match = val.match(/\(([a-z]{2,8})\)$/i);
+  let code;
+  if (match) {
+    code = match[1].toLowerCase();
+  } else {
+    // Try to resolve by name or treat as code
+    const byName = Object.entries(ALL_LANGUAGES).find(([,n]) => n.toLowerCase() === val.toLowerCase());
+    code = byName ? byName[0] : val.toLowerCase().replace(/[^a-z]/g,'').slice(0,8);
+  }
+  if (code) {
+    myLanguage = code;
+    loadLangPack(code);
+  }
 }
 
 // ─── Language pack loader ─────────────────────────────────────────────────────

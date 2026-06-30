@@ -349,9 +349,22 @@ datalist option { background: var(--surface2); color: var(--text); }
 const KEY        = 'tod2_packages';
 const BUILTIN_ID = '__builtin__';
 const SUPPORTED_LANGUAGES = {
-  en: '🇬🇧 English', nl: '🇳🇱 Dutch',   es: '🇪🇸 Spanish',
-  fr: '🇫🇷 French',  de: '🇩🇪 German',  it: '🇮🇹 Italian',
-  pt: '🇵🇹 Portuguese', ja: '🇯🇵 Japanese', ko: '🇰🇷 Korean', zh: '🇨🇳 Chinese',
+  en:'English',nl:'Dutch',es:'Spanish',fr:'French',de:'German',it:'Italian',
+  pt:'Portuguese',ja:'Japanese',ko:'Korean',zh:'Chinese',ar:'Arabic',
+  ru:'Russian',hi:'Hindi',bn:'Bengali',tr:'Turkish',pl:'Polish',
+  uk:'Ukrainian',ro:'Romanian',cs:'Czech',hu:'Hungarian',sv:'Swedish',
+  da:'Danish',fi:'Finnish',nb:'Norwegian',el:'Greek',he:'Hebrew',
+  th:'Thai',vi:'Vietnamese',id:'Indonesian',ms:'Malay',fa:'Persian',
+  ur:'Urdu',sw:'Swahili',af:'Afrikaans',ca:'Catalan',hr:'Croatian',
+  sk:'Slovak',sl:'Slovenian',lt:'Lithuanian',lv:'Latvian',et:'Estonian',
+  bg:'Bulgarian',sr:'Serbian',mk:'Macedonian',sq:'Albanian',hy:'Armenian',
+  ka:'Georgian',az:'Azerbaijani',kk:'Kazakh',uz:'Uzbek',mn:'Mongolian',
+  ne:'Nepali',si:'Sinhala',my:'Burmese',km:'Khmer',lo:'Lao',
+  tl:'Filipino',jv:'Javanese',su:'Sundanese',gu:'Gujarati',mr:'Marathi',
+  pa:'Punjabi',ta:'Tamil',te:'Telugu',kn:'Kannada',ml:'Malayalam',
+  gl:'Galician',eu:'Basque',cy:'Welsh',ga:'Irish',mt:'Maltese',
+  is:'Icelandic',mk:'Macedonian',lb:'Luxembourgish',fy:'Frisian',
+  eo:'Esperanto',la:'Latin',
 };
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -822,15 +835,53 @@ function toggleAddLangMenu(e) {
 function updateAddLangMenu() {
   const menu = document.getElementById('add-lang-menu');
   const existing = new Set(Object.keys(edTexts));
-  const available = Object.entries(SUPPORTED_LANGUAGES).filter(([k]) => !existing.has(k));
-  menu.innerHTML = available.length
-    ? available.map(([code, label]) => `<div class="add-lang-item" onclick="addLangTab('${code}')">${label}</div>`).join('')
-    : `<div class="add-lang-item" style="color:var(--muted)">All languages added</div>`;
+  menu.innerHTML = `
+    <div style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <input id="lang-search" class="finp" placeholder="Language name or code…" autocomplete="off"
+        style="font-size:0.8rem;padding:4px 8px"
+        oninput="filterLangMenu(this.value)" onkeydown="langSearchKey(event)">
+    </div>
+    <div id="lang-suggestions" style="max-height:160px;overflow-y:auto"></div>`;
+  filterLangMenu('');
+  setTimeout(() => document.getElementById('lang-search')?.focus(), 30);
 }
 
-function addLangTab(code) {
+function filterLangMenu(q) {
+  const existing = new Set(Object.keys(edTexts));
+  const lq = q.toLowerCase();
+  const matches = Object.entries(SUPPORTED_LANGUAGES)
+    .filter(([code, name]) => !existing.has(code)
+      && (name.toLowerCase().includes(lq) || code.toLowerCase().includes(lq)));
+  const cleanCode = q.toLowerCase().replace(/[^a-z]/g,'').slice(0,8);
+  const custom = q && cleanCode && !existing.has(cleanCode)
+    && !matches.some(([c]) => c === cleanCode)
+    ? [{ code: cleanCode, label: q }] : [];
+  const list = document.getElementById('lang-suggestions');
+  if (!list) return;
+  const rows = [
+    ...matches.slice(0,10).map(([code,label]) => ({ code, label })),
+    ...custom,
+  ];
+  list.innerHTML = rows.length
+    ? rows.map(({ code, label }) =>
+        `<div class="add-lang-item" onclick="addLangTab('${h(code)}','${h(label)}')">${h(label)} <span style="color:var(--muted);font-size:.7rem">${h(code)}</span></div>`
+      ).join('')
+    : `<div class="add-lang-item" style="color:var(--muted)">No matches</div>`;
+}
+
+function langSearchKey(e) {
+  if (e.key === 'Enter') {
+    const first = document.querySelector('#lang-suggestions .add-lang-item');
+    if (first) first.click();
+  }
+}
+
+function addLangTab(code, label) {
   syncActiveLangText();
-  if (!(code in edTexts)) edTexts[code] = '';
+  if (!(code in edTexts)) {
+    edTexts[code] = '';
+    if (label && !(code in SUPPORTED_LANGUAGES)) SUPPORTED_LANGUAGES[code] = label;
+  }
   edActiveLang = code;
   document.getElementById('add-lang-menu').style.display = 'none';
   renderLangTabs(!!editing?.card?._builtin);
