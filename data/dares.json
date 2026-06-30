@@ -5,7 +5,10 @@
       "type": "truth",
       "level": 1,
       "difficulty": 1,
-      "text": "Wat is je meest embarrassante moment ooit?",
+      "text": {
+        "nl": "Wat is je meest embarrassante moment ooit?",
+        "en": "What is your most embarrassing moment ever?"
+      },
       "tags": [
         "general"
       ],
@@ -20,7 +23,10 @@
       "type": "truth",
       "level": 1,
       "difficulty": 2,
-      "text": "Wat is een geheim dat je nog nooit aan iemand in deze kamer hebt verteld?",
+      "text": {
+        "nl": "Wat is een geheim dat je nog nooit aan iemand in deze kamer hebt verteld?",
+        "en": "What is a secret you've never told anyone in this room?"
+      },
       "tags": [
         "general"
       ],
@@ -35,7 +41,10 @@
       "type": "truth",
       "level": 1,
       "difficulty": 1,
-      "text": "Wat is het meest kinderachtige dat je nog steeds doet?",
+      "text": {
+        "nl": "Wat is het meest kinderachtige dat je nog steeds doet?",
+        "en": "What is the most childish thing you still do?"
+      },
       "tags": [
         "general"
       ],
@@ -50,7 +59,10 @@
       "type": "truth",
       "level": 1,
       "difficulty": 1,
-      "text": "Wat is de meest bizarre droom die je ooit hebt gehad?",
+      "text": {
+        "nl": "Wat is de meest bizarre droom die je ooit hebt gehad?",
+        "en": "What is the most bizarre dream you've ever had?"
+      },
       "tags": [
         "general"
       ],
@@ -65,7 +77,10 @@
       "type": "truth",
       "level": 1,
       "difficulty": 1,
-      "text": "Wat is de meest ongemakkelijke situatie die je ooit hebt meegemaakt?",
+      "text": {
+        "nl": "Wat is de meest ongemakkelijke situatie die je ooit hebt meegemaakt?",
+        "en": "What is the most uncomfortable situation you've ever been in?"
+      },
       "tags": [
         "general"
       ],
@@ -80,7 +95,10 @@
       "type": "truth",
       "level": 2,
       "difficulty": 2,
-      "text": "Heb je ooit gelogen om onder een date uit te komen?",
+      "text": {
+        "nl": "Heb je ooit gelogen om onder een date uit te komen?",
+        "en": "Have you ever lied to get out of a date?"
+      },
       "tags": [
         "general",
         "flirty"
@@ -96,7 +114,10 @@
       "type": "truth",
       "level": 2,
       "difficulty": 2,
-      "text": "Wie in deze kamer vind je het meest aantrekkelijk?",
+      "text": {
+        "nl": "Wie in deze kamer vind je het meest aantrekkelijk?",
+        "en": "Who in this room do you find most attractive?"
+      },
       "tags": [
         "flirty"
       ],
@@ -111,7 +132,10 @@
       "type": "truth",
       "level": 2,
       "difficulty": 1,
-      "text": "Heb je ooit een crush gehad op iemand in deze kamer?",
+      "text": {
+        "nl": "Heb je ooit een crush gehad op iemand in deze kamer?",
+        "en": "Have you ever had a crush on someone in this room?"
+      },
       "tags": [
         "flirty"
       ],
@@ -126,7 +150,10 @@
       "type": "truth",
       "level": 2,
       "difficulty": 1,
-      "text": "Wat is de cheesiest openingszin die je ooit hebt gebruikt?",
+      "text": {
+        "nl": "Wat is de cheesiest openingszin die je ooit hebt gebruikt?",
+        "en": "What is the cheesiest pick-up line you've ever used?"
+      },
       "tags": [
         "flirty"
       ],
@@ -141,7 +168,10 @@
       "type": "truth",
       "level": 2,
       "difficulty": 2,
-      "text": "Wat is het meest gedurfde dat je ooit hebt gedaan om indruk te maken?",
+      "text": {
+        "nl": "Wat is het meest gedurfde dat je ooit hebt gedaan om indruk te maken?",
+        "en": "What is the most daring thing you've ever done to impress someone?"
+      },
       "tags": [
         "flirty"
       ],
@@ -156,7 +186,10 @@
       "type": "truth",
       "level": 3,
       "difficulty": 1,
-      "text": "Op welk lichaamsdeel van jezelf ben je het meest trots?",
+      "text": {
+        "nl": "Op welk lichaamsdeel van jezelf ben je het meest trots?",
+        "en": "Which part of your own body are you most proud of?"
+      },
       "tags": [
         "body"
       ],
@@ -171,7 +204,10 @@
       "type": "truth",
       "level": 3,
       "difficulty": 2,
-      "text": "Welk lichaamsdeel vind je het aantrekkelijkst bij een partner?",
+      "text": {
+        "nl": "Welk lichaamsdeel vind je het aantrekkelijkst bij een partner?",
+        "en": "Which body part do you find most attractive on a partner?"
+      },
       "tags": [
         "body",
         "flirty"
@@ -187,7 +223,10 @@
       "type": "truth",
       "level": 4,
       "difficulty": 2,
-      "text": "Heb je ooit naakt gezwommen?",
+      "text": {
+        "nl": "Heb je ooit naakt gezwommen?",
+        "en": "Have you ever gone skinny dipping?"
+      },
       "tags": [
         "body",
         "clothing"
@@ -203,7 +242,10 @@
       "type": "truth",
       "level": 4,
       "difficulty": 2,
-      "text": "Beschrijf de beste kus die je ooit hebt gehad.",
+      "text": {
+        "nl": "Beschrijf de beste kus die je ooit hebt gehad.",
+        "en": "Describe the best kiss you've ever had."
+      },
       "tags": [
         "intimate",
         "kissing"
@@ -219,7 +261,10 @@
       "type": "truth",
       "level": 4,
       "difficulty": 2,
-      "text": "Heb je ooit iemand gekust waar je spijt van had?",
+      "text": {
+        "nl": "Heb je ooit iemand gekust waar je spijt van had?",
+        "en": "Have you ever kissed someone you regretted?"
+      },
       "tags": [
         "flirty",
         "kissing"
@@ -235,7 +280,10 @@
       "type": "truth",
       "level": 4,
       "difficulty": 2,
-      "text": "Beschrijf je ideale eerste kus.",
+      "text": {
+        "nl": "Beschrijf je ideale eerste kus.",
+        "en": "Describe your ideal first kiss."
+      },
       "tags": [
         "flirty",
         "kissing"
@@ -251,7 +299,10 @@
       "type": "truth",
       "level": 4,
       "difficulty": 2,
-      "text": "Wat is het meest bizarre dat je ooit in je mond hebt gestopt?",
+      "text": {
+        "nl": "Wat is het meest bizarre dat je ooit in je mond hebt gestopt?",
+        "en": "What is the most bizarre thing you've ever put in your mouth?"
+      },
       "tags": [
         "kissing"
       ],
@@ -266,7 +317,10 @@
       "type": "truth",
       "level": 5,
       "difficulty": 1,
-      "text": "Wanneer heeft iemand voor het laatst je voeten aangeraakt, en vond je het fijn?",
+      "text": {
+        "nl": "Wanneer heeft iemand voor het laatst je voeten aangeraakt, en vond je het fijn?",
+        "en": "When did someone last touch your feet, and did you enjoy it?"
+      },
       "tags": [
         "feet"
       ],
@@ -281,7 +335,10 @@
       "type": "truth",
       "level": 5,
       "difficulty": 1,
-      "text": "Heb je een bijzondere voeten-herinnering — goed of slecht?",
+      "text": {
+        "nl": "Heb je een bijzondere voeten-herinnering — goed of slecht?",
+        "en": "Do you have a special feet memory — good or bad?"
+      },
       "tags": [
         "feet"
       ],
@@ -296,7 +353,10 @@
       "type": "truth",
       "level": 5,
       "difficulty": 1,
-      "text": "Zou je iemand nu je teennagels laten lakken?",
+      "text": {
+        "nl": "Zou je iemand nu je teennagels laten lakken?",
+        "en": "Would you let someone paint your toenails right now?"
+      },
       "tags": [
         "feet"
       ],
@@ -311,7 +371,10 @@
       "type": "truth",
       "level": 5,
       "difficulty": 2,
-      "text": "Heb je ooit iets vies in iemands oor gefluisterd op een openbare plek?",
+      "text": {
+        "nl": "Heb je ooit iets vies in iemands oor gefluisterd op een openbare plek?",
+        "en": "Have you ever whispered something naughty in someone's ear in a public place?"
+      },
       "tags": [
         "flirty",
         "speaking"
@@ -327,7 +390,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 2,
-      "text": "Wat is jouw grootste turn-on?",
+      "text": {
+        "nl": "Wat is jouw grootste turn-on?",
+        "en": "What is your biggest turn-on?"
+      },
       "tags": [
         "flirty",
         "intimate"
@@ -343,7 +409,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 2,
-      "text": "Wat is jouw grootste turn-off?",
+      "text": {
+        "nl": "Wat is jouw grootste turn-off?",
+        "en": "What is your biggest turn-off?"
+      },
       "tags": [
         "intimate",
         "flirty"
@@ -359,7 +428,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 2,
-      "text": "Wat is iets dat je altijd al hebt willen proberen maar nog niet hebt gedaan?",
+      "text": {
+        "nl": "Wat is iets dat je altijd al hebt willen proberen maar nog niet hebt gedaan?",
+        "en": "What is something you've always wanted to try but haven't yet?"
+      },
       "tags": [
         "intimate"
       ],
@@ -374,7 +446,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 3,
-      "text": "Over hoeveel mensen in deze kamer heb je al romantisch nagedacht?",
+      "text": {
+        "nl": "Over hoeveel mensen in deze kamer heb je al romantisch nagedacht?",
+        "en": "How many people in this room have you already thought about romantically?"
+      },
       "tags": [
         "intimate",
         "flirty"
@@ -390,7 +465,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 3,
-      "text": "Wat is het vuilste dat je ooit tegen iemand hebt gezegd?",
+      "text": {
+        "nl": "Wat is het vuilste dat je ooit tegen iemand hebt gezegd?",
+        "en": "What is the dirtiest thing you've ever said to someone?"
+      },
       "tags": [
         "intimate",
         "speaking"
@@ -406,7 +484,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 3,
-      "text": "Beschrijf, zonder namen te noemen, de beste nacht van je leven.",
+      "text": {
+        "nl": "Beschrijf, zonder namen te noemen, de beste nacht van je leven.",
+        "en": "Without naming names, describe the best night of your life."
+      },
       "tags": [
         "intimate",
         "speaking"
@@ -422,7 +503,10 @@
       "type": "truth",
       "level": 6,
       "difficulty": 2,
-      "text": "Op welke meest avontuurlijke plek ben je ooit uitgekleed geweest?",
+      "text": {
+        "nl": "Op welke meest avontuurlijke plek ben je ooit uitgekleed geweest?",
+        "en": "What is the most adventurous place you've ever been undressed?"
+      },
       "tags": [
         "body",
         "clothing",
@@ -439,7 +523,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 3,
-      "text": "Wat is het stoerste dat je ooit in een slaapkamer hebt gedaan?",
+      "text": {
+        "nl": "Wat is het stoerste dat je ooit in een slaapkamer hebt gedaan?",
+        "en": "What is the boldest thing you've ever done in a bedroom?"
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -455,7 +542,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 3,
-      "text": "Wat is je meest gewaagde fantasie?",
+      "text": {
+        "nl": "Wat is je meest gewaagde fantasie?",
+        "en": "What is your most daring fantasy?"
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -471,7 +561,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 3,
-      "text": "Wat is iets dat je alleen in het donker zou doen?",
+      "text": {
+        "nl": "Wat is iets dat je alleen in het donker zou doen?",
+        "en": "What is something you would only do in the dark?"
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -487,7 +580,10 @@
       "type": "dare",
       "level": 1,
       "difficulty": 1,
-      "text": "Doe je beste imitatie van iemand in de kamer. Iedereen stemt op wie het is.",
+      "text": {
+        "nl": "Doe je beste imitatie van iemand in de kamer. Iedereen stemt op wie het is.",
+        "en": "Do your best impression of someone in the room. Everyone votes on who it is."
+      },
       "tags": [
         "general"
       ],
@@ -502,7 +598,10 @@
       "type": "dare",
       "level": 1,
       "difficulty": 1,
-      "text": "Spreek de volgende 3 ronden in een accent naar keuze van de groep.",
+      "text": {
+        "nl": "Spreek de volgende 3 ronden in een accent naar keuze van de groep.",
+        "en": "Speak in an accent chosen by the group for the next 3 rounds."
+      },
       "tags": [
         "general"
       ],
@@ -517,7 +616,10 @@
       "type": "dare",
       "level": 1,
       "difficulty": 1,
-      "text": "Laat de groep je een bijnaam geven voor de rest van het spel.",
+      "text": {
+        "nl": "Laat de groep je een bijnaam geven voor de rest van het spel.",
+        "en": "Let the group give you a nickname for the rest of the game."
+      },
       "tags": [
         "general"
       ],
@@ -532,7 +634,10 @@
       "type": "dare",
       "level": 1,
       "difficulty": 1,
-      "text": "Zeg iets aardigs en oprechts over elke speler in de kamer.",
+      "text": {
+        "nl": "Zeg iets aardigs en oprechts over elke speler in de kamer.",
+        "en": "Say something kind and genuine about every player in the room."
+      },
       "tags": [
         "general"
       ],
@@ -547,7 +652,10 @@
       "type": "dare",
       "level": 1,
       "difficulty": 1,
-      "text": "Beschrijf alles wat de speler rechts van je doet in de meest dramatische stem, gedurende 1 minuut.",
+      "text": {
+        "nl": "Beschrijf alles wat de speler rechts van je doet in de meest dramatische stem, gedurende 1 minuut.",
+        "en": "Narrate everything the player to your right does in the most dramatic voice possible, for 1 minute."
+      },
       "tags": [
         "general",
         "speaking"
@@ -563,7 +671,10 @@
       "type": "dare",
       "level": 2,
       "difficulty": 1,
-      "text": "Knipoog naar elke speler één voor één, zo verleidelijk als je kunt.",
+      "text": {
+        "nl": "Knipoog naar elke speler één voor één, zo verleidelijk als je kunt.",
+        "en": "Wink at every player one by one, as seductively as you can."
+      },
       "tags": [
         "flirty"
       ],
@@ -578,7 +689,10 @@
       "type": "dare",
       "level": 2,
       "difficulty": 2,
-      "text": "Stuur een flirterig berichtje naar de laatste persoon in je contacten.",
+      "text": {
+        "nl": "Stuur een flirterig berichtje naar de laatste persoon in je contacten.",
+        "en": "Send a flirty text to the last person in your contacts."
+      },
       "tags": [
         "flirty"
       ],
@@ -593,7 +707,10 @@
       "type": "dare",
       "level": 2,
       "difficulty": 1,
-      "text": "Doe je beste verleidelijke blik naar de speler tegenover je.",
+      "text": {
+        "nl": "Doe je beste verleidelijke blik naar de speler tegenover je.",
+        "en": "Give your best smouldering look to the player opposite you."
+      },
       "tags": [
         "flirty"
       ],
@@ -608,7 +725,10 @@
       "type": "dare",
       "level": 2,
       "difficulty": 1,
-      "text": "Doe nu 15 jumping jacks.",
+      "text": {
+        "nl": "Doe nu 15 jumping jacks.",
+        "en": "Do 15 jumping jacks right now."
+      },
       "tags": [
         "general",
         "physical"
@@ -624,7 +744,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Houd een plank 30 seconden vol.",
+      "text": {
+        "nl": "Houd een plank 30 seconden vol.",
+        "en": "Hold a plank for 30 seconds."
+      },
       "tags": [
         "physical"
       ],
@@ -639,7 +762,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 2,
-      "text": "Doe een arm drukken met de sterkst uitziende speler in de kamer.",
+      "text": {
+        "nl": "Doe een arm drukken met de sterkst uitziende speler in de kamer.",
+        "en": "Arm-wrestle the player who looks strongest in the room."
+      },
       "tags": [
         "physical"
       ],
@@ -654,7 +780,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Houd oogcontact met de speler tegenover je gedurende 1 minuut zonder te lachen.",
+      "text": {
+        "nl": "Houd oogcontact met de speler tegenover je gedurende 1 minuut zonder te lachen.",
+        "en": "Maintain eye contact with the player opposite you for 1 minute without laughing."
+      },
       "tags": [
         "physical",
         "flirty"
@@ -670,7 +799,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Laat iemand met een pen alles wat ze willen op je arm tekenen.",
+      "text": {
+        "nl": "Laat iemand met een pen alles wat ze willen op je arm tekenen.",
+        "en": "Let someone draw anything they want on your arm with a pen."
+      },
       "tags": [
         "body"
       ],
@@ -685,7 +817,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Span je spieren en hou een standbeeldpose 30 seconden vast.",
+      "text": {
+        "nl": "Span je spieren en hou een standbeeldpose 30 seconden vast.",
+        "en": "Flex your muscles and hold a statue pose for 30 seconds."
+      },
       "tags": [
         "body",
         "physical"
@@ -701,7 +836,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Laat de groep je meest awkward dansmove zien.",
+      "text": {
+        "nl": "Laat de groep je meest awkward dansmove zien.",
+        "en": "Show the group your most awkward dance move."
+      },
       "tags": [
         "body",
         "physical"
@@ -717,7 +855,10 @@
       "type": "dare",
       "level": 3,
       "difficulty": 1,
-      "text": "Lees het meest recente ongelezen bericht op je telefoon hardop voor.",
+      "text": {
+        "nl": "Lees het meest recente ongelezen bericht op je telefoon hardop voor.",
+        "en": "Read the most recent unread message on your phone out loud."
+      },
       "tags": [
         "speaking"
       ],
@@ -732,7 +873,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 2,
-      "text": "Trek één kledingstuk naar keuze uit.",
+      "text": {
+        "nl": "Trek één kledingstuk naar keuze uit.",
+        "en": "Remove one item of clothing of your choice."
+      },
       "tags": [
         "clothing"
       ],
@@ -747,7 +891,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 2,
-      "text": "Wissel een kledingstuk met de speler rechts van je voor 2 ronden.",
+      "text": {
+        "nl": "Wissel een kledingstuk met de speler rechts van je voor 2 ronden.",
+        "en": "Swap one item of clothing with the player to your right for 2 rounds."
+      },
       "tags": [
         "clothing"
       ],
@@ -762,7 +909,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 3,
-      "text": "Laat de groep stemmen welk kledingstuk jij uittrekt.",
+      "text": {
+        "nl": "Laat de groep stemmen welk kledingstuk jij uittrekt.",
+        "en": "Let the group vote on which item of clothing you take off."
+      },
       "tags": [
         "clothing"
       ],
@@ -777,7 +927,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 2,
-      "text": "Kus de achterkant van de hand van de speler tegenover je.",
+      "text": {
+        "nl": "Kus de achterkant van de hand van de speler tegenover je.",
+        "en": "Kiss the back of the hand of the player opposite you."
+      },
       "tags": [
         "flirty",
         "kissing"
@@ -793,7 +946,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 2,
-      "text": "Laat de groep een mysterieus voorwerp in je mond stoppen (niets gevaarlijks) — raad wat het is.",
+      "text": {
+        "nl": "Laat de groep een mysterieus voorwerp in je mond stoppen (niets gevaarlijks) — raad wat het is.",
+        "en": "Let the group put a mystery object in your mouth (nothing dangerous) — guess what it is."
+      },
       "tags": [
         "kissing"
       ],
@@ -808,7 +964,10 @@
       "type": "dare",
       "level": 4,
       "difficulty": 1,
-      "text": "Fluister een compliment in het oor van de speler links van je.",
+      "text": {
+        "nl": "Fluister een compliment in het oor van de speler links van je.",
+        "en": "Whisper a compliment in the ear of the player to your left."
+      },
       "tags": [
         "flirty",
         "speaking"
@@ -824,7 +983,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Trek je schoenen uit en geef ze 2 ronden aan iemand anders.",
+      "text": {
+        "nl": "Trek je schoenen uit en geef ze 2 ronden aan iemand anders.",
+        "en": "Take off your shoes and give them to someone else for 2 rounds."
+      },
       "tags": [
         "clothing",
         "feet"
@@ -840,7 +1002,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Trek je sokken uit en laat ze uit voor de rest van het spel.",
+      "text": {
+        "nl": "Trek je sokken uit en laat ze uit voor de rest van het spel.",
+        "en": "Take off your socks and stay barefoot for the rest of the game."
+      },
       "tags": [
         "clothing",
         "feet"
@@ -856,7 +1021,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Laat iemand met hun vinger een woord schrijven op de zool van je voet — raad het woord.",
+      "text": {
+        "nl": "Laat iemand met hun vinger een woord schrijven op de zool van je voet — raad het woord.",
+        "en": "Let someone write a word on the sole of your foot with their finger — guess the word."
+      },
       "tags": [
         "feet",
         "body"
@@ -872,7 +1040,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Trek je rechtersok uit en pak met je tenen een klein voorwerp op.",
+      "text": {
+        "nl": "Trek je rechtersok uit en pak met je tenen een klein voorwerp op.",
+        "en": "Take off your right sock and pick up a small object with your toes."
+      },
       "tags": [
         "feet",
         "clothing"
@@ -888,7 +1059,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Fluister de meest romantische zin die je kunt bedenken in iemands oor.",
+      "text": {
+        "nl": "Fluister de meest romantische zin die je kunt bedenken in iemands oor.",
+        "en": "Whisper the most romantic sentence you can think of into someone's ear."
+      },
       "tags": [
         "intimate",
         "flirty",
@@ -905,7 +1079,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Beschrijf in detail hoe je een romantische avond zou organiseren — hou niets achter.",
+      "text": {
+        "nl": "Beschrijf in detail hoe je een romantische avond zou organiseren — hou niets achter.",
+        "en": "Describe in detail how you would plan a romantic evening — hold nothing back."
+      },
       "tags": [
         "intimate",
         "speaking"
@@ -921,7 +1098,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Laat de speler links van je 10 seconden je voeten kietelen. Niet wegtrekken.",
+      "text": {
+        "nl": "Laat de speler links van je 10 seconden je voeten kietelen. Niet wegtrekken.",
+        "en": "Let the player to your left tickle your feet for 10 seconds. No pulling away."
+      },
       "tags": [
         "feet",
         "intimate"
@@ -937,7 +1117,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Geef de speler rechts van je 30 seconden voetmassage.",
+      "text": {
+        "nl": "Geef de speler rechts van je 30 seconden voetmassage.",
+        "en": "Give the player to your right a 30-second foot massage."
+      },
       "tags": [
         "feet",
         "intimate"
@@ -953,7 +1136,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Geef de speler rechts van je 30 seconden schoudermassage.",
+      "text": {
+        "nl": "Geef de speler rechts van je 30 seconden schoudermassage.",
+        "en": "Give the player to your right a 30-second shoulder massage."
+      },
       "tags": [
         "physical",
         "intimate"
@@ -969,7 +1155,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Laat de speler links van je een vorm op je rug tekenen — raad wat het is.",
+      "text": {
+        "nl": "Laat de speler links van je een vorm op je rug tekenen — raad wat het is.",
+        "en": "Let the player to your left draw a shape on your back — guess what it is."
+      },
       "tags": [
         "body",
         "intimate"
@@ -985,7 +1174,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Ga de volgende ronde op de schoot zitten van de speler naar keuze.",
+      "text": {
+        "nl": "Ga de volgende ronde op de schoot zitten van de speler naar keuze.",
+        "en": "Sit on the lap of a player of your choice for the next round."
+      },
       "tags": [
         "intimate",
         "body",
@@ -1002,7 +1194,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 3,
-      "text": "Laat de speler links van je een plek op je arm kiezen om te kussen.",
+      "text": {
+        "nl": "Laat de speler links van je een plek op je arm kiezen om te kussen.",
+        "en": "Let the player to your left choose a spot on your arm to kiss."
+      },
       "tags": [
         "intimate",
         "flirty",
@@ -1019,7 +1214,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Geef de speler tegenover je een langzame, dramatische haarstreling.",
+      "text": {
+        "nl": "Geef de speler tegenover je een langzame, dramatische haarstreling.",
+        "en": "Give the player opposite you a slow, dramatic hair stroke."
+      },
       "tags": [
         "intimate",
         "body"
@@ -1035,7 +1233,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Kijk de speler rechts van je diep in de ogen en vertel hen één ding dat je oprecht aantrekkelijk aan hen vindt.",
+      "text": {
+        "nl": "Kijk de speler rechts van je diep in de ogen en vertel hen één ding dat je oprecht aantrekkelijk aan hen vindt.",
+        "en": "Look the player to your right deep in the eyes and tell them one thing you genuinely find attractive about them."
+      },
       "tags": [
         "intimate",
         "flirty",
@@ -1052,7 +1253,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 3,
-      "text": "Houd een stukje eten tussen je lippen en laat de speler links van je het pakken met hun tanden.",
+      "text": {
+        "nl": "Houd een stukje eten tussen je lippen en laat de speler links van je het pakken met hun tanden.",
+        "en": "Hold a piece of food between your lips and let the player to your left take it with their teeth."
+      },
       "tags": [
         "intimate",
         "kissing"
@@ -1068,7 +1272,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Fluister drie oprechte complimenten over iemands uiterlijk in hun oor.",
+      "text": {
+        "nl": "Fluister drie oprechte complimenten over iemands uiterlijk in hun oor.",
+        "en": "Whisper three genuine compliments about someone's appearance in their ear."
+      },
       "tags": [
         "flirty",
         "intimate",
@@ -1085,7 +1292,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Beschrijf zo gedetailleerd als je wilt je ideale romantische scenario.",
+      "text": {
+        "nl": "Beschrijf zo gedetailleerd als je wilt je ideale romantische scenario.",
+        "en": "Describe your ideal romantic scenario in as much detail as you like."
+      },
       "tags": [
         "explicit",
         "intimate",
@@ -1102,7 +1312,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Doe de meest verleidelijke wandeling die je kunt door de kamer en terug.",
+      "text": {
+        "nl": "Doe de meest verleidelijke wandeling die je kunt door de kamer en terug.",
+        "en": "Do the most seductive walk you can manage across the room and back."
+      },
       "tags": [
         "explicit",
         "body",
@@ -1119,7 +1332,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Laat de groep je een dare geven binnen jouw voorkeuren. Als ze te ver gaan — zeg het.",
+      "text": {
+        "nl": "Laat de groep je een dare geven binnen jouw voorkeuren. Als ze te ver gaan — zeg het.",
+        "en": "Let the group give you a dare within your preferences. If they go too far — say so."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1135,7 +1351,10 @@
       "type": "duel",
       "level": 1,
       "difficulty": 1,
-      "text": "Starwedstrijd — wie het eerst knippert verliest. Ga!",
+      "text": {
+        "nl": "Starwedstrijd — wie het eerst knippert verliest. Ga!",
+        "en": "Staring contest — first to blink loses. Go!"
+      },
       "tags": [
         "general"
       ],
@@ -1150,7 +1369,10 @@
       "type": "duel",
       "level": 1,
       "difficulty": 1,
-      "text": "Duimworstelwedstrijd, best of 3. Laat de beste duim winnen.",
+      "text": {
+        "nl": "Duimworstelwedstrijd, best of 3. Laat de beste duim winnen.",
+        "en": "Thumb wrestling, best of 3. Let the best thumb win."
+      },
       "tags": [
         "general",
         "physical"
@@ -1166,7 +1388,10 @@
       "type": "duel",
       "level": 2,
       "difficulty": 1,
-      "text": "Steen-schaar-papier, best of 5. De verliezer doet een grappige straf gekozen door de groep.",
+      "text": {
+        "nl": "Steen-schaar-papier, best of 5. De verliezer doet een grappige straf gekozen door de groep.",
+        "en": "Rock-paper-scissors, best of 5. The loser does a funny penalty chosen by the group."
+      },
       "tags": [
         "general"
       ],
@@ -1181,7 +1406,10 @@
       "type": "duel",
       "level": 2,
       "difficulty": 1,
-      "text": "Creatieve complimentenwedstrijd — geef elkaar jullie beste compliment. De groep stemt voor de meest overtuigende.",
+      "text": {
+        "nl": "Creatieve complimentenwedstrijd — geef elkaar jullie beste compliment. De groep stemt voor de meest overtuigende.",
+        "en": "Creative compliment battle — give each other your best compliment. The group votes for the most convincing."
+      },
       "tags": [
         "general",
         "flirty"
@@ -1197,7 +1425,10 @@
       "type": "duel",
       "level": 3,
       "difficulty": 2,
-      "text": "Versieringszinnen-duel — geef elkaar jullie beste openingszin. De groep stemt wie ze echt zou versieren.",
+      "text": {
+        "nl": "Versieringszinnen-duel — geef elkaar jullie beste openingszin. De groep stemt wie ze echt zou versieren.",
+        "en": "Pick-up line duel — give each other your best opening line. The group votes on who would actually work."
+      },
       "tags": [
         "flirty"
       ],
@@ -1212,7 +1443,10 @@
       "type": "duel",
       "level": 3,
       "difficulty": 2,
-      "text": "Flirt-duel: 30 seconden elk om de groep te overtuigen dat jij de betere flirter bent. De groep stemt.",
+      "text": {
+        "nl": "Flirt-duel: 30 seconden elk om de groep te overtuigen dat jij de betere flirter bent. De groep stemt.",
+        "en": "Flirt duel: 30 seconds each to convince the group you are the better flirt. The group votes."
+      },
       "tags": [
         "flirty",
         "speaking"
@@ -1228,7 +1462,10 @@
       "type": "duel",
       "level": 4,
       "difficulty": 2,
-      "text": "Oogcontact-uitdaging — houd elkaars blik vast zonder weg te kijken. Wie het langst volhoudt wint.",
+      "text": {
+        "nl": "Oogcontact-uitdaging — houd elkaars blik vast zonder weg te kijken. Wie het langst volhoudt wint.",
+        "en": "Eye contact challenge — hold each other's gaze without looking away. Whoever lasts longest wins."
+      },
       "tags": [
         "flirty",
         "physical"
@@ -1244,7 +1481,10 @@
       "type": "duel",
       "level": 4,
       "difficulty": 2,
-      "text": "Strak-gezicht-uitdaging — probeer de ander aan het lachen te maken terwijl je zelf een strak gezicht houdt. Wie het eerst lacht verliest.",
+      "text": {
+        "nl": "Strak-gezicht-uitdaging — probeer de ander aan het lachen te maken terwijl je zelf een strak gezicht houdt. Wie het eerst lacht verliest.",
+        "en": "Straight face challenge — try to make the other person laugh while keeping a straight face yourself. First to laugh loses."
+      },
       "tags": [
         "flirty",
         "general"
@@ -1260,7 +1500,10 @@
       "type": "duel",
       "level": 5,
       "difficulty": 2,
-      "text": "Dans 30 seconden langzaam samen. Wie de ander het eerst dichter naar zich toe trekt wint.",
+      "text": {
+        "nl": "Dans 30 seconden langzaam samen. Wie de ander het eerst dichter naar zich toe trekt wint.",
+        "en": "Dance together slowly for 30 seconds. Whoever pulls the other closer first wins."
+      },
       "tags": [
         "physical",
         "flirty",
@@ -1277,7 +1520,10 @@
       "type": "duel",
       "level": 5,
       "difficulty": 2,
-      "text": "Rug-aan-rug, haken in elkaars armen en samen opstaan. Wie het eerst opgeeft of loslaat verliest.",
+      "text": {
+        "nl": "Rug-aan-rug, haken in elkaars armen en samen opstaan. Wie het eerst opgeeft of loslaat verliest.",
+        "en": "Back-to-back, arms linked, stand up together. Whoever gives up or lets go first loses."
+      },
       "tags": [
         "physical"
       ],
@@ -1292,7 +1538,10 @@
       "type": "duel",
       "level": 6,
       "difficulty": 2,
-      "text": "Zit tegenover elkaar, pak elkaars handen vast en houd oogcontact in stilte. Wie het eerst spreekt of wegkijkt verliest.",
+      "text": {
+        "nl": "Zit tegenover elkaar, pak elkaars handen vast en houd oogcontact in stilte. Wie het eerst spreekt of wegkijkt verliest.",
+        "en": "Sit facing each other, hold hands, maintain eye contact in silence. Whoever speaks or looks away first loses."
+      },
       "tags": [
         "intimate",
         "physical"
@@ -1308,7 +1557,10 @@
       "type": "duel",
       "level": 6,
       "difficulty": 2,
-      "text": "Arm drukken — of duimworstelwedstrijd als dat de voorkeur heeft. De verliezer krijgt een straf van de groep.",
+      "text": {
+        "nl": "Arm drukken — of duimworstelwedstrijd als dat de voorkeur heeft. De verliezer krijgt een straf van de groep.",
+        "en": "Arm wrestling — or thumb wrestling if preferred. The loser gets a penalty from the group."
+      },
       "tags": [
         "physical",
         "intimate"
@@ -1324,7 +1576,10 @@
       "type": "duel",
       "level": 7,
       "difficulty": 3,
-      "text": "Fluister het meest verleidelijke dat je kunt bedenken in het oor van de ander. De groep stemt wie de ander het meest deed blozen.",
+      "text": {
+        "nl": "Fluister het meest verleidelijke dat je kunt bedenken in het oor van de ander. De groep stemt wie de ander het meest deed blozen.",
+        "en": "Whisper the most seductive thing you can think of in the other's ear. The group votes on who made the other blush more."
+      },
       "tags": [
         "intimate",
         "flirty",
@@ -1341,7 +1596,10 @@
       "type": "duel",
       "level": 8,
       "difficulty": 3,
-      "text": "Uithoudings-uitdaging: houd de meest verleidelijke pose vast, tegenover elkaar. Wie het eerst zijn/haar houding verbreekt of wegkijkt verliest — en is de winnaar één dare verschuldigd (binnen limits).",
+      "text": {
+        "nl": "Uithoudings-uitdaging: houd de meest verleidelijke pose vast, tegenover elkaar. Wie het eerst zijn/haar houding verbreekt of wegkijkt verliest — en is de winnaar één dare verschuldigd (binnen limits).",
+        "en": "Endurance challenge: hold the most seductive pose you can, facing each other. Whoever breaks their pose or looks away first loses — and owes the winner one dare (within limits)."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1357,7 +1615,10 @@
       "type": "duel",
       "level": 9,
       "difficulty": 3,
-      "text": "Adem-uitdaging: sta zo dicht mogelijk bij elkaar zonder aan te raken. Wie het eerst beweegt of aanraakt verliest — de winnaar verdient één intiem commando (binnen harde limits en volledige toestemming).",
+      "text": {
+        "nl": "Adem-uitdaging: sta zo dicht mogelijk bij elkaar zonder aan te raken. Wie het eerst beweegt of aanraakt verliest — de winnaar verdient één intiem commando (binnen harde limits en volledige toestemming).",
+        "en": "Breath challenge: stand as close as possible without touching. Whoever moves or touches first loses — the winner earns one intimate command (within hard limits and full consent)."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1373,7 +1634,10 @@
       "type": "truth",
       "level": 7,
       "difficulty": 2,
-      "text": "Wat is een seksuele fantasie die je altijd al hebt willen uitproberen maar nog nooit aan iemand hebt verteld?",
+      "text": {
+        "nl": "Wat is een seksuele fantasie die je altijd al hebt willen uitproberen maar nog nooit aan iemand hebt verteld?",
+        "en": "What is a sexual fantasy you've always wanted to try but have never told anyone?"
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1389,7 +1653,10 @@
       "type": "truth",
       "level": 7,
       "difficulty": 2,
-      "text": "Beschrijf de meest avontuurlijke plek waar je ooit seks hebt gehad — of de plek waar je het het liefst zou willen.",
+      "text": {
+        "nl": "Beschrijf de meest avontuurlijke plek waar je ooit seks hebt gehad — of de plek waar je het het liefst zou willen.",
+        "en": "Describe the most adventurous place you've ever had sex — or the place you'd most like to."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1405,7 +1672,10 @@
       "type": "truth",
       "level": 7,
       "difficulty": 3,
-      "text": "Wat is iets dat je altijd al in bed hebt willen proberen maar te verlegen was om te vragen?",
+      "text": {
+        "nl": "Wat is iets dat je altijd al in bed hebt willen proberen maar te verlegen was om te vragen?",
+        "en": "What is something you've always wanted to try in bed but were too shy to ask for?"
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1421,7 +1691,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 2,
-      "text": "Beschrijf in detail hoe jij iemand die je onweerstaanbaar vindt zou verleiden.",
+      "text": {
+        "nl": "Beschrijf in detail hoe jij iemand die je onweerstaanbaar vindt zou verleiden.",
+        "en": "Describe in detail how you would seduce someone you find irresistible."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -1437,7 +1710,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 3,
-      "text": "Vertel de groep de meest ondeugende gedachte die je vandaag hebt gehad.",
+      "text": {
+        "nl": "Vertel de groep de meest ondeugende gedachte die je vandaag hebt gehad.",
+        "en": "Tell the group the naughtiest thought you've had today."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1453,7 +1729,10 @@
       "type": "truth",
       "level": 8,
       "difficulty": 3,
-      "text": "Wat is dé zet die iemand altijd volledig in de stemming krijgt — beschrijf het stap voor stap.",
+      "text": {
+        "nl": "Wat is dé zet die iemand altijd volledig in de stemming krijgt — beschrijf het stap voor stap.",
+        "en": "What is the one move that always gets someone fully in the mood — describe it step by step?"
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1469,7 +1748,10 @@
       "type": "truth",
       "level": 9,
       "difficulty": 3,
-      "text": "Wat is je meest intense of verboden fantasie — de ene die je alleen zou durven fluisteren?",
+      "text": {
+        "nl": "Wat is je meest intense of verboden fantasie — de ene die je alleen zou durven fluisteren?",
+        "en": "What is your most intense or forbidden fantasy — the one you'd only dare to whisper?"
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1485,7 +1767,10 @@
       "type": "truth",
       "level": 9,
       "difficulty": 3,
-      "text": "Ben je ooit vastgebonden geweest of heb je iemand anders vastgebonden tijdens seks? Beschrijf de ervaring in detail.",
+      "text": {
+        "nl": "Ben je ooit vastgebonden geweest of heb je iemand anders vastgebonden tijdens seks? Beschrijf de ervaring in detail.",
+        "en": "Have you ever been tied up or tied someone else up during sex? Describe the experience in detail."
+      },
       "tags": [
         "bondage",
         "explicit"
@@ -1501,7 +1786,10 @@
       "type": "truth",
       "level": 9,
       "difficulty": 3,
-      "text": "Wat is de meest wilde of onverwachte plek waar je ooit intiem bent geweest met iemand?",
+      "text": {
+        "nl": "Wat is de meest wilde of onverwachte plek waar je ooit intiem bent geweest met iemand?",
+        "en": "What is the wildest or most unexpected place you've ever been intimate with someone?"
+      },
       "tags": [
         "explicit",
         "intimate",
@@ -1518,7 +1806,10 @@
       "type": "truth",
       "level": 10,
       "difficulty": 3,
-      "text": "Beschrijf je ultieme expliciete fantasie in volledig detail — houd absoluut niets achter.",
+      "text": {
+        "nl": "Beschrijf je ultieme expliciete fantasie in volledig detail — houd absoluut niets achter.",
+        "en": "Describe your ultimate explicit fantasy in complete detail — hold absolutely nothing back."
+      },
       "tags": [
         "explicit",
         "extreme",
@@ -1535,7 +1826,10 @@
       "type": "truth",
       "level": 10,
       "difficulty": 3,
-      "text": "Wat is het meest extreme of kinky dat je ooit echt gefantaseerd hebt over doen — en met wie?",
+      "text": {
+        "nl": "Wat is het meest extreme of kinky dat je ooit echt gefantaseerd hebt over doen — en met wie?",
+        "en": "What is the most extreme or kinky thing you have ever genuinely fantasised about doing — and with whom?"
+      },
       "tags": [
         "explicit",
         "extreme"
@@ -1551,7 +1845,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Prikkel elk centimeter van het lichaam van {{sp}} — vermijd hun mond en geslachtsdelen volledig. Geen praten, alleen aanraking. Als ze smeken zonder 'alsjeblieft' te zeggen, beloon ze met één diepe, trage kus.",
+      "text": {
+        "nl": "Prikkel elk centimeter van het lichaam van {{sp}} — vermijd hun mond en geslachtsdelen volledig. Geen praten, alleen aanraking. Als ze smeken zonder 'alsjeblieft' te zeggen, beloon ze met één diepe, trage kus.",
+        "en": "Tease every inch of {{sp}}'s body — completely avoid their mouth and genitals. No talking, only touch. If they beg without saying 'please', reward them with one deep, slow kiss."
+      },
       "tags": [
         "intimate",
         "body"
@@ -1567,7 +1864,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Blinddoek {{sp}} en trek een ijsblokje langzaam over hun lichaam terwijl je de gevoeligste plekken plagend aanraakt. Wissel naar warme lippen als het smelt — kus en zuig het water van hun huid.",
+      "text": {
+        "nl": "Blinddoek {{sp}} en trek een ijsblokje langzaam over hun lichaam terwijl je de gevoeligste plekken plagend aanraakt. Wissel naar warme lippen als het smelt — kus en zuig het water van hun huid.",
+        "en": "Blindfold {{sp}} and drag an ice cube slowly over their body, teasing the most sensitive spots. Switch to warm lips as it melts — kiss and suck the water from their skin."
+      },
       "tags": [
         "intimate",
         "body"
@@ -1583,7 +1883,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 3,
-      "text": "Blinddoek {{sp}} en bind hun handen boven het hoofd. Ga schrijlings op ze zitten, volledig gekleed, en fluister: 'Je krijgt mijn kus pas als je hem verdiend hebt — met niets dan je gekreun.'",
+      "text": {
+        "nl": "Blinddoek {{sp}} en bind hun handen boven het hoofd. Ga schrijlings op ze zitten, volledig gekleed, en fluister: 'Je krijgt mijn kus pas als je hem verdiend hebt — met niets dan je gekreun.'",
+        "en": "Blindfold {{sp}} and bind their hands above their head. Straddle them, fully clothed, and whisper: 'You won't earn my kiss until you've deserved it — with nothing but your moaning.'"
+      },
       "tags": [
         "intimate",
         "bondage"
@@ -1595,9 +1898,18 @@
       "targetGenitals": null,
       "timerMode": "duration",
       "tiers": [
-        { "difficulty": 1, "seconds": 60 },
-        { "difficulty": 2, "seconds": 120 },
-        { "difficulty": 3, "seconds": 180 }
+        {
+          "difficulty": 1,
+          "seconds": 60
+        },
+        {
+          "difficulty": 2,
+          "seconds": 120
+        },
+        {
+          "difficulty": 3,
+          "seconds": 180
+        }
       ]
     },
     {
@@ -1605,7 +1917,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Bind de handen van {{sp}} voorzichtig vast met een sjaal. Houd een vibrator tegen hun gevoeligste plek terwijl je ze een diepe, plagerige kus geeft — houd het speeltje de hele tijd perfect op zijn plek.",
+      "text": {
+        "nl": "Bind de handen van {{sp}} voorzichtig vast met een sjaal. Houd een vibrator tegen hun gevoeligste plek terwijl je ze een diepe, plagerige kus geeft — houd het speeltje de hele tijd perfect op zijn plek.",
+        "en": "Gently tie {{sp}}'s wrists with a scarf. Hold a vibrator against their most sensitive spot while giving them a deep, teasing kiss — keep the toy perfectly in place the entire time."
+      },
       "tags": [
         "intimate",
         "toy",
@@ -1622,7 +1937,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Doe een langzame, plagerige striptease op je favoriete nummer. Niemand mag je aanraken tot de allerlaatste noot — geef het publiek daarna één opdracht.",
+      "text": {
+        "nl": "Doe een langzame, plagerige striptease op je favoriete nummer. Niemand mag je aanraken tot de allerlaatste noot — geef het publiek daarna één opdracht.",
+        "en": "Do a slow, teasing striptease to your favourite song. No one may touch you until the very last note — then give the audience one command."
+      },
       "tags": [
         "clothing",
         "intimate",
@@ -1639,7 +1957,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Kus en prikkel de binnenkant van de dijen van {{sp}}: trek eerst een koud glas of ijsblokje over de huid, volg dan direct met warme lippen en tong. Wissel minstens 5 keer af, telkens iets hoger.",
+      "text": {
+        "nl": "Kus en prikkel de binnenkant van de dijen van {{sp}}: trek eerst een koud glas of ijsblokje over de huid, volg dan direct met warme lippen en tong. Wissel minstens 5 keer af, telkens iets hoger.",
+        "en": "Kiss and tease the inside of {{sp}}'s thighs: first drag a cold glass or ice cube over the skin, then follow immediately with warm lips and tongue. Alternate at least 5 times, moving slightly higher each time."
+      },
       "tags": [
         "intimate",
         "body",
@@ -1657,8 +1978,11 @@
       "level": 7,
       "difficulty": 3,
       "estimatedMinutes": 20,
-      "text": "Wikkel {{sp}} strak in folie van borst tot dijen, laat alleen bepaalde gebieden vrij. Schuif een vibrerend speeltje tussen hun benen en neem volledige controle — breng ze op de rand tot ze smeken. Jij blijft de baas totdat je anders zegt.",
-            "tags": [
+      "text": {
+        "nl": "Wikkel {{sp}} strak in folie van borst tot dijen, laat alleen bepaalde gebieden vrij. Schuif een vibrerend speeltje tussen hun benen en neem volledige controle — breng ze op de rand tot ze smeken. Jij blijft de baas totdat je anders zegt.",
+        "en": "Wrap {{sp}} tightly in cling film from chest to thighs, leaving certain areas exposed. Slide a vibrating toy between their legs and take full control — bring them to the edge until they beg. You stay in charge until you decide otherwise."
+      },
+      "tags": [
         "bondage",
         "toy",
         "intimate"
@@ -1670,9 +1994,18 @@
       "targetGenitals": null,
       "timerMode": "duration",
       "tiers": [
-        { "difficulty": 1, "seconds": 60 },
-        { "difficulty": 2, "seconds": 120 },
-        { "difficulty": 3, "seconds": 180 }
+        {
+          "difficulty": 1,
+          "seconds": 60
+        },
+        {
+          "difficulty": 2,
+          "seconds": 120
+        },
+        {
+          "difficulty": 3,
+          "seconds": 180
+        }
       ]
     },
     {
@@ -1680,7 +2013,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Laat {{sp}} op hun rug liggen met gespreide benen. Prikkel ze door hun geslachtsdelen te kussen, likken en zuigen — bouw de spanning langzaam op en breng ze op de rand zonder ze te laten klaarkomen.",
+      "text": {
+        "nl": "Laat {{sp}} op hun rug liggen met gespreide benen. Prikkel ze door hun geslachtsdelen te kussen, likken en zuigen — bouw de spanning langzaam op en breng ze op de rand zonder ze te laten klaarkomen.",
+        "en": "Have {{sp}} lie on their back with legs spread. Tease them by kissing, licking and sucking their genitals — build the tension slowly and bring them to the edge without letting them come."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -1697,7 +2033,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Geef {{sp}} orale seks tot ze beginnen te kreunen, stop dan. Herhaal — breng ze op de rand en trek je terug — minstens 3 keer. Laat ze pas klaarkomen als jij beslist dat het moment juist is.",
+      "text": {
+        "nl": "Geef {{sp}} orale seks tot ze beginnen te kreunen, stop dan. Herhaal — breng ze op de rand en trek je terug — minstens 3 keer. Laat ze pas klaarkomen als jij beslist dat het moment juist is.",
+        "en": "Give {{sp}} oral sex until they start moaning, then stop. Repeat — bring them to the edge and pull back — at least 3 times. Only let them come when you decide the moment is right."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -1709,9 +2048,18 @@
       "targetGenitals": null,
       "timerMode": "speed",
       "tiers": [
-        { "difficulty": 3, "seconds": 120 },
-        { "difficulty": 2, "seconds": 240 },
-        { "difficulty": 1, "seconds": 360 }
+        {
+          "difficulty": 3,
+          "seconds": 120
+        },
+        {
+          "difficulty": 2,
+          "seconds": 240
+        },
+        {
+          "difficulty": 1,
+          "seconds": 360
+        }
       ]
     },
     {
@@ -1719,7 +2067,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Blinddoek {{sp}}, laat ze liggen met gespreide benen en kus en prikkel langzaam elke erogene zone voor 5 minuten — binnendijen, heupen, nek, onderrug. Maak ze verlangend voordat je meer geeft.",
+      "text": {
+        "nl": "Blinddoek {{sp}}, laat ze liggen met gespreide benen en kus en prikkel langzaam elke erogene zone voor 5 minuten — binnendijen, heupen, nek, onderrug. Maak ze verlangend voordat je meer geeft.",
+        "en": "Blindfold {{sp}}, have them lie with legs spread, and slowly kiss and tease every erogenous zone for 5 minutes — inner thighs, hips, neck, lower back. Make them desperate before giving more."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -1736,7 +2087,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Film jezelf in 3 verschillende standjes. Bekijk daarna de clips samen en rangschik ze van slechtste naar beste. De eigenaar van de slechtste positie moet die overdoen totdat hij bovenaan staat.",
+      "text": {
+        "nl": "Film jezelf in 3 verschillende standjes. Bekijk daarna de clips samen en rangschik ze van slechtste naar beste. De eigenaar van de slechtste positie moet die overdoen totdat hij bovenaan staat.",
+        "en": "Film yourselves in 3 different positions. Watch the clips together afterwards and rank them from worst to best. The owner of the worst position must redo it until it tops the list."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1752,7 +2106,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Beiden volledig naakt. Ga rug-aan-rug zitten. Kus de nek en schouders van {{sp}} terwijl één hand ze tussen de benen prikkelt — ga door totdat ze omdraaien.",
+      "text": {
+        "nl": "Beiden volledig naakt. Ga rug-aan-rug zitten. Kus de nek en schouders van {{sp}} terwijl één hand ze tussen de benen prikkelt — ga door totdat ze omdraaien.",
+        "en": "Both fully naked. Sit back-to-back. Kiss {{sp}}'s neck and shoulders while one hand teases them between the legs — keep going until they turn around."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -1768,7 +2125,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Gebruik je vingers of een discreet speeltje bij {{sp}} op een semi-openbare plek — balkon, geparkeerde auto of bioscoop. Stop niet totdat ze klaarkomen, ook al loopt er iemand langs.",
+      "text": {
+        "nl": "Gebruik je vingers of een discreet speeltje bij {{sp}} op een semi-openbare plek — balkon, geparkeerde auto of bioscoop. Stop niet totdat ze klaarkomen, ook al loopt er iemand langs.",
+        "en": "Use your fingers or a discreet toy on {{sp}} in a semi-public place — balcony, parked car or cinema. Do not stop until they come, even if someone walks past."
+      },
       "tags": [
         "explicit",
         "intimate",
@@ -1786,8 +2146,11 @@
       "level": 8,
       "difficulty": 3,
       "estimatedMinutes": 15,
-      "text": "Bind de polsen en enkels van {{sp}} aan het bed of een stoel. Prikkel elk stukje met veren, ijs en zachte aanrakingen — nog geen penetratie. Elke keer dat ze smeken, pauzeer je volledig 30 seconden.",
-            "tags": [
+      "text": {
+        "nl": "Bind de polsen en enkels van {{sp}} aan het bed of een stoel. Prikkel elk stukje met veren, ijs en zachte aanrakingen — nog geen penetratie. Elke keer dat ze smeken, pauzeer je volledig 30 seconden.",
+        "en": "Bind {{sp}}'s wrists and ankles to the bed or a chair. Tease every inch with feathers, ice and soft touches — no penetration yet. Every time they beg, pause completely for 30 seconds."
+      },
+      "tags": [
         "bondage",
         "intimate",
         "explicit"
@@ -1799,9 +2162,18 @@
       "targetGenitals": null,
       "timerMode": "duration",
       "tiers": [
-        { "difficulty": 1, "seconds": 60 },
-        { "difficulty": 2, "seconds": 120 },
-        { "difficulty": 3, "seconds": 180 }
+        {
+          "difficulty": 1,
+          "seconds": 60
+        },
+        {
+          "difficulty": 2,
+          "seconds": 120
+        },
+        {
+          "difficulty": 3,
+          "seconds": 180
+        }
       ]
     },
     {
@@ -1809,7 +2181,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Gebruik een op afstand bediend speeltje bij {{sp}}. Elke keer dat ze zichtbaar reageren of een geluid maken in het bijzijn van anderen, verhoog je de intensiteit voor 30 seconden.",
+      "text": {
+        "nl": "Gebruik een op afstand bediend speeltje bij {{sp}}. Elke keer dat ze zichtbaar reageren of een geluid maken in het bijzijn van anderen, verhoog je de intensiteit voor 30 seconden.",
+        "en": "Use a remote-controlled toy on {{sp}}. Every time they visibly react or make a sound in front of others, increase the intensity for 30 seconds."
+      },
       "tags": [
         "explicit",
         "toy",
@@ -1826,7 +2201,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Maak {{sp}} tot een canvas: gebruik slagroom, chocolade of lichaamsverf om hun huid te versieren. Verken dan elke plek met je lippen, tong en vingers — lik, kus en prikkel elk stukje.",
+      "text": {
+        "nl": "Maak {{sp}} tot een canvas: gebruik slagroom, chocolade of lichaamsverf om hun huid te versieren. Verken dan elke plek met je lippen, tong en vingers — lik, kus en prikkel elk stukje.",
+        "en": "Make {{sp}} your canvas: use whipped cream, chocolate or body paint to decorate their skin. Then explore every spot with your lips, tongue and fingers — lick, kiss and tease every inch."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -1844,8 +2222,11 @@
       "level": 8,
       "difficulty": 2,
       "estimatedMinutes": 20,
-      "text": "Laat {{sp}} 10 minuten de dominante rol spelen: volg elke instructie die ze geven. Wissel dan — de rollen keren volledig om. Bespreek welke het meest natuurlijk aanvoelde.",
-            "tags": [
+      "text": {
+        "nl": "Laat {{sp}} 10 minuten de dominante rol spelen: volg elke instructie die ze geven. Wissel dan — de rollen keren volledig om. Bespreek welke het meest natuurlijk aanvoelde.",
+        "en": "Let {{sp}} play the dominant role for 10 minutes: follow every instruction they give. Then switch — roles completely reversed. Discuss which felt most natural."
+      },
+      "tags": [
         "intimate",
         "explicit"
       ],
@@ -1860,7 +2241,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Blinddoek {{sp}}. Strip langzaam voor ze terwijl ze zitten met de handen achter de rug vastgebonden. Pauzeer 30 seconden elke keer dat ze een geluid maken of hun kalmte verliezen.",
+      "text": {
+        "nl": "Blinddoek {{sp}}. Strip langzaam voor ze terwijl ze zitten met de handen achter de rug vastgebonden. Pauzeer 30 seconden elke keer dat ze een geluid maken of hun kalmte verliezen.",
+        "en": "Blindfold {{sp}}. Strip slowly for them while they sit with hands bound behind their back. Pause for 30 seconds every time they make a sound or lose their composure."
+      },
       "tags": [
         "clothing",
         "intimate",
@@ -1877,7 +2261,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Vraag {{sp}} welke beloning ze willen. Blinddoek en beperk ze, prikkel dan elk stukje van hun lichaam met lippen, ijs of veren voor 5 volle minuten — geef ze daarna precies wat ze vroegen.",
+      "text": {
+        "nl": "Vraag {{sp}} welke beloning ze willen. Blinddoek en beperk ze, prikkel dan elk stukje van hun lichaam met lippen, ijs of veren voor 5 volle minuten — geef ze daarna precies wat ze vroegen.",
+        "en": "Ask {{sp}} what reward they want. Blindfold and restrain them, then tease every inch of their body with lips, ice or feathers for 5 full minutes — give them exactly what they asked for afterwards."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -1894,7 +2281,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Kies een rollenspelscenario dat je altijd al hebt willen proberen. Stel de sfeer in, ga in karakter en verwerk minstens één speeltje in de scene.",
+      "text": {
+        "nl": "Kies een rollenspelscenario dat je altijd al hebt willen proberen. Stel de sfeer in, ga in karakter en verwerk minstens één speeltje in de scene.",
+        "en": "Choose a role-play scenario you've always wanted to try. Set the mood, get into character, and incorporate at least one toy into the scene."
+      },
       "tags": [
         "explicit",
         "toy",
@@ -1911,7 +2301,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Geef {{sp}} orale seks terwijl je ze tegelijkertijd intern stimuleert met vingers. Gebruik een 'kom hier'-beweging om hun gevoeligste interne plek te vinden en te stimuleren — combineer interne en externe stimulatie.",
+      "text": {
+        "nl": "Geef {{sp}} orale seks terwijl je ze tegelijkertijd intern stimuleert met vingers. Gebruik een 'kom hier'-beweging om hun gevoeligste interne plek te vinden en te stimuleren — combineer interne en externe stimulatie.",
+        "en": "Give {{sp}} oral sex while simultaneously stimulating them internally with fingers. Use a 'come hither' motion to find and stimulate their most sensitive internal spot — combine internal and external stimulation."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -1924,9 +2317,18 @@
       "targetGenitals": null,
       "timerMode": "speed",
       "tiers": [
-        { "difficulty": 3, "seconds": 120 },
-        { "difficulty": 2, "seconds": 240 },
-        { "difficulty": 1, "seconds": 360 }
+        {
+          "difficulty": 3,
+          "seconds": 120
+        },
+        {
+          "difficulty": 2,
+          "seconds": 240
+        },
+        {
+          "difficulty": 1,
+          "seconds": 360
+        }
       ]
     },
     {
@@ -1934,7 +2336,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Prikkel de achterkant van {{sp}} met langzame, zachte bewegingen met vingers, tong of een speeltje. Bouw de druk geleidelijk op — zorg altijd voor smering en comfort. Prikkel door totdat ze smeken voor meer.",
+      "text": {
+        "nl": "Prikkel de achterkant van {{sp}} met langzame, zachte bewegingen met vingers, tong of een speeltje. Bouw de druk geleidelijk op — zorg altijd voor smering en comfort. Prikkel door totdat ze smeken voor meer.",
+        "en": "Tease {{sp}}'s backside with slow, gentle movements using fingers, tongue or a toy. Build pressure gradually — always use lubrication and ensure comfort. Keep teasing until they beg for more."
+      },
       "tags": [
         "anal",
         "explicit",
@@ -1953,7 +2358,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Gebruik een buttplug of anale kralen bij {{sp}} in een positie naar keuze. Stimuleer tegelijkertijd de voorkant met vingers, een speeltje of je mond — combineer beide sensaties voor maximaal effect.",
+      "text": {
+        "nl": "Gebruik een buttplug of anale kralen bij {{sp}} in een positie naar keuze. Stimuleer tegelijkertijd de voorkant met vingers, een speeltje of je mond — combineer beide sensaties voor maximaal effect.",
+        "en": "Use a buttplug or anal beads on {{sp}} in a position of your choice. Simultaneously stimulate the front with fingers, a toy or your mouth — combine both sensations for maximum effect."
+      },
       "tags": [
         "anal",
         "explicit",
@@ -1974,8 +2382,11 @@
       "level": 9,
       "difficulty": 3,
       "estimatedMinutes": 15,
-      "text": "Beperk {{sp}} volledig — polsen en enkels vastgemaakt. Prikkel zonder ze te laten klaarkomen. Laat ze je minstens 5 keer smeken — elke keer explicieter dan de vorige — voordat je ze toestaat te klaarkomen.",
-            "tags": [
+      "text": {
+        "nl": "Beperk {{sp}} volledig — polsen en enkels vastgemaakt. Prikkel zonder ze te laten klaarkomen. Laat ze je minstens 5 keer smeken — elke keer explicieter dan de vorige — voordat je ze toestaat te klaarkomen.",
+        "en": "Fully restrain {{sp}} — wrists and ankles secured. Tease without letting them come. Make them beg you at least 5 times — each time more explicitly than the last — before allowing them to come."
+      },
+      "tags": [
         "bondage",
         "explicit",
         "intimate"
@@ -1991,7 +2402,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Laat {{sp}} een halsband en riem dragen. Leid ze door de kamer en geef opdrachten die ze moeten gehoorzamen. Na 5 minuten wisselen — de rollen keren volledig om.",
+      "text": {
+        "nl": "Laat {{sp}} een halsband en riem dragen. Leid ze door de kamer en geef opdrachten die ze moeten gehoorzamen. Na 5 minuten wisselen — de rollen keren volledig om.",
+        "en": "Have {{sp}} wear a collar and leash. Lead them around the room and give commands they must obey. After 5 minutes, switch — roles completely reversed."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -2008,7 +2422,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Leg een vibrerend speeltje bij {{sp}} terwijl ze proberen een normaal gesprek te voeren met anderen. Zie hoe lang ze het volhouden — prikkel, fluister en geniet van hun reacties. Ze mogen de kamer niet verlaten.",
+      "text": {
+        "nl": "Leg een vibrerend speeltje bij {{sp}} terwijl ze proberen een normaal gesprek te voeren met anderen. Zie hoe lang ze het volhouden — prikkel, fluister en geniet van hun reacties. Ze mogen de kamer niet verlaten.",
+        "en": "Place a vibrating toy on {{sp}} while they try to hold a normal conversation with others. See how long they last — tease, whisper and enjoy their reactions. They may not leave the room."
+      },
       "tags": [
         "toy",
         "explicit",
@@ -2026,8 +2443,11 @@
       "level": 9,
       "difficulty": 3,
       "estimatedMinutes": 10,
-      "text": "Markeer lichaamszone's op {{sp}} met een stift (borst, dijen, rug). Wijs een regel toe aan elke zone: tikken, kussen, ijs of op de rand brengen. Kies elke 2 minuten een nieuwe zone voor 10 minuten totaal.",
-            "tags": [
+      "text": {
+        "nl": "Markeer lichaamszone's op {{sp}} met een stift (borst, dijen, rug). Wijs een regel toe aan elke zone: tikken, kussen, ijs of op de rand brengen. Kies elke 2 minuten een nieuwe zone voor 10 minuten totaal.",
+        "en": "Mark body zones on {{sp}} with a marker (chest, thighs, back). Assign a rule to each zone: tickling, kissing, ice or edging. Choose a new zone every 2 minutes for 10 minutes total."
+      },
+      "tags": [
         "bondage",
         "explicit",
         "body"
@@ -2043,7 +2463,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Blinddoek en beperk {{sp}} zacht. Breng ze naar een nieuwe plek, trek ze volledig uit en verken elk stukje van hun lichaam met alleen je mond — prikkel, lik en geniet — totdat ze je smeken om te stoppen.",
+      "text": {
+        "nl": "Blinddoek en beperk {{sp}} zacht. Breng ze naar een nieuwe plek, trek ze volledig uit en verken elk stukje van hun lichaam met alleen je mond — prikkel, lik en geniet — totdat ze je smeken om te stoppen.",
+        "en": "Blindfold and gently restrain {{sp}}. Take them to a new spot, undress them completely, and explore every inch of their body with only your mouth — tease, lick and savour — until they beg you to stop."
+      },
       "tags": [
         "bondage",
         "oral",
@@ -2061,7 +2484,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Breng {{sp}} oraal naar de rand van een orgasme, stop dan. Herhaal deze edging-cyclus minstens 4 keer zonder ze te laten klaarkomen. Laat ze pas klaarkomen als jij dat besluit — niet eerder.",
+      "text": {
+        "nl": "Breng {{sp}} oraal naar de rand van een orgasme, stop dan. Herhaal deze edging-cyclus minstens 4 keer zonder ze te laten klaarkomen. Laat ze pas klaarkomen als jij dat besluit — niet eerder.",
+        "en": "Bring {{sp}} to the edge of orgasm orally, then stop. Repeat this edging cycle at least 4 times without letting them come. They can only come when you decide — not before."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -2073,9 +2499,18 @@
       "targetGenitals": null,
       "timerMode": "speed",
       "tiers": [
-        { "difficulty": 3, "seconds": 120 },
-        { "difficulty": 2, "seconds": 240 },
-        { "difficulty": 1, "seconds": 360 }
+        {
+          "difficulty": 3,
+          "seconds": 120
+        },
+        {
+          "difficulty": 2,
+          "seconds": 240
+        },
+        {
+          "difficulty": 1,
+          "seconds": 360
+        }
       ]
     },
     {
@@ -2083,7 +2518,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Breng {{sp}} tot een orgasme op een semi-publieke plek: balkon, geparkeerde auto of bioscoop. Alleen handen of een discreet speeltje. Ga door totdat ze klaarkomen — speels, plaagziek en gewaagd.",
+      "text": {
+        "nl": "Breng {{sp}} tot een orgasme op een semi-publieke plek: balkon, geparkeerde auto of bioscoop. Alleen handen of een discreet speeltje. Ga door totdat ze klaarkomen — speels, plaagziek en gewaagd.",
+        "en": "Bring {{sp}} to orgasm in a semi-public place: balcony, parked car or cinema. Hands or a discreet toy only. Keep going until they come — playful, teasing and daring."
+      },
       "tags": [
         "explicit",
         "public",
@@ -2100,7 +2538,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Stel een sessie met meerdere speeltjes in bij {{sp}}. Verken elk speeltje minstens een minuut voordat je wisselt. Combineer oraal, vingers en speeltjes in willekeurige volgorde — ze mogen je pas aansturen als ze smeken.",
+      "text": {
+        "nl": "Stel een sessie met meerdere speeltjes in bij {{sp}}. Verken elk speeltje minstens een minuut voordat je wisselt. Combineer oraal, vingers en speeltjes in willekeurige volgorde — ze mogen je pas aansturen als ze smeken.",
+        "en": "Set up a multi-toy session with {{sp}}. Explore each toy for at least a minute before switching. Combine oral, fingers and toys in random order — they may only direct you once they are begging."
+      },
       "tags": [
         "toy",
         "oral",
@@ -2118,8 +2559,11 @@
       "level": 10,
       "difficulty": 3,
       "estimatedMinutes": 10,
-      "text": "Volledige bondage-sessie: beperk {{sp}} volledig — polsen, enkels, geblinddoekt — en prikkel elk stukje met kussen, likken, ijs, licht bijten en een speeltje. Ze mogen geen geluid maken. Elk geluid levert een straf naar jouw keuze op. Duurt 10 volle minuten.",
-            "tags": [
+      "text": {
+        "nl": "Volledige bondage-sessie: beperk {{sp}} volledig — polsen, enkels, geblinddoekt — en prikkel elk stukje met kussen, likken, ijs, licht bijten en een speeltje. Ze mogen geen geluid maken. Elk geluid levert een straf naar jouw keuze op. Duurt 10 volle minuten.",
+        "en": "Full bondage session: fully restrain {{sp}} — wrists, ankles, blindfolded — and tease every inch with kisses, licking, ice, light biting and a toy. They may make no sound. Every sound earns a penalty of your choice. Lasts 10 full minutes."
+      },
+      "tags": [
         "bondage",
         "explicit",
         "extreme"
@@ -2136,8 +2580,11 @@
       "level": 10,
       "difficulty": 3,
       "estimatedMinutes": 20,
-      "text": "Intense dom/sub-sessie: {{sp}} is volledig beperkt en moet elke opdracht direct opvolgen. De dominant verkent elke overeengekomen grens met orale seks, edging, speeltjes, tikken en was — niets buiten harde limits.",
-            "tags": [
+      "text": {
+        "nl": "Intense dom/sub-sessie: {{sp}} is volledig beperkt en moet elke opdracht direct opvolgen. De dominant verkent elke overeengekomen grens met orale seks, edging, speeltjes, tikken en was — niets buiten harde limits.",
+        "en": "Intense dom/sub session: {{sp}} is fully restrained and must follow every command immediately. The dominant explores every agreed boundary with oral sex, edging, toys, spanking and wax — nothing outside hard limits."
+      },
+      "tags": [
         "bondage",
         "explicit",
         "extreme"
@@ -2153,7 +2600,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 2,
-      "text": "Vertel een expliciete seksclub-fantasie in volledig detail aan je geblinddoekte, beperkte {{sp}} — wat er gebeurt, wie wat doet, waar elke hand en mond is. Maak het levendig en erotisch. Vertel 5 volle minuten ononderbroken.",
+      "text": {
+        "nl": "Vertel een expliciete seksclub-fantasie in volledig detail aan je geblinddoekte, beperkte {{sp}} — wat er gebeurt, wie wat doet, waar elke hand en mond is. Maak het levendig en erotisch. Vertel 5 volle minuten ononderbroken.",
+        "en": "Tell an explicit sex-club fantasy in full detail to your blindfolded, restrained {{sp}} — what happens, who does what, where every hand and mouth is. Make it vivid and erotic. Narrate uninterrupted for 5 full minutes."
+      },
       "tags": [
         "explicit",
         "extreme",
@@ -2171,7 +2621,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Wasdruppel-sessie: druppel kaarswas op lage temperatuur op je geblinddoekte, beperkte {{sp}}. Volg elke druppel direct met een kus of lik. Wissel af met ijs tussen druppels. Ga 5 minuten door, breng ze dan volledig tot een klaarkoming.",
+      "text": {
+        "nl": "Wasdruppel-sessie: druppel kaarswas op lage temperatuur op je geblinddoekte, beperkte {{sp}}. Volg elke druppel direct met een kus of lik. Wissel af met ijs tussen druppels. Ga 5 minuten door, breng ze dan volledig tot een klaarkoming.",
+        "en": "Wax drip session: drip low-temperature candle wax onto your blindfolded, restrained {{sp}}. Follow each drop immediately with a kiss or lick. Alternate with ice between drops. Continue for 5 minutes, then bring them fully to orgasm."
+      },
       "tags": [
         "bondage",
         "extreme",
@@ -2188,7 +2641,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Face-sitting sessie: {{sp}} ligt op hun rug, de ander gaat op hun gezicht zitten. De bovenste gebruikt alleen gewicht en beweging — geen handen. De onderste gebruikt alleen mond en tong totdat {{sp}} klaarkomt.",
+      "text": {
+        "nl": "Face-sitting sessie: {{sp}} ligt op hun rug, de ander gaat op hun gezicht zitten. De bovenste gebruikt alleen gewicht en beweging — geen handen. De onderste gebruikt alleen mond en tong totdat {{sp}} klaarkomt.",
+        "en": "{{sp}} lies on their back, the other sits on their face. The one on top uses only weight and movement — no hands. The one below uses only mouth and tongue until {{sp}} comes."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -2206,8 +2662,11 @@
       "level": 10,
       "difficulty": 3,
       "estimatedMinutes": 20,
-      "text": "Uitgebreide edging-marathon: wissel af tussen orale seks, handen en speeltjes bij {{sp}} — breng ze naar de absolute rand zonder ze te laten klaarkomen. Doe dit minstens 5 keer. Ze mogen alleen klaarkomen als je expliciet toestemming geeft.",
-            "tags": [
+      "text": {
+        "nl": "Uitgebreide edging-marathon: wissel af tussen orale seks, handen en speeltjes bij {{sp}} — breng ze naar de absolute rand zonder ze te laten klaarkomen. Doe dit minstens 5 keer. Ze mogen alleen klaarkomen als je expliciet toestemming geeft.",
+        "en": "Extended edging marathon: alternate between oral sex, hands and toys on {{sp}} — bring them to the absolute edge without ever letting them come. At least 5 times. They can only come when you explicitly permit it."
+      },
+      "tags": [
         "oral",
         "explicit",
         "extreme",
@@ -2224,7 +2683,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Diep oraal dare: vind een positie waarbij {{sp}} de diepte en het tempo volledig bepaalt. Gebruik alleen je mond en keel — handen moeten plat op de vloer of achter je rug blijven. Ga precies zoals aangegeven door totdat ze klaarkomen.",
+      "text": {
+        "nl": "Diep oraal dare: vind een positie waarbij {{sp}} de diepte en het tempo volledig bepaalt. Gebruik alleen je mond en keel — handen moeten plat op de vloer of achter je rug blijven. Ga precies zoals aangegeven door totdat ze klaarkomen.",
+        "en": "Deep oral dare: find a position where {{sp}} controls the depth and pace completely. Use only your mouth and throat — hands must stay flat on the floor or behind your back. Continue exactly as directed until they come."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -2241,7 +2703,10 @@
       "type": "duel",
       "level": 8,
       "difficulty": 3,
-      "text": "Handen-vrij plaag-wedstrijd: plag de ander op beurt met alleen je mond — handen mogen nergens komen. Degene die als eerste kreunt, grijpt of zijn/haar kalmte verliest, verliest. De winnaar verdient één dare naar keuze van de verliezer.",
+      "text": {
+        "nl": "Handen-vrij plaag-wedstrijd: plag de ander op beurt met alleen je mond — handen mogen nergens komen. Degene die als eerste kreunt, grijpt of zijn/haar kalmte verliest, verliest. De winnaar verdient één dare naar keuze van de verliezer.",
+        "en": "Hands-free tease contest: take turns teasing the other with only your mouth — no hands allowed anywhere. Whoever moans, grabs or loses their composure first loses. The winner earns one dare of their choice from the loser."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -2257,7 +2722,10 @@
       "type": "duel",
       "level": 9,
       "difficulty": 3,
-      "text": "Edging-duel: beiden proberen tegelijkertijd de ander op de rand te brengen met alleen handen. Degene die als eerste smeekt of klaarkomt verliest. De verliezer voert één level-10 dare uit naar keuze van de winnaar.",
+      "text": {
+        "nl": "Edging-duel: beiden proberen tegelijkertijd de ander op de rand te brengen met alleen handen. Degene die als eerste smeekt of klaarkomt verliest. De verliezer voert één level-10 dare uit naar keuze van de winnaar.",
+        "en": "Edging duel: both try to bring the other to the edge at the same time using only hands. Whoever begs or comes first loses. The loser carries out one level-10 dare of the winner's choice."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -2273,7 +2741,10 @@
       "type": "duel",
       "level": 10,
       "difficulty": 3,
-      "text": "Ultiem speeltjes-duel: beiden worden tegelijkertijd geplagd met vibrerende speeltjes op maximale intensiteit. Degene die als eerste klaarkomt verliest. De verliezer voert elke dare uit die de winnaar noemt — binnen harde limits.",
+      "text": {
+        "nl": "Ultiem speeltjes-duel: beiden worden tegelijkertijd geplagd met vibrerende speeltjes op maximale intensiteit. Degene die als eerste klaarkomt verliest. De verliezer voert elke dare uit die de winnaar noemt — binnen harde limits.",
+        "en": "Ultimate toy duel: both are teased simultaneously with vibrating toys on maximum intensity. Whoever comes first loses. The loser carries out any dare the winner names — within hard limits."
+      },
       "tags": [
         "toy",
         "explicit",
@@ -2290,7 +2761,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Kus elk stukje van haar nek en schouders — neem minstens 2 minuten. Ga door totdat ze je naar zich toe trekt of je vraagt te stoppen.",
+      "text": {
+        "nl": "Kus elk stukje van haar nek en schouders — neem minstens 2 minuten. Ga door totdat ze je naar zich toe trekt of je vraagt te stoppen.",
+        "en": "Kiss every inch of her neck and shoulders — take at least 2 minutes. Continue until she pulls you toward her or asks you to stop."
+      },
       "tags": [
         "intimate",
         "kissing"
@@ -2308,7 +2782,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Geef haar 3 minuten een sensuele schouder- en nekm massage — niet haastig, niets overslaan. Gebruik je duimen, handpalmen en lippen.",
+      "text": {
+        "nl": "Geef haar 3 minuten een sensuele schouder- en nekm massage — niet haastig, niets overslaan. Gebruik je duimen, handpalmen en lippen.",
+        "en": "Give her a 3-minute sensual shoulder and neck massage — no rushing, no skipping. Use your thumbs, palms and lips."
+      },
       "tags": [
         "body",
         "intimate"
@@ -2326,7 +2803,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Fluister het meest verleidelijke dat je kunt bedenken direct in haar oor — ze mag je niet aankijken terwijl je het doet.",
+      "text": {
+        "nl": "Fluister het meest verleidelijke dat je kunt bedenken direct in haar oor — ze mag je niet aankijken terwijl je het doet.",
+        "en": "Whisper the most seductive thing you can think of directly in her ear — she may not look at you while you do it."
+      },
       "tags": [
         "flirty",
         "intimate"
@@ -2344,7 +2824,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Schrijf tijdens het eten of een spel iets ondeugends op een servet en schuif het naar haar. Als ze bloost, moet ze er voor het einde van de avond op ingaan.",
+      "text": {
+        "nl": "Schrijf tijdens het eten of een spel iets ondeugends op een servet en schuif het naar haar. Als ze bloost, moet ze er voor het einde van de avond op ingaan.",
+        "en": "While eating or playing a game, write something naughty on a napkin and slide it to her. If she blushes, she must act on it before the end of the evening."
+      },
       "tags": [
         "flirty",
         "intimate"
@@ -2362,7 +2845,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Laat haar koken — of gewoon in de keuken staan — terwijl ze een op afstand bediend speeltje draagt dat jij bestuurt. Elke keer dat ze een lade of kast opent, verhoog je de intensiteit.",
+      "text": {
+        "nl": "Laat haar koken — of gewoon in de keuken staan — terwijl ze een op afstand bediend speeltje draagt dat jij bestuurt. Elke keer dat ze een lade of kast opent, verhoog je de intensiteit.",
+        "en": "Let her cook — or just stand in the kitchen — while wearing a remote-controlled toy that you control. Every time she opens a drawer or cupboard, increase the intensity."
+      },
       "tags": [
         "toy",
         "intimate",
@@ -2381,7 +2867,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Zoek haar terwijl jullie geparkeerd staan uitgebreid 3 minuten. Bonuspunten als er een echte kans is dat iemand langs loopt.",
+      "text": {
+        "nl": "Zoek haar terwijl jullie geparkeerd staan uitgebreid 3 minuten. Bonuspunten als er een echte kans is dat iemand langs loopt.",
+        "en": "Make out with her properly in a parked car for 3 minutes. Bonus points if there's a real chance someone walks past."
+      },
       "tags": [
         "intimate",
         "public",
@@ -2400,7 +2889,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Schuif je hand in haar tailleband of langs haar gevoeligste plek terwijl jullie in een lift staan. Bevriest volledig zodra de deuren opengaan.",
+      "text": {
+        "nl": "Schuif je hand in haar tailleband of langs haar gevoeligste plek terwijl jullie in een lift staan. Bevriest volledig zodra de deuren opengaan.",
+        "en": "Slide your hand inside her waistband or along her most sensitive area while you are standing in a lift. Freeze completely the moment the doors open."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -2419,7 +2911,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Beiden naakt. Blinddoek haar en bind haar handen zacht vast. Ga rug-aan-rug zitten. Kus haar nek en schouders terwijl één hand haar tussen de benen prikkelt — stop niet totdat ze omdraait.",
+      "text": {
+        "nl": "Beiden naakt. Blinddoek haar en bind haar handen zacht vast. Ga rug-aan-rug zitten. Kus haar nek en schouders terwijl één hand haar tussen de benen prikkelt — stop niet totdat ze omdraait.",
+        "en": "Both naked. Blindfold her and gently bind her wrists. Sit back-to-back. Kiss her neck and shoulders while one hand teases her between her legs — do not stop until she turns around."
+      },
       "tags": [
         "intimate",
         "bondage",
@@ -2438,7 +2933,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Breng een tintelende opwindingsgel aan op haar clitoris. Stimuleer haar met vingers, mond of een speeltje — let goed op haar reacties — totdat ze trilt van plezier.",
+      "text": {
+        "nl": "Breng een tintelende opwindingsgel aan op haar clitoris. Stimuleer haar met vingers, mond of een speeltje — let goed op haar reacties — totdat ze trilt van plezier.",
+        "en": "Apply a tingling arousal gel to her clitoris. Stimulate her with fingers, mouth or a toy — pay close attention to her reactions — until she trembles with pleasure."
+      },
       "tags": [
         "explicit",
         "toy",
@@ -2460,7 +2958,10 @@
       "level": 7,
       "difficulty": 3,
       "estimatedMinutes": 15,
-      "text": "Bind haar polsen en enkels aan het bed. Gebruik veren, ijs en je lippen op elk stukje — blijf plagen. Elke keer dat ze smeekt zonder 'alsjeblieft' te zeggen, pauzeer je 30 seconden.",
+      "text": {
+        "nl": "Bind haar polsen en enkels aan het bed. Gebruik veren, ijs en je lippen op elk stukje — blijf plagen. Elke keer dat ze smeekt zonder 'alsjeblieft' te zeggen, pauzeer je 30 seconden.",
+        "en": "Bind her wrists and ankles to the bed. Use feathers, ice and your lips on every inch — keep teasing. Every time she begs without saying 'please', pause for 30 seconds."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -2479,7 +2980,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Laat haar een discreet speeltje dragen tijdens een korte uitstap of wandeling. Reageer op haar reacties — zet het harder als ze kalm is, zet het zachter als ze begint te worstelen. Blijf de hele tijd in controle.",
+      "text": {
+        "nl": "Laat haar een discreet speeltje dragen tijdens een korte uitstap of wandeling. Reageer op haar reacties — zet het harder als ze kalm is, zet het zachter als ze begint te worstelen. Blijf de hele tijd in controle.",
+        "en": "Have her wear a discreet toy during a short outing or walk. Respond to her reactions — turn it up when she's calm, turn it down when she starts to struggle. Stay in control the entire time."
+      },
       "tags": [
         "toy",
         "public",
@@ -2498,7 +3002,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Met haar op haar rug, benen gespreid en vastgemaakt met een spreider of touw, prikkel haar door te kussen, likken en zuigen totdat ze smeekt — laat haar niet klaarkomen totdat jij dat besluit.",
+      "text": {
+        "nl": "Met haar op haar rug, benen gespreid en vastgemaakt met een spreider of touw, prikkel haar door te kussen, likken en zuigen totdat ze smeekt — laat haar niet klaarkomen totdat jij dat besluit.",
+        "en": "With her on her back, legs spread and secured with a spreader or rope, tease her by kissing, licking and sucking until she begs — do not let her come until you decide."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -2517,7 +3024,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Geef haar orale seks tot ze begint te kreunen, stop dan. Herhaal — breng haar op de rand en trek je terug — minstens 4 keer. Vrijlating alleen met jouw toestemming.",
+      "text": {
+        "nl": "Geef haar orale seks tot ze begint te kreunen, stop dan. Herhaal — breng haar op de rand en trek je terug — minstens 4 keer. Vrijlating alleen met jouw toestemming.",
+        "en": "Give her oral sex until she starts moaning, then stop. Repeat — bring her to the edge and pull back — at least 4 times. Release only on your terms."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -2535,7 +3045,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Terwijl je haar orale seks geeft, voeg je één of twee vingers in. Gebruik een 'kom hier'-beweging om haar G-spot te stimuleren terwijl je mond haar clitoris bewerkt. Combineer interne en externe stimulatie.",
+      "text": {
+        "nl": "Terwijl je haar orale seks geeft, voeg je één of twee vingers in. Gebruik een 'kom hier'-beweging om haar G-spot te stimuleren terwijl je mond haar clitoris bewerkt. Combineer interne en externe stimulatie.",
+        "en": "While giving her oral sex, add one or two fingers inside. Use a 'come hither' motion to stimulate her G-spot while your mouth works her clitoris. Combine internal and external stimulation."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -2556,7 +3069,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Blinddoek haar, leg haar neer met gespreide benen en besteed 5 minuten aan het kussen van elke erogene zone — binnendijen, heupen, onderbuik, achter de knieën. Maak haar verlangend voordat je meer geeft.",
+      "text": {
+        "nl": "Blinddoek haar, leg haar neer met gespreide benen en besteed 5 minuten aan het kussen van elke erogene zone — binnendijen, heupen, onderbuik, achter de knieën. Maak haar verlangend voordat je meer geeft.",
+        "en": "Blindfold her, lay her down with legs spread, and spend 5 minutes kissing every erogenous zone — inner thighs, hips, lower belly, behind the knees. Make her desperate before you give more."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -2575,7 +3091,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Gebruik een op afstand bediend speeltje bij haar in het openbaar. Elke keer dat ze kreunt of zichtbaar reageert, moet ze stiekem één kledingstuk uitdoen en het aan jou geven.",
+      "text": {
+        "nl": "Gebruik een op afstand bediend speeltje bij haar in het openbaar. Elke keer dat ze kreunt of zichtbaar reageert, moet ze stiekem één kledingstuk uitdoen en het aan jou geven.",
+        "en": "Use a remote-controlled toy on her in public. Every time she moans or visibly reacts, she must secretly remove one item of clothing and hand it to you."
+      },
       "tags": [
         "toy",
         "public",
@@ -2595,7 +3114,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Maak haar tot je canvas: gebruik slagroom of lichaamsverf om haar huid te versieren. Verken elke plek met je lippen, tong en vingers — lik, kus en prikkel elk stukje.",
+      "text": {
+        "nl": "Maak haar tot je canvas: gebruik slagroom of lichaamsverf om haar huid te versieren. Verken elke plek met je lippen, tong en vingers — lik, kus en prikkel elk stukje.",
+        "en": "Make her your canvas: use whipped cream or body paint to decorate her skin. Explore every spot with your lips, tongue and fingers — lick, kiss and tease every inch."
+      },
       "tags": [
         "explicit",
         "intimate",
@@ -2614,7 +3136,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Vraag haar eerst welke beloning ze wil. Blinddoek en boeien, prikkel dan elk stukje van haar lichaam met lippen, ijs of veren voor 5 minuten — geef haar dan precies wat ze vroeg.",
+      "text": {
+        "nl": "Vraag haar eerst welke beloning ze wil. Blinddoek en boeien, prikkel dan elk stukje van haar lichaam met lippen, ijs of veren voor 5 minuten — geef haar dan precies wat ze vroeg.",
+        "en": "Ask her what reward she wants first. Blindfold and cuff her, then tease every inch of her body with lips, ice or feathers for 5 minutes — give her exactly what she asked for."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -2633,7 +3158,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Geef haar een op afstand bediend speeltje voordat jullie uitgaan. Bedien het de hele avond — zet het harder wanneer ze het het minst verwacht. Ze moet volkomen normaal doen voor anderen.",
+      "text": {
+        "nl": "Geef haar een op afstand bediend speeltje voordat jullie uitgaan. Bedien het de hele avond — zet het harder wanneer ze het het minst verwacht. Ze moet volkomen normaal doen voor anderen.",
+        "en": "Give her a remote-controlled toy before you go out. Control it all evening — turn it up when she least expects it. She must appear completely normal to everyone else."
+      },
       "tags": [
         "toy",
         "public",
@@ -2652,7 +3180,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Kies een positie en gebruik een buttplug of anale kralen bij haar. Stimuleer tegelijkertijd haar clitoris met je mond of vingers — ze komt niet klaar totdat jij dat zegt.",
+      "text": {
+        "nl": "Kies een positie en gebruik een buttplug of anale kralen bij haar. Stimuleer tegelijkertijd haar clitoris met je mond of vingers — ze komt niet klaar totdat jij dat zegt.",
+        "en": "Choose a position and use a buttplug or anal beads on her. Simultaneously stimulate her clitoris with your mouth or fingers — she does not come until you say so."
+      },
       "tags": [
         "anal",
         "oral",
@@ -2674,7 +3205,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Prikkel haar achterkant langzaam met vingers, tong of een klein speeltje. Bouw de druk geleidelijk op — gebruik altijd smering. Blijf plagen totdat ze smeekt voor meer.",
+      "text": {
+        "nl": "Prikkel haar achterkant langzaam met vingers, tong of een klein speeltje. Bouw de druk geleidelijk op — gebruik altijd smering. Blijf plagen totdat ze smeekt voor meer.",
+        "en": "Slowly tease her backside with fingers, tongue or a small toy. Build pressure gradually — always use lubrication. Keep teasing until she begs for more."
+      },
       "tags": [
         "anal",
         "explicit",
@@ -2695,7 +3229,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Vraag haar een intieme ervaring te beschrijven die ze bijzonder intens vond. Terwijl ze praat, observeer je haar reacties en prikkel je haar — gebruik wat ze onthult om te bepalen wat je daarna doet.",
+      "text": {
+        "nl": "Vraag haar een intieme ervaring te beschrijven die ze bijzonder intens vond. Terwijl ze praat, observeer je haar reacties en prikkel je haar — gebruik wat ze onthult om te bepalen wat je daarna doet.",
+        "en": "Ask her to describe an intimate experience she found especially intense. While she talks, observe her reactions and tease her — use what she reveals to decide what you do next."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -2713,7 +3250,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Blinddoek haar en laat haar liggen met gespreide benen. Masseer haar binnendijen, volg dan met gepassioneerde kussen op elke erogene zone. Als ze haar heupen optilt, stop je — ze moet stil blijven om meer te krijgen.",
+      "text": {
+        "nl": "Blinddoek haar en laat haar liggen met gespreide benen. Masseer haar binnendijen, volg dan met gepassioneerde kussen op elke erogene zone. Als ze haar heupen optilt, stop je — ze moet stil blijven om meer te krijgen.",
+        "en": "Blindfold her and have her lie with legs spread. Massage her inner thighs, then follow with passionate kisses on every erogenous zone. If she lifts her hips, stop — she must stay still to get more."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -2732,7 +3272,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Laat haar een bondage-geïnspireerd outfit of lingerie aantrekken. Vraag haar het te modellen terwijl jij speelse kritieken en complimenten geeft — gebruik dan wat je ziet om te bepalen wat er daarna gebeurt.",
+      "text": {
+        "nl": "Laat haar een bondage-geïnspireerd outfit of lingerie aantrekken. Vraag haar het te modellen terwijl jij speelse kritieken en complimenten geeft — gebruik dan wat je ziet om te bepalen wat er daarna gebeurt.",
+        "en": "Have her put on bondage-inspired lingerie or an outfit. Ask her to model it while you give playful critiques and compliments — then use what you see to decide what happens next."
+      },
       "tags": [
         "bondage",
         "clothing",
@@ -2752,7 +3295,10 @@
       "level": 9,
       "difficulty": 3,
       "estimatedMinutes": 15,
-      "text": "Beperk haar, houd haar benen open en prikkel haar zonder haar te laten klaarkomen. Laat haar je minstens 5 keer smeken — elke keer iets explicieter dan daarvoor — voordat je haar toestaat te klaarkomen.",
+      "text": {
+        "nl": "Beperk haar, houd haar benen open en prikkel haar zonder haar te laten klaarkomen. Laat haar je minstens 5 keer smeken — elke keer iets explicieter dan daarvoor — voordat je haar toestaat te klaarkomen.",
+        "en": "Restrain her, hold her legs open, and tease her without letting her come. Make her beg you at least 5 times — each time a little more explicitly than before — before allowing her to come."
+      },
       "tags": [
         "bondage",
         "explicit",
@@ -2772,7 +3318,10 @@
       "level": 10,
       "difficulty": 3,
       "estimatedMinutes": 10,
-      "text": "Volledige bondage-sessie met haar: beperk haar volledig — polsen, enkels, geblinddoekt. Prikkel elk stukje met kussen, likken, ijs, speeltjes en licht bijten. Ze mag geen geluid maken. Elk geluid levert een straf op. Duurt 10 minuten, breng haar dan volledig tot een klaarkoming.",
+      "text": {
+        "nl": "Volledige bondage-sessie met haar: beperk haar volledig — polsen, enkels, geblinddoekt. Prikkel elk stukje met kussen, likken, ijs, speeltjes en licht bijten. Ze mag geen geluid maken. Elk geluid levert een straf op. Duurt 10 minuten, breng haar dan volledig tot een klaarkoming.",
+        "en": "Full bondage session with her: fully restrain her — wrists, ankles, blindfolded. Tease every inch with kisses, licking, ice, toys and light biting. She may make no sound. Every sound earns a penalty. Lasts 10 minutes, then bring her fully to orgasm."
+      },
       "tags": [
         "bondage",
         "explicit",
@@ -2791,7 +3340,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Uitgebreide edging-sessie: breng haar op de rand via orale seks, vingers en een speeltje — laat haar nooit klaarkomen. Herhaal minstens 5 keer. Ze kan alleen klaarkomen als jij het woord zegt.",
+      "text": {
+        "nl": "Uitgebreide edging-sessie: breng haar op de rand via orale seks, vingers en een speeltje — laat haar nooit klaarkomen. Herhaal minstens 5 keer. Ze kan alleen klaarkomen als jij het woord zegt.",
+        "en": "Extended edging session: bring her to the edge via oral sex, fingers and a toy — never let her come. Repeat at least 5 times. She can only come when you say the word."
+      },
       "tags": [
         "oral",
         "toy",
@@ -2811,7 +3363,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Wasdruppel-sessie op haar: druppel kaarswas op lage temperatuur op haar geblinddoekte lichaam. Volg elke druppel met een kus of lik. Wissel af met ijs tussen druppels. Duurt 5 minuten — breng haar daarna tot een klaarkoming.",
+      "text": {
+        "nl": "Wasdruppel-sessie op haar: druppel kaarswas op lage temperatuur op haar geblinddoekte lichaam. Volg elke druppel met een kus of lik. Wissel af met ijs tussen druppels. Duurt 5 minuten — breng haar daarna tot een klaarkoming.",
+        "en": "Wax drip session on her: drip low-temperature candle wax onto her blindfolded body. Follow each drop with a kiss or lick. Alternate with ice between drops. Lasts 5 minutes — then bring her to orgasm."
+      },
       "tags": [
         "bondage",
         "extreme",
@@ -2830,7 +3385,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Ga schrijlings op hem zitten op de bank en beweeg langzaam terwijl je intensief oogcontact houdt. Hij mag je niet aanraken totdat jij toestemming geeft.",
+      "text": {
+        "nl": "Ga schrijlings op hem zitten op de bank en beweeg langzaam terwijl je intensief oogcontact houdt. Hij mag je niet aanraken totdat jij toestemming geeft.",
+        "en": "Straddle him on the sofa and move slowly while maintaining intense eye contact. He may not touch you until you give permission."
+      },
       "tags": [
         "intimate",
         "body"
@@ -2848,7 +3406,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Geef hem een 3 minuten durende schouder- en rugm massage — maar laat je lippen langs zijn nek en oren strijken terwijl je bezig bent. Hij mag niet reageren met zijn handen.",
+      "text": {
+        "nl": "Geef hem een 3 minuten durende schouder- en rugm massage — maar laat je lippen langs zijn nek en oren strijken terwijl je bezig bent. Hij mag niet reageren met zijn handen.",
+        "en": "Give him a 3-minute shoulder and back massage — but let your lips brush his neck and ears as you work. He may not respond with his hands."
+      },
       "tags": [
         "body",
         "intimate"
@@ -2866,7 +3427,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 2,
-      "text": "Doe een langzame striptease op je favoriete nummer speciaal voor hem. Hij mag je niet aanraken tot de allerlaatste noot.",
+      "text": {
+        "nl": "Doe een langzame striptease op je favoriete nummer speciaal voor hem. Hij mag je niet aanraken tot de allerlaatste noot.",
+        "en": "Do a slow striptease to your favourite song just for him. He may not touch you until the very last note."
+      },
       "tags": [
         "clothing",
         "intimate",
@@ -2885,7 +3449,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Ga tussen zijn benen zitten terwijl hij zachtjes door je haar strijkt. Kijk naar hem op, fluister 'ik ben van jou,' en kus langzaam langs zijn binnendij.",
+      "text": {
+        "nl": "Ga tussen zijn benen zitten terwijl hij zachtjes door je haar strijkt. Kijk naar hem op, fluister 'ik ben van jou,' en kus langzaam langs zijn binnendij.",
+        "en": "Sit between his legs while he gently strokes your hair. Look up at him, whisper 'I'm yours,' and slowly kiss along his inner thigh."
+      },
       "tags": [
         "intimate",
         "flirty",
@@ -2904,7 +3471,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Koop samen ijs. Jij moet het zo verleidelijk en slordig mogelijk eten — hem achterlaten om het van je lippen, kin of vingers 'op te ruimen' met zijn mond.",
+      "text": {
+        "nl": "Koop samen ijs. Jij moet het zo verleidelijk en slordig mogelijk eten — hem achterlaten om het van je lippen, kin of vingers 'op te ruimen' met zijn mond.",
+        "en": "Get ice cream together. You must eat it as seductively and messily as possible — leaving him to clean up whatever ends up on your lips, chin or fingers with his mouth."
+      },
       "tags": [
         "flirty",
         "intimate",
@@ -2923,7 +3493,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Doe een speeltje om hem en bedien het met een afstandsbediening. Stel hem vragen die hij eerlijk moet beantwoorden — en verander de instelling afhankelijk van of je zijn antwoord bevalt.",
+      "text": {
+        "nl": "Doe een speeltje om hem en bedien het met een afstandsbediening. Stel hem vragen die hij eerlijk moet beantwoorden — en verander de instelling afhankelijk van of je zijn antwoord bevalt.",
+        "en": "Put a toy on him and control it with a remote. Ask him questions he must answer honestly — and change the setting depending on whether you like his answer."
+      },
       "tags": [
         "toy",
         "intimate",
@@ -2942,7 +3515,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Neem een 30-seconden ondeugende voicemail op waarin je precies beschrijft wat je hem nu zou aandoen. Laat hem het niet horen totdat jij er klaar voor bent. Kijk naar zijn gezicht als je het afspeelt.",
+      "text": {
+        "nl": "Neem een 30-seconden ondeugende voicemail op waarin je precies beschrijft wat je hem nu zou aandoen. Laat hem het niet horen totdat jij er klaar voor bent. Kijk naar zijn gezicht als je het afspeelt.",
+        "en": "Record a 30-second naughty voicemail describing exactly what you would do to him right now. Do not let him hear it until you are ready. Watch his face when you play it."
+      },
       "tags": [
         "flirty",
         "intimate",
@@ -2962,7 +3538,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Blinddoek hem en beperk zijn polsen met zachte boeien of een sjaal. Verken langzaam zijn lichaam met je lippen, tong en vingertips — wissel af tussen plagerige kussen en zacht tikken. Fluister wat je wil dat hij doet, en stop niet totdat hij smeekt.",
+      "text": {
+        "nl": "Blinddoek hem en beperk zijn polsen met zachte boeien of een sjaal. Verken langzaam zijn lichaam met je lippen, tong en vingertips — wissel af tussen plagerige kussen en zacht tikken. Fluister wat je wil dat hij doet, en stop niet totdat hij smeekt.",
+        "en": "Blindfold him and restrain his wrists with soft cuffs or a scarf. Slowly explore his body with your lips, tongue and fingertips — alternate between teasing kisses and light spanking. Whisper what you want him to do, and do not stop until he begs."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -2981,7 +3560,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Bind hem vast aan een stoel, volledig blootgesteld. Prikkel hem met je lippen, vingers en speeltjes — net genoeg om hem gek te maken. Hij kan vrijlating alleen verdienen door goed te smeken.",
+      "text": {
+        "nl": "Bind hem vast aan een stoel, volledig blootgesteld. Prikkel hem met je lippen, vingers en speeltjes — net genoeg om hem gek te maken. Hij kan vrijlating alleen verdienen door goed te smeken.",
+        "en": "Tie him to a chair, fully exposed. Tease him with your lips, fingers and toys — just enough to drive him wild. He can earn release only by begging properly."
+      },
       "tags": [
         "bondage",
         "intimate",
@@ -3000,7 +3582,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 3,
-      "text": "Blinddoek hem en gebruik je tong om vormen te tekenen op verschillende lichaamsdelen — begin met een hart. Hij moet raden wat je tekende. Als hij 3 correct raadt, verdient hij een beloning naar jouw keuze.",
+      "text": {
+        "nl": "Blinddoek hem en gebruik je tong om vormen te tekenen op verschillende lichaamsdelen — begin met een hart. Hij moet raden wat je tekende. Als hij 3 correct raadt, verdient hij een beloning naar jouw keuze.",
+        "en": "Blindfold him and use your tongue to draw shapes on different parts of his body — start with a heart. He must guess what you drew. If he gets 3 correct, he earns a reward of your choice."
+      },
       "tags": [
         "intimate",
         "body",
@@ -3019,7 +3604,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Prikkel hem 5 minuten — breng hem elke keer dicht bij een klaarkoming — stop dan. Als hij klaarkomt voordat de tijd om is, moet hij een straf van jouw keuze ondergaan.",
+      "text": {
+        "nl": "Prikkel hem 5 minuten — breng hem elke keer dicht bij een klaarkoming — stop dan. Als hij klaarkomt voordat de tijd om is, moet hij een straf van jouw keuze ondergaan.",
+        "en": "Tease him for 5 minutes — bringing him close to orgasm each time — then stop. If he comes before time is up, he must undergo a penalty of your choice."
+      },
       "tags": [
         "explicit",
         "intimate"
@@ -3037,7 +3625,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Begin met zijn penis langzaam te kussen en te likken, neem hem dan volledig in je mond. Masseer zijn ballen en perineum met je hand terwijl je bezig bent — neem de tijd.",
+      "text": {
+        "nl": "Begin met zijn penis langzaam te kussen en te likken, neem hem dan volledig in je mond. Masseer zijn ballen en perineum met je hand terwijl je bezig bent — neem de tijd.",
+        "en": "Start by slowly kissing and licking his penis, then take him fully into your mouth. Massage his balls and perineum with your hand as you go — take your time."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -3057,7 +3648,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Geef hem orale seks totdat hij dicht bij een klaarkoming is, stop dan. Herhaal minstens 3 keer — breng hem op de rand en trek je terug. Laat hem pas klaarkomen als jij beslist dat het moment juist is.",
+      "text": {
+        "nl": "Geef hem orale seks totdat hij dicht bij een klaarkoming is, stop dan. Herhaal minstens 3 keer — breng hem op de rand en trek je terug. Laat hem pas klaarkomen als jij beslist dat het moment juist is.",
+        "en": "Give him oral sex until he is close to orgasm, then stop. Repeat at least 3 times — bring him to the edge and pull back. Only let him come when you decide the moment is right."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -3075,7 +3669,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Beveel hem jou oraal te bevredigen — puur voor jouw plezier, geen beloning beloofd. Laat hem de hele tijd oogcontact houden. Bonus: hij moet volledig stil en passief blijven onder jouw controle.",
+      "text": {
+        "nl": "Beveel hem jou oraal te bevredigen — puur voor jouw plezier, geen beloning beloofd. Laat hem de hele tijd oogcontact houden. Bonus: hij moet volledig stil en passief blijven onder jouw controle.",
+        "en": "Command him to go down on you — purely for your pleasure, no reward promised. Make him maintain eye contact the entire time. Bonus: he must remain completely still and passive under your control."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3094,7 +3691,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Stel een timer van 3 minuten in. Geef hem orale seks totdat de timer afloopt. Wissel van rol. Herhaal — beiden om beurten — totdat hij klaarkomt. Dan geeft hij je hetzelfde terug totdat jij klaarkomt.",
+      "text": {
+        "nl": "Stel een timer van 3 minuten in. Geef hem orale seks totdat de timer afloopt. Wissel van rol. Herhaal — beiden om beurten — totdat hij klaarkomt. Dan geeft hij je hetzelfde terug totdat jij klaarkomt.",
+        "en": "Set a 3-minute timer. Give him oral sex until it runs out. Switch roles. Repeat — both taking turns — until he comes. Then he gives you the same until you come."
+      },
       "tags": [
         "oral",
         "explicit"
@@ -3112,7 +3712,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Blinddoek jezelf terwijl hij chocolade, honing of slagroom op een lichaamsdeel aanbrengt. Gebruik alleen je mond en tong om het te vinden en eraf te likken — geen handen, niet kijken.",
+      "text": {
+        "nl": "Blinddoek jezelf terwijl hij chocolade, honing of slagroom op een lichaamsdeel aanbrengt. Gebruik alleen je mond en tong om het te vinden en eraf te likken — geen handen, niet kijken.",
+        "en": "Blindfold yourself while he applies chocolate, honey or whipped cream to a body part. Use only your mouth and tongue to find it and lick it off — no hands, no looking."
+      },
       "tags": [
         "explicit",
         "kissing"
@@ -3130,7 +3733,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Terwijl je hem bevredigt, geef je expliciete complimenten over zijn lichaam en prestaties. Als je aarzelt of lacht, brengt hij je op de rand als gevolg — dan ga je nog 2 minuten door.",
+      "text": {
+        "nl": "Terwijl je hem bevredigt, geef je expliciete complimenten over zijn lichaam en prestaties. Als je aarzelt of lacht, brengt hij je op de rand als gevolg — dan ga je nog 2 minuten door.",
+        "en": "While pleasuring him, give explicit compliments about his body and performance. If you hesitate or laugh, he brings you to the edge as a consequence — then you continue for another 2 minutes."
+      },
       "tags": [
         "explicit",
         "oral",
@@ -3149,7 +3755,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Maak 5 selfies terwijl je hem 3 minuten orale seks geeft. Vergelijk de foto's daarna samen.",
+      "text": {
+        "nl": "Maak 5 selfies terwijl je hem 3 minuten orale seks geeft. Vergelijk de foto's daarna samen.",
+        "en": "Take 5 selfies while giving him oral sex for 3 minutes. Compare the photos together afterwards."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3168,7 +3777,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Voer een prostaat-massager of P-spot vibrator in en stel hem in op een willekeurige of pulserende modus. Breng hem op de rand totdat hij smeekt — geen klaarkoming tenzij jij dat beveelt.",
+      "text": {
+        "nl": "Voer een prostaat-massager of P-spot vibrator in en stel hem in op een willekeurige of pulserende modus. Breng hem op de rand totdat hij smeekt — geen klaarkoming tenzij jij dat beveelt.",
+        "en": "Insert a prostate massager or P-spot vibrator and set it to a random or pulsing mode. Bring him to the edge until he begs — no coming unless you command it."
+      },
       "tags": [
         "anal",
         "toy",
@@ -3189,7 +3801,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Sluit hem op in een kuisheidsgordel. Neem hem mee winkelen — of gewoon op een klusje — zonder hem te bevrijden. Jij hebt de sleutel. Vrijlating alleen wanneer jij besluit dat het moment juist is.",
+      "text": {
+        "nl": "Sluit hem op in een kuisheidsgordel. Neem hem mee winkelen — of gewoon op een klusje — zonder hem te bevrijden. Jij hebt de sleutel. Vrijlating alleen wanneer jij besluit dat het moment juist is.",
+        "en": "Lock him in a chastity device. Take him shopping — or just on an errand — without releasing him. You have the key. Release only when you decide the moment is right."
+      },
       "tags": [
         "bondage",
         "toy",
@@ -3211,7 +3826,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Maak hem vast. Prikkel hem meedogenloos met je mond, handen en een speeltje — hij moet stil blijven en smeken. Elk gekreun verdient meer plagen, meer weigering, meer intensiteit.",
+      "text": {
+        "nl": "Maak hem vast. Prikkel hem meedogenloos met je mond, handen en een speeltje — hij moet stil blijven en smeken. Elk gekreun verdient meer plagen, meer weigering, meer intensiteit.",
+        "en": "Restrain him. Tease him mercilessly with your mouth, hands and a toy — he must stay quiet and beg. Every moan earns more teasing, more denial, more intensity."
+      },
       "tags": [
         "bondage",
         "explicit",
@@ -3230,7 +3848,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Beperk hem volledig. Teken woorden of patronen op zijn huid met je vingers, ijs of warm was. Elke verkeerde gok wat je schreef verdient hem een tik, een zuigzoen of een plagerige aanraking naar jouw keuze.",
+      "text": {
+        "nl": "Beperk hem volledig. Teken woorden of patronen op zijn huid met je vingers, ijs of warm was. Elke verkeerde gok wat je schreef verdient hem een tik, een zuigzoen of een plagerige aanraking naar jouw keuze.",
+        "en": "Fully restrain him. Write words or patterns on his skin with your fingers, ice or warm wax. Every wrong guess at what you wrote earns him a spank, a hickey or a teasing touch of your choice."
+      },
       "tags": [
         "bondage",
         "explicit",
@@ -3249,7 +3870,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Geef hem 3 tot 5 verleidelijke opdrachten — 'kus mijn nek', 'lik mijn binnendijen', 'vertel me wat je wilt'. Hij moet elke opdracht nauwkeurig opvolgen. Fluister correcties als hij faalt.",
+      "text": {
+        "nl": "Geef hem 3 tot 5 verleidelijke opdrachten — 'kus mijn nek', 'lik mijn binnendijen', 'vertel me wat je wilt'. Hij moet elke opdracht nauwkeurig opvolgen. Fluister correcties als hij faalt.",
+        "en": "Give him 3 to 5 seductive commands — 'kiss my neck', 'lick my inner thighs', 'tell me what you want'. He must carry out each command accurately. Whisper corrections if he fails."
+      },
       "tags": [
         "intimate",
         "explicit",
@@ -3268,7 +3892,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Volledige dom-sessie op hem: beperk hem volledig — polsen, enkels, geblinddoekt. Prikkel elk stukje met kussen, speeltjes, ijs en was. Hij mag geen geluid maken. Elk geluid verdient jouw gekozen straf. Duurt 10 minuten, breng hem dan volledig tot een klaarkoming.",
+      "text": {
+        "nl": "Volledige dom-sessie op hem: beperk hem volledig — polsen, enkels, geblinddoekt. Prikkel elk stukje met kussen, speeltjes, ijs en was. Hij mag geen geluid maken. Elk geluid verdient jouw gekozen straf. Duurt 10 minuten, breng hem dan volledig tot een klaarkoming.",
+        "en": "Full dom session on him: fully restrain him — wrists, ankles, blindfolded. Tease every inch with kisses, toys, ice and wax. He may make no sound. Every sound earns your chosen penalty. Lasts 10 minutes, then bring him fully to orgasm."
+      },
       "tags": [
         "bondage",
         "explicit",
@@ -3287,7 +3914,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Face-sitting sessie: hij ligt op zijn rug. Jij gaat op zijn gezicht zitten — aan jouw kant geen handen. Hij gebruikt alleen mond en tong totdat jij klaarkomt. Jij bepaalt het tempo volledig.",
+      "text": {
+        "nl": "Face-sitting sessie: hij ligt op zijn rug. Jij gaat op zijn gezicht zitten — aan jouw kant geen handen. Hij gebruikt alleen mond en tong totdat jij klaarkomt. Jij bepaalt het tempo volledig.",
+        "en": "Face-sitting session: he lies on his back. You sit on his face — no hands on your side. He uses only mouth and tongue until you come. You control the pace entirely."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3306,7 +3936,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Uitgebreide edging-marathon op hem: wissel af tussen orale seks, je hand en een speeltje — breng hem naar de absolute rand maar laat hem nooit klaarkomen. Minstens 5 cycli. Hij klaarkomt alleen als jij expliciet toestemming geeft.",
+      "text": {
+        "nl": "Uitgebreide edging-marathon op hem: wissel af tussen orale seks, je hand en een speeltje — breng hem naar de absolute rand maar laat hem nooit klaarkomen. Minstens 5 cycli. Hij klaarkomt alleen als jij expliciet toestemming geeft.",
+        "en": "Extended edging marathon on him: alternate between oral sex, your hand and a toy — bring him to the absolute edge but never let him come. At least 5 cycles. He comes only when you explicitly give permission."
+      },
       "tags": [
         "oral",
         "toy",
@@ -3326,7 +3959,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Diep oraal dare: vind een positie waarbij jij de diepte en het tempo volledig bepaalt. Zijn handen moeten plat op de vloer of achter zijn rug blijven. Jij gaat precies zo door als jij kiest totdat hij klaarkomt.",
+      "text": {
+        "nl": "Diep oraal dare: vind een positie waarbij jij de diepte en het tempo volledig bepaalt. Zijn handen moeten plat op de vloer of achter zijn rug blijven. Jij gaat precies zo door als jij kiest totdat hij klaarkomt.",
+        "en": "Deep oral dare: find a position where you control the depth and pace entirely. His hands must stay flat on the floor or behind his back. You continue exactly as you choose until he comes."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3345,7 +3981,10 @@
       "type": "dare",
       "level": 5,
       "difficulty": 1,
-      "text": "Jij en {{sp}} houdt een ijsblokje in hun mond. Smelt het door het tussen elkaar door te geven — geen handen toegestaan. Wie het laat vallen, moet een kledingstuk uitdoen.",
+      "text": {
+        "nl": "Jij en {{sp}} houdt een ijsblokje in hun mond. Smelt het door het tussen elkaar door te geven — geen handen toegestaan. Wie het laat vallen, moet een kledingstuk uitdoen.",
+        "en": "Both hold an ice cube in their mouths. Melt it by passing it between each other — no hands allowed. Whoever drops it must remove an item of clothing."
+      },
       "tags": [
         "intimate",
         "clothing",
@@ -3362,7 +4001,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Zet een sexy selfie op sociale media. Laat {{sp}} de DM's zien die je ontvangt en laat ze reageren op de aandacht die je krijgt.",
+      "text": {
+        "nl": "Zet een sexy selfie op sociale media. Laat {{sp}} de DM's zien die je ontvangt en laat ze reageren op de aandacht die je krijgt.",
+        "en": "Post a sexy selfie on social media. Let {{sp}} see the DMs you receive and watch them react to the attention you are getting."
+      },
       "tags": [
         "flirty",
         "exposure"
@@ -3378,7 +4020,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Trek de kleding van {{sp}} aan terwijl hij/zij iets van jou aantrekt. Kijk hoe ze je proberen te verleiden in jouw outfit. Als je lacht of bloost, mogen ze je één opdracht geven.",
+      "text": {
+        "nl": "Trek de kleding van {{sp}} aan terwijl hij/zij iets van jou aantrekt. Kijk hoe ze je proberen te verleiden in jouw outfit. Als je lacht of bloost, mogen ze je één opdracht geven.",
+        "en": "Put on {{sp}}'s clothes while they put on something of yours. Watch them try to seduce you in your outfit. If you laugh or blush, they get to give you one command."
+      },
       "tags": [
         "flirty",
         "clothing",
@@ -3395,7 +4040,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Ga naar een winkel met alleen een korte rok zonder ondergoed. Browse door items terwijl je {{sp}} plagend aankijkt. Bonus: flirt luchtig met een winkelmedewerker terwijl {{sp}} toekijkt.",
+      "text": {
+        "nl": "Ga naar een winkel met alleen een korte rok zonder ondergoed. Browse door items terwijl je {{sp}} plagend aankijkt. Bonus: flirt luchtig met een winkelmedewerker terwijl {{sp}} toekijkt.",
+        "en": "Go to a shop wearing only a short skirt with nothing underneath. Browse items while teasing {{sp}} with your gaze. Bonus: lightly flirt with a shop assistant while {{sp}} watches."
+      },
       "tags": [
         "clothing",
         "public",
@@ -3412,7 +4060,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "X Marks the Spot: {{sp}} kiest stiekem een lichaamsdeel dat ze gekust willen hebben. Jouw taak is om verschillende plekken te kussen — stop niet totdat je de juiste hebt gevonden. Geen hints toegestaan.",
+      "text": {
+        "nl": "X Marks the Spot: {{sp}} kiest stiekem een lichaamsdeel dat ze gekust willen hebben. Jouw taak is om verschillende plekken te kussen — stop niet totdat je de juiste hebt gevonden. Geen hints toegestaan.",
+        "en": "X Marks the Spot: {{sp}} secretly picks a body part they want kissed. Your job is to kiss different spots — do not stop until you find the right one. No hints allowed."
+      },
       "tags": [
         "intimate",
         "body",
@@ -3429,7 +4080,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Laat {{sp}} je hand of mond begeleiden — ze laten je precies zien hoe ze graag bevredigd worden. Ga langzaam, volg elke instructie nauwkeurig en wees geduldig.",
+      "text": {
+        "nl": "Laat {{sp}} je hand of mond begeleiden — ze laten je precies zien hoe ze graag bevredigd worden. Ga langzaam, volg elke instructie nauwkeurig en wees geduldig.",
+        "en": "Let {{sp}} guide your hand or mouth — they show you exactly how they like to be pleasured. Go slowly, follow every instruction carefully and be patient."
+      },
       "tags": [
         "intimate",
         "oral"
@@ -3445,7 +4099,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Speel een hitsige film- of fantasiescène van jouw keuze na — kostuums, dialoog, alles. Blijf volledig in karakter totdat de scène klaar is.",
+      "text": {
+        "nl": "Speel een hitsige film- of fantasiescène van jouw keuze na — kostuums, dialoog, alles. Blijf volledig in karakter totdat de scène klaar is.",
+        "en": "Re-enact a steamy film or fantasy scene of your choice — costumes, dialogue, everything. Stay fully in character until the scene is finished."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -3461,7 +4118,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 2,
-      "text": "Kies een verleidelijk rollenspelscenario (bijv. fotograaf & model, baas & stagiaire) en speel het 10 minuten uit. Wie als eerste uit zijn/haar karakter valt, krijgt een speelse straf gekozen door {{sp}}.",
+      "text": {
+        "nl": "Kies een verleidelijk rollenspelscenario (bijv. fotograaf & model, baas & stagiaire) en speel het 10 minuten uit. Wie als eerste uit zijn/haar karakter valt, krijgt een speelse straf gekozen door {{sp}}.",
+        "en": "Choose a seductive role-play scenario (e.g. photographer and model, boss and intern) and play it out for 10 minutes. Whoever breaks character first receives a playful penalty chosen by {{sp}}."
+      },
       "tags": [
         "intimate",
         "explicit"
@@ -3477,7 +4137,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Terwijl je {{sp}} oraal bevredigt, geef je 5 expliciete complimenten over zijn/haar lichaam of prestaties, één voor één. Als je aarzelt, herhaalt of lacht: ontvang je 5 speelse tikken en word je 2 minuten op de rand gebracht voordat je verdergaat.",
+      "text": {
+        "nl": "Terwijl je {{sp}} oraal bevredigt, geef je 5 expliciete complimenten over zijn/haar lichaam of prestaties, één voor één. Als je aarzelt, herhaalt of lacht: ontvang je 5 speelse tikken en word je 2 minuten op de rand gebracht voordat je verdergaat.",
+        "en": "While going down on {{sp}}, give 5 explicit compliments about their body or performance, one by one. If you hesitate, repeat yourself or laugh: receive 5 playful spankings and be brought to the edge for 2 minutes before continuing."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3494,7 +4157,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 2,
-      "text": "Doe 10 squats, 15 jumping jacks of een plank van 60 seconden terwijl je een buttplug binnenhoudt. Als hij eruit valt, krijg je een pak slaag. {{sp}} telt hardop mee.",
+      "text": {
+        "nl": "Doe 10 squats, 15 jumping jacks of een plank van 60 seconden terwijl je een buttplug binnenhoudt. Als hij eruit valt, krijg je een pak slaag. {{sp}} telt hardop mee.",
+        "en": "Do 10 squats, 15 jumping jacks or a 60-second plank while keeping a buttplug in. If it falls out, you get a spanking. {{sp}} counts loudly."
+      },
       "tags": [
         "anal",
         "physical",
@@ -3513,7 +4179,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Vertel {{sp}} dat je al heel lang niet echt tevreden bent gesteld. Laat ze naar je toe kruipen en hun waarde bewijzen met alleen hun mond — jij beslist wanneer je overtuigd bent.",
+      "text": {
+        "nl": "Vertel {{sp}} dat je al heel lang niet echt tevreden bent gesteld. Laat ze naar je toe kruipen en hun waarde bewijzen met alleen hun mond — jij beslist wanneer je overtuigd bent.",
+        "en": "Tell {{sp}} you have not been truly satisfied in a long time. Have them crawl to you and prove their worth with only their mouth — you decide when you are convinced."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3531,8 +4200,11 @@
       "level": 9,
       "difficulty": 3,
       "estimatedMinutes": 20,
-      "text": "Bind {{sp}} in een Shibari-stijl touwharnas, laat ze blootgesteld en hulpeloos achter. Prikkel ze meedogenloos — ze moeten om vrijlating smeken. Geen klaarkoming zonder toestemming. Blinddoek en speeltjes optioneel.",
-            "tags": [
+      "text": {
+        "nl": "Bind {{sp}} in een Shibari-stijl touwharnas, laat ze blootgesteld en hulpeloos achter. Prikkel ze meedogenloos — ze moeten om vrijlating smeken. Geen klaarkoming zonder toestemming. Blinddoek en speeltjes optioneel.",
+        "en": "Bind {{sp}} in a Shibari-style rope harness, leaving them exposed and helpless. Tease them mercilessly — they must beg for release. No coming without permission. Blindfold and toys optional."
+      },
+      "tags": [
         "bondage",
         "explicit",
         "extreme"
@@ -3548,7 +4220,10 @@
       "type": "dare",
       "level": 9,
       "difficulty": 3,
-      "text": "Gooi een dobbelsteen: dat is het aantal keren dat {{sp}} je zal stoppen van klaarkomen tijdens de sessie. Elke onderbreking wordt gevolgd door 60 seconden intensief plagen voordat je het opnieuw mag proberen.",
+      "text": {
+        "nl": "Gooi een dobbelsteen: dat is het aantal keren dat {{sp}} je zal stoppen van klaarkomen tijdens de sessie. Elke onderbreking wordt gevolgd door 60 seconden intensief plagen voordat je het opnieuw mag proberen.",
+        "en": "Roll a die: that is how many times {{sp}} will stop you from coming during the session. Each interruption is followed by 60 seconds of intense teasing before you may try again."
+      },
       "tags": [
         "explicit",
         "toy",
@@ -3565,7 +4240,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Zet {{sp}} voor een spiegel met een vibrerende prostaatvibrator of intern speeltje erin. Gebruik je eigen speeltje terwijl ze toekijken en hardop beschrijven wat ze zien. Houd ze aan de praat en smekend totdat jij besluit te stoppen.",
+      "text": {
+        "nl": "Zet {{sp}} voor een spiegel met een vibrerende prostaatvibrator of intern speeltje erin. Gebruik je eigen speeltje terwijl ze toekijken en hardop beschrijven wat ze zien. Houd ze aan de praat en smekend totdat jij besluit te stoppen.",
+        "en": "Position {{sp}} in front of a mirror with a vibrating prostate vibrator or internal toy inside them. Use your own toy while they watch and describe out loud what they see. Keep them talking and begging until you decide to stop."
+      },
       "tags": [
         "toy",
         "anal",
@@ -3585,7 +4263,10 @@
       "type": "dare",
       "level": 10,
       "difficulty": 3,
-      "text": "Ga op je rug liggen. Laat {{sp}} schrijlings op je gezicht gaan zitten op hun knieën, naar jou toe gekeerd. Geef ze orale seks terwijl ze jouw lichaam plagen. Geen van jullie gebruikt handen — alleen monden.",
+      "text": {
+        "nl": "Ga op je rug liggen. Laat {{sp}} schrijlings op je gezicht gaan zitten op hun knieën, naar jou toe gekeerd. Geef ze orale seks terwijl ze jouw lichaam plagen. Geen van jullie gebruikt handen — alleen monden.",
+        "en": "Lie on your back. Have {{sp}} straddle your face on their knees, facing you. Give them oral sex while they tease your body. Neither of you uses hands — mouths only."
+      },
       "tags": [
         "oral",
         "explicit",
@@ -3602,7 +4283,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 2,
-      "text": "Neem een 30-seconden ondeugende voicemail op waarin je precies beschrijft wat je {{sp}} nu zou aandoen. Laat ze het niet horen totdat jij het moment kiest. Kijk naar hun gezicht als je het afspeelt.",
+      "text": {
+        "nl": "Neem een 30-seconden ondeugende voicemail op waarin je precies beschrijft wat je {{sp}} nu zou aandoen. Laat ze het niet horen totdat jij het moment kiest. Kijk naar hun gezicht als je het afspeelt.",
+        "en": "Record a 30-second naughty voicemail describing exactly what you would do to {{sp}} right now. Do not let them hear it until you choose the moment. Watch their face when you play it."
+      },
       "tags": [
         "flirty",
         "intimate",
@@ -3620,7 +4304,10 @@
       "type": "dare",
       "level": 7,
       "difficulty": 2,
-      "text": "Maak nu — vanuit deze kamer — een ondeugende of onthullende foto van jezelf en stuur die alleen naar {{sp}}. Zij mogen één voorwaarde stellen voordat je hem maakt.",
+      "text": {
+        "nl": "Maak nu — vanuit deze kamer — een ondeugende of onthullende foto van jezelf en stuur die alleen naar {{sp}}. Zij mogen één voorwaarde stellen voordat je hem maakt.",
+        "en": "Right now — from this room — take a naughty or revealing photo of yourself and send it only to {{sp}}. They may set one condition before you take it."
+      },
       "tags": [
         "body",
         "intimate",
@@ -3637,7 +4324,10 @@
       "type": "dare",
       "level": 6,
       "difficulty": 3,
-      "text": "Stuur nu een bericht naar de laatste persoon in je telefooncontacten. De groep beslist wat je stuurt — moet 'ik hou van je' zijn of een verleidelijk compliment. Laat iedereen de reactie zien.",
+      "text": {
+        "nl": "Stuur nu een bericht naar de laatste persoon in je telefooncontacten. De groep beslist wat je stuurt — moet 'ik hou van je' zijn of een verleidelijk compliment. Laat iedereen de reactie zien.",
+        "en": "Send a message right now to the last person in your contacts. The group decides what you send — it must be \"I love you\" or a seductive compliment. Show everyone the reply."
+      },
       "tags": [
         "flirty",
         "exposure"
@@ -3653,7 +4343,10 @@
       "type": "dare",
       "level": 8,
       "difficulty": 3,
-      "text": "Film jezelf in 3 intieme posities. Kijk de clips daarna samen terug. Rangschik ze van slechtste naar beste — en de eigenaar van de slechtste moet die opnieuw doen.",
+      "text": {
+        "nl": "Film jezelf in 3 intieme posities. Kijk de clips daarna samen terug. Rangschik ze van slechtste naar beste — en de eigenaar van de slechtste moet die opnieuw doen.",
+        "en": "Film yourselves in 3 intimate positions. Watch the clips back together. Rank them from worst to best — and the owner of the worst must redo it."
+      },
       "tags": [
         "explicit",
         "intimate",
