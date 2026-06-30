@@ -7,3 +7,4 @@ Thumbs.db
 node.exe
 node-arm64
 node-x64
+.claude/
