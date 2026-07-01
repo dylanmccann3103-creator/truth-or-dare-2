@@ -1096,6 +1096,7 @@ input::placeholder { color: #7a6b8a; }
         <button class="config-btn active" data-key="levelMode" data-val="locked" onclick="setGameConfig('levelMode','locked')">🔒 Progressive</button>
         <button class="config-btn"        data-key="levelMode" data-val="free"   onclick="setGameConfig('levelMode','free')">🔓 All Unlocked</button>
       </div>
+      <p style="font-size:0.72rem;color:#6b5f7a;margin-top:5px;line-height:1.4">🔒 Progressive: players unlock higher levels by earning XP <em>and</em> completing ≥3 dares at the previous level. 🔓 All Unlocked: everyone can pick any level from the start.</p>
 
       <div style="font-size:0.8rem;color:#7a6b8a;margin:10px 0 4px">Start Level <span style="font-weight:400" id="config-minlevel-val">(1)</span></div>
       <div class="config-row" id="config-minlevel" style="flex-wrap:wrap">
@@ -1358,6 +1359,7 @@ input::placeholder { color: #7a6b8a; }
     <div style="margin-top:8px" id="card-park-wrap">
       <button class="btn btn-secondary" onclick="useBreakSlot()" id="card-park-btn">🅿️ Park it <span id="card-park-slots"></span></button>
       <p class="text-muted text-center" style="font-size:0.75rem;margin-top:4px">Save for a later turn. You have a limited number of slots.</p>
+      <p id="card-park-loss-warning" style="display:none;font-size:0.78rem;color:#ef4444;text-align:center;margin-top:6px;font-weight:600">⚠️ All slots full — refusing this dare means you lose!</p>
     </div>
 
     <p class="text-muted text-center" style="margin-top:8px;font-size:0.78rem">Tap Done when you finish the dare.</p>
@@ -2773,8 +2775,12 @@ function buildCardScreen(state) {
     if (me) {
       const slotsLeft = me.breakSlots.total - me.breakSlots.used;
       document.getElementById('card-park-slots').textContent =
-        `(${slotsLeft} slot${slotsLeft !== 1 ? 's' : ''} left)`;
+        slotsLeft > 0
+          ? `(${slotsLeft} slot${slotsLeft !== 1 ? 's' : ''} left)`
+          : '(full)';
       document.getElementById('card-park-btn').disabled = slotsLeft <= 0;
+      const lossWarning = document.getElementById('card-park-loss-warning');
+      if (lossWarning) lossWarning.style.display = slotsLeft <= 0 ? 'block' : 'none';
     }
 
   }
