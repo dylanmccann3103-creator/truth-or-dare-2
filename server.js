@@ -1461,6 +1461,19 @@ io.on('connection', (socket) => {
     cb && cb({ ok: true });
   });
 
+  // Host-only: permanently remove a ghost player from the room
+  socket.on('kick-player', ({ code, targetId }, cb) => {
+    const room = getRoom(code);
+    if (!room) return cb && cb({ ok: false, error: 'Room not found' });
+    const callerIsHost = socket.id === room.host || socket.id === room.displayHostId;
+    if (!callerIsHost) return cb && cb({ ok: false, error: 'Host only' });
+    if (!room.players[targetId]) return cb && cb({ ok: false, error: 'Player not found' });
+    delete room.players[targetId];
+    room.turnOrder = room.turnOrder.filter(id => id !== targetId);
+    io.to(code).emit('room-state', roomPublicState(room));
+    cb && cb({ ok: true });
+  });
+
   // Disconnect cleanup
   socket.on('disconnect', () => {
     const code = socket.data.roomCode;
